@@ -19,7 +19,9 @@ export class LoginComponent {
   showSuccessMessage: boolean = false;
   loginAttempts: number = 0;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    console.log('Rutas disponibles:', this.router.config.length);
+  }
 
   onLogin() {
     this.isLoading = true;
@@ -40,11 +42,15 @@ export class LoginComponent {
   }
 
   onForgotPassword() {
-    this.router.navigate(['/forgot-password']);
+    console.log('Navegando a forgot-password...');
+    // Usar window.location para navegación directa
+    window.location.href = '/forgot-password';
   }
 
   onCreateUser() {
-    this.router.navigate(['/create-user']);
+    console.log('Navegando a create-user...');
+    // Usar window.location para navegación directa  
+    window.location.href = '/create-user';
   }
 
   togglePasswordVisibility() {
@@ -53,10 +59,10 @@ export class LoginComponent {
 
   private showSuccessAnimation() {
     this.showSuccessMessage = true;
-    // Simular redirección después de mostrar éxito
+    // Redirigir a selección de planes después de mostrar éxito
     setTimeout(() => {
-      console.log('Redirecting to dashboard...');
-      // this.router.navigate(['/dashboard']);
+      console.log('Redirecting to plan selection...');
+      this.router.navigate(['/plan-selection']);
     }, 2000);
   }
 

@@ -15,7 +15,11 @@ export class ForgotPasswordComponent {
   isLoading: boolean = false;
   currentStep: string = 'form';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    console.log('ForgotPasswordComponent constructor ejecutado');
+    console.log('localStorage selectedPlan:', localStorage.getItem('selectedPlan'));
+    console.log('localStorage setupCompleted:', localStorage.getItem('setupCompleted'));
+  }
 
   goToLogin() {
     this.router.navigate(['/login']);

@@ -1,0 +1,486 @@
+:host {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.plan-selection-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: clamp(0.5rem, 1vh, 1rem) clamp(0.5rem, 1vw, 1rem);
+  overflow: hidden;
+}
+
+/* HEADER SECTION */
+.header-section {
+  text-align: center;
+  margin-bottom: clamp(1rem, 2vh, 1.5rem);
+  z-index: 2;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.header-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.brand-logo {
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  animation: float 6s ease-in-out infinite;
+}
+
+.brand-logo svg {
+  width: clamp(30px, 4vw, 40px);
+  height: clamp(30px, 4vw, 40px);
+}
+
+.main-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  color: white;
+  margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.main-subtitle {
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 300;
+  line-height: 1.3;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* PLANS CONTAINER */
+.plans-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(1rem, 2vh, 1.5rem);
+  z-index: 2;
+  position: relative;
+  width: 100%;
+  padding: 0 clamp(0.5rem, 1vw, 1rem);
+  min-height: 0;
+}
+
+.plans-grid {
+  display: flex;
+  gap: clamp(0.5rem, 1vw, 1rem);
+  width: calc(100vw - 4rem);
+  max-width: 100%;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* PLAN CARDS */
+.plan-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(0.5rem, 1vw, 0.75rem);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  width: calc((100vw - 4rem - 3rem) / 4);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: clamp(280px, 35vh, 350px);
+  max-height: clamp(280px, 35vh, 350px);
+}
+
+.plan-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.plan-card.selected {
+  border-color: #667eea;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  transform: translateY(-8px) scale(1.02);
+}
+
+.plan-card.popular {
+  border-color: #8b5cf6;
+  box-shadow: 0 15px 50px rgba(139, 92, 246, 0.2);
+}
+
+.plan-card.popular.selected {
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
+}
+
+/* POPULAR BADGE */
+.popular-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: clamp(0.2rem, 0.5vh, 0.3rem) clamp(0.6rem, 1.5vw, 0.8rem);
+  border-radius: 0 0 8px 8px;
+  font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+}
+
+/* PLAN HEADER */
+.plan-header {
+  text-align: center;
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  padding-top: clamp(0.25rem, 0.5vh, 0.5rem);
+}
+
+.plan-name {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+}
+
+.plan-price {
+  margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+}
+
+.price-label {
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  font-weight: 800;
+  color: #667eea;
+  display: block;
+  line-height: 1;
+}
+
+.price-period {
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+  color: #64748b;
+  font-weight: 500;
+}
+
+.plan-invoices {
+  font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+  color: #64748b;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* PLAN FEATURES */
+.plan-features {
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: clamp(0.1rem, 0.2vh, 0.15rem) 0;
+  font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+  color: #374151;
+  line-height: 1.1;
+  flex: 1;
+  min-height: clamp(18px, 2.5vh, 22px);
+}
+
+.check-icon {
+  color: #10b981;
+  flex-shrink: 0;
+  width: clamp(10px, 1.5vw, 12px);
+  height: clamp(10px, 1.5vw, 12px);
+}
+
+/* SELECTION INDICATOR */
+.selection-indicator {
+  position: absolute;
+  bottom: clamp(1rem, 2vh, 1.5rem);
+  right: clamp(1rem, 2vw, 1.5rem);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.plan-card.selected .selection-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.check-selected {
+  animation: checkmark 0.5s ease-in-out;
+}
+
+/* ACTIONS SECTION */
+.actions-section {
+  z-index: 2;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.actions-container {
+  display: flex;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.skip-button, .continue-button {
+  padding: clamp(0.5rem, 1vh, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  min-width: 140px;
+}
+
+.skip-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.skip-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.continue-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.continue-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.continue-button:disabled, .skip-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* LOADING SPINNER */
+.button-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+/* BACKGROUND ELEMENTS */
+.bg-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-element {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 8s ease-in-out infinite;
+}
+
+.floating-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-2 {
+  width: 120px;
+  height: 120px;
+  top: 20%;
+  right: 15%;
+  animation-delay: -2s;
+}
+
+.floating-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 30%;
+  left: 20%;
+  animation-delay: -4s;
+}
+
+.floating-4 {
+  width: 100px;
+  height: 100px;
+  bottom: 15%;
+  right: 10%;
+  animation-delay: -6s;
+}
+
+/* ANIMATIONS */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-20px) rotate(5deg); 
+  }
+}
+
+@keyframes checkmark {
+  0% { 
+    transform: scale(0.5); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.2); 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .plans-grid {
+    gap: clamp(0.25rem, 0.5vw, 0.5rem);
+  }
+  
+  .plan-card {
+    width: calc((100vw - 4rem - 1.5rem) / 4);
+    padding: clamp(0.5rem, 1vw, 0.75rem);
+  }
+  
+  .plan-name {
+    font-size: clamp(0.8rem, 2vw, 1rem);
+  }
+  
+  .price-label {
+    font-size: clamp(1rem, 3vw, 1.4rem);
+  }
+  
+  .plan-features li {
+    font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+    padding: 0.2rem 0;
+  }
+  
+  .actions-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .skip-button, .continue-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .plan-selection-container {
+    padding: 0.5rem;
+  }
+  
+  .plans-container {
+    padding: 0 0.5rem;
+  }
+  
+  .plans-grid {
+    gap: 0.25rem;
+  }
+  
+  .plan-card {
+    width: calc((100vw - 2rem - 0.75rem) / 4);
+    padding: clamp(0.25rem, 0.8vw, 0.5rem);
+    border-radius: 8px;
+  }
+  
+  .plan-name {
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+    margin-bottom: 0.25rem;
+  }
+  
+  .price-label {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  }
+  
+  .plan-features li {
+    font-size: clamp(0.55rem, 1.3vw, 0.65rem);
+    padding: 0.1rem 0;
+  }
+  
+  .plan-features ul {
+    margin: 0.5rem 0;
+  }
+  
+  .popular-badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.6rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .plans-grid {
+    max-width: 1400px;
+  }
+  
+  .plan-card {
+    padding: 2.5rem;
+  }
+}

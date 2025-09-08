@@ -235,7 +235,8 @@
 
 .form-input {
   width: 100% !important;
-  padding: 0.875rem 3rem 0.875rem 1rem !important;
+  height: clamp(2.5rem, 4vh, 3rem) !important;
+  padding: 0 3rem 0 1rem !important;
   border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: 1rem !important;
@@ -363,7 +364,7 @@
 
 .primary-button {
   width: 100% !important;
-  padding: 0.875rem 1.5rem !important;
+  height: clamp(2.5rem, 4vh, 3rem) !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white !important;
   border: none !important;

@@ -19,7 +19,11 @@ export class CreateUserComponent {
   currentStep: string = 'form';
   showPassword: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    console.log('CreateUserComponent constructor ejecutado');
+    console.log('localStorage selectedPlan:', localStorage.getItem('selectedPlan'));
+    console.log('localStorage setupCompleted:', localStorage.getItem('setupCompleted'));
+  }
 
   goToLogin() {
     this.router.navigate(['/login']);
