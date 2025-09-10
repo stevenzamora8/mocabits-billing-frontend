@@ -42,6 +42,9 @@ export class ClientsComponent implements OnInit {
   itemsPerPage: number = 10;
   totalPages: number = 1;
 
+  // Make Math available in template
+  readonly Math = Math;
+
   constructor(
     private formBuilder: FormBuilder
   ) {
@@ -131,6 +134,174 @@ export class ClientsComponent implements OnInit {
         lastInvoiceDate: new Date('2023-12-20'),
         createdAt: new Date('2023-11-01'),
         updatedAt: new Date('2023-12-20')
+      },
+      {
+        id: '4',
+        name: 'Carlos Rodríguez',
+        identification: '0456789123',
+        identificationType: 'CEDULA',
+        email: 'carlos.rodriguez@email.com',
+        phone: '0965432109',
+        address: 'Barrio Centro 321, Ambato',
+        type: 'PERSONA_NATURAL',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-01-25'),
+        createdAt: new Date('2023-10-15'),
+        updatedAt: new Date('2024-01-25')
+      },
+      {
+        id: '5',
+        name: 'Tech Solutions Corp',
+        identification: '2345678900012',
+        identificationType: 'RUC',
+        email: 'admin@techsolutions.com',
+        phone: '0223456789',
+        address: 'Edificio Empresarial 567, Quito',
+        type: 'EMPRESA',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-01'),
+        createdAt: new Date('2023-09-20'),
+        updatedAt: new Date('2024-02-01')
+      },
+      {
+        id: '6',
+        name: 'Ana López',
+        identification: '0567891234',
+        identificationType: 'CEDULA',
+        email: 'ana.lopez@email.com',
+        phone: '0954321098',
+        address: 'Conjunto Residencial 890, Guayaquil',
+        type: 'PERSONA_NATURAL',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-01-30'),
+        createdAt: new Date('2023-08-10'),
+        updatedAt: new Date('2024-01-30')
+      },
+      {
+        id: '7',
+        name: 'Global Imports Ltda',
+        identification: '3456789010013',
+        identificationType: 'RUC',
+        email: 'imports@globalimports.com',
+        phone: '0212345678',
+        address: 'Zona Industrial 123, Manta',
+        type: 'EMPRESA',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-05'),
+        createdAt: new Date('2023-07-05'),
+        updatedAt: new Date('2024-02-05')
+      },
+      {
+        id: '8',
+        name: 'Luis Martínez',
+        identification: '0678912345',
+        identificationType: 'CEDULA',
+        email: 'luis.martinez@email.com',
+        phone: '0943210987',
+        address: 'Urbanización Moderna 456, Cuenca',
+        type: 'PERSONA_NATURAL',
+        status: 'INACTIVO',
+        lastInvoiceDate: new Date('2023-11-15'),
+        createdAt: new Date('2023-06-01'),
+        updatedAt: new Date('2023-11-15')
+      },
+      {
+        id: '9',
+        name: 'Digital Services Pro',
+        identification: '4567890120014',
+        identificationType: 'RUC',
+        email: 'contact@digitalservices.com',
+        phone: '0209876543',
+        address: 'Centro Empresarial 789, Quito',
+        type: 'EMPRESA',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-10'),
+        createdAt: new Date('2023-05-15'),
+        updatedAt: new Date('2024-02-10')
+      },
+      {
+        id: '10',
+        name: 'Sofia Ramírez',
+        identification: '0789123456',
+        identificationType: 'CEDULA',
+        email: 'sofia.ramirez@email.com',
+        phone: '0932109876',
+        address: 'Residencial del Valle 234, Loja',
+        type: 'PERSONA_NATURAL',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-12'),
+        createdAt: new Date('2023-04-20'),
+        updatedAt: new Date('2024-02-12')
+      },
+      {
+        id: '11',
+        name: 'Construction Experts S.A.',
+        identification: '5678901230015',
+        identificationType: 'RUC',
+        email: 'projects@constructionexperts.com',
+        phone: '0198765432',
+        address: 'Av. Industrial 567, Guayaquil',
+        type: 'EMPRESA',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-15'),
+        createdAt: new Date('2023-03-10'),
+        updatedAt: new Date('2024-02-15')
+      },
+      {
+        id: '12',
+        name: 'Miguel Torres',
+        identification: '0891234567',
+        identificationType: 'CEDULA',
+        email: 'miguel.torres@email.com',
+        phone: '0921098765',
+        address: 'Sector Histórico 345, Quito',
+        type: 'PERSONA_NATURAL',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-18'),
+        createdAt: new Date('2023-02-05'),
+        updatedAt: new Date('2024-02-18')
+      },
+      {
+        id: '13',
+        name: 'Fashion Boutique',
+        identification: '6789012340016',
+        identificationType: 'RUC',
+        email: 'sales@fashionboutique.com',
+        phone: '0187654321',
+        address: 'Centro Comercial 678, Cuenca',
+        type: 'EMPRESA',
+        status: 'INACTIVO',
+        lastInvoiceDate: new Date('2023-10-30'),
+        createdAt: new Date('2023-01-15'),
+        updatedAt: new Date('2023-10-30')
+      },
+      {
+        id: '14',
+        name: 'Gabriela Sánchez',
+        identification: '0901234567',
+        identificationType: 'CEDULA',
+        email: 'gabriela.sanchez@email.com',
+        phone: '0910987654',
+        address: 'Conjunto Habitacional 456, Ambato',
+        type: 'PERSONA_NATURAL',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-20'),
+        createdAt: new Date('2022-12-01'),
+        updatedAt: new Date('2024-02-20')
+      },
+      {
+        id: '15',
+        name: 'Auto Parts Plus',
+        identification: '7890123450017',
+        identificationType: 'RUC',
+        email: 'parts@autopartsplus.com',
+        phone: '0176543210',
+        address: 'Zona Franca 789, Manta',
+        type: 'EMPRESA',
+        status: 'ACTIVO',
+        lastInvoiceDate: new Date('2024-02-22'),
+        createdAt: new Date('2022-11-10'),
+        updatedAt: new Date('2024-02-22')
       }
     ];
   }
@@ -196,6 +367,23 @@ export class ClientsComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
     }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 
   // Modal management

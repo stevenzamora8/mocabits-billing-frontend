@@ -1,0 +1,417 @@
+<div class="products-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Productos</h1>
+        <p>Administra tu catálogo de productos y servicios</p>
+      </div>
+      <button class="btn-primary" (click)="openProductModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo Producto
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ products.length }}</div>
+        <div class="stat-label">Total Productos</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ activeProducts.length }}</div>
+        <div class="stat-label">Productos Activos</div>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ lowStockProducts.length }}</div>
+        <div class="stat-label">Stock Bajo</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">${{ totalValue | number:'1.2-2' }}</div>
+        <div class="stat-label">Valor Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        [(ngModel)]="searchTerm"
+        (input)="filterProducts()"
+      >
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        class="filter-btn"
+        [class.active]="selectedCategory === ''"
+        (click)="filterByCategory('')"
+      >
+        Todos
+      </button>
+      <button
+        class="filter-btn"
+        *ngFor="let category of simplifiedCategories"
+        [class.active]="selectedCategory === category.name"
+        (click)="filterByCategory(category.name)"
+      >
+        {{ category.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-container">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>SKU</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of paginatedProducts" class="product-row">
+          <td class="product-info">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-description">{{ product.description }}</div>
+          </td>
+          <td>
+            <span class="category-badge" [style.background-color]="getCategoryColor(product.category)">
+              {{ product.category }}
+            </span>
+          </td>
+          <td class="sku">{{ product.sku }}</td>
+          <td class="price">${{ product.price | number:'1.2-2' }}</td>
+          <td class="stock">
+            <span [class.low-stock]="product.stock <= product.minStock">
+              {{ product.stock }} {{ product.unit }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [class.active]="product.isActive">
+              {{ product.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="action-btn edit" (click)="editProduct(product)" title="Editar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="action-btn delete" (click)="deleteProduct(product)" title="Eliminar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredProducts.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+        </svg>
+      </div>
+      <h3>No se encontraron productos</h3>
+      <p>Intenta con otros términos de búsqueda o agrega un nuevo producto.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <div class="pagination-info">
+      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredProducts.length) }} de {{ filteredProducts.length }} productos
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 1"
+        (click)="goToPage(1)"
+        title="Primera página"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/>
+        </svg>
+      </button>
+
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 1"
+        (click)="previousPage()"
+        title="Página anterior"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/>
+        </svg>
+      </button>
+
+      <div class="pagination-numbers">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="pagination-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+        title="Página siguiente"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
+
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(totalPages)"
+        title="Última página"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" *ngIf="showProductModal" (click)="closeProductModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+        <button class="close-btn" (click)="closeProductModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="product-form" (ngSubmit)="saveProduct()" #productForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nombre del Producto *</label>
+            <input
+              type="text"
+              id="name"
+              [(ngModel)]="currentProduct.name"
+              name="name"
+              required
+              placeholder="Ej: Desarrollo Web Básico"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="sku">SKU *</label>
+            <input
+              type="text"
+              id="sku"
+              [(ngModel)]="currentProduct.sku"
+              name="sku"
+              required
+              placeholder="Ej: WEB-BASIC-001"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <textarea
+            id="description"
+            [(ngModel)]="currentProduct.description"
+            name="description"
+            rows="3"
+            placeholder="Describe el producto o servicio..."
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Categoría *</label>
+            <select
+              id="category"
+              [(ngModel)]="currentProduct.category"
+              name="category"
+              required
+            >
+              <option value="">Seleccionar categoría</option>
+              <option *ngFor="let category of simplifiedCategories" [value]="category.name">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="unit">Unidad *</label>
+            <select
+              id="unit"
+              [(ngModel)]="currentProduct.unit"
+              name="unit"
+              required
+            >
+              <option value="">Seleccionar unidad</option>
+              <option value="pieza">Pieza</option>
+              <option value="servicio">Servicio</option>
+              <option value="hora">Hora</option>
+              <option value="licencia">Licencia</option>
+              <option value="paquete">Paquete</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="price">Precio de Venta *</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input
+                type="number"
+                id="price"
+                [(ngModel)]="currentProduct.price"
+                name="price"
+                required
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cost">Costo (opcional)</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input
+                type="number"
+                id="cost"
+                [(ngModel)]="currentProduct.cost"
+                name="cost"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="stock">Stock Inicial *</label>
+            <input
+              type="number"
+              id="stock"
+              [(ngModel)]="currentProduct.stock"
+              name="stock"
+              required
+              min="0"
+              placeholder="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="minStock">Stock Mínimo *</label>
+            <input
+              type="number"
+              id="minStock"
+              [(ngModel)]="currentProduct.minStock"
+              name="minStock"
+              required
+              min="0"
+              placeholder="0"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taxRate">Tasa de Impuesto (%)</label>
+            <input
+              type="number"
+              id="taxRate"
+              [(ngModel)]="currentProduct.taxRate"
+              name="taxRate"
+              step="0.01"
+              min="0"
+              max="100"
+              placeholder="16.00"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="currentProduct.isActive"
+                name="isActive"
+              >
+              <span class="checkmark"></span>
+              Producto Activo
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="closeProductModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="!productForm.valid">
+            {{ isEditing ? 'Actualizar' : 'Crear' }} Producto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

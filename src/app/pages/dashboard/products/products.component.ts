@@ -1,105 +1,219 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { ProductsService, Product, ProductCategory } from '../../../services/products.service';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="products-container">
-      <div class="page-header">
-        <h1>Gestión de Productos</h1>
-        <p>Administra tu catálogo de productos y servicios</p>
-      </div>
-      
-      <div class="content-placeholder">
-        <div class="placeholder-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-          </svg>
-        </div>
-        <h2>Próximamente</h2>
-        <p>El módulo de productos estará disponible pronto</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .products-container {
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .page-header {
-      margin-bottom: 3rem;
-      text-align: center;
-    }
-
-    .page-header h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .page-header p {
-      margin: 0;
-      color: #64748b;
-      font-size: 1.1rem;
-    }
-
-    .content-placeholder {
-      text-align: center;
-      padding: 4rem 2rem;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
-    }
-
-    .placeholder-icon {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 2rem auto;
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #667eea;
-    }
-
-    .content-placeholder h2 {
-      margin: 0 0 1rem 0;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #1e293b;
-    }
-
-    .content-placeholder p {
-      margin: 0;
-      color: #64748b;
-      font-size: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .products-container {
-        padding: 1rem;
-      }
-      
-      .page-header h1 {
-        font-size: 2rem;
-      }
-      
-      .content-placeholder {
-        padding: 2rem 1rem;
-      }
-    }
-  `]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './products.component.html',
+  styleUrls: ['./products.component.css']
 })
-export class ProductsComponent {
-  constructor() { }
+export class ProductsComponent implements OnInit, OnDestroy {
+  products: Product[] = [];
+  categories: ProductCategory[] = [];
+  filteredProducts: Product[] = [];
+
+  // Modal and form state
+  showProductModal = false;
+  isEditing = false;
+  currentProduct: Product = this.createEmptyProduct();
+
+  // Filters and search
+  searchTerm = '';
+  selectedCategory = '';
+
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+
+  // Make Math available in template
+  readonly Math = Math;
+
+  private subscriptions = new Subscription();
+
+  constructor(private productsService: ProductsService) {}
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
+  private loadData() {
+    // Subscribe to products
+    this.subscriptions.add(
+      this.productsService.products$.subscribe(products => {
+        this.products = products;
+        this.filterProducts();
+      })
+    );
+
+    // Subscribe to categories
+    this.subscriptions.add(
+      this.productsService.categories$.subscribe(categories => {
+        this.categories = categories;
+      })
+    );
+  }
+
+  private createEmptyProduct(): Product {
+    return {
+      id: '',
+      name: '',
+      description: '',
+      price: 0,
+      category: '',
+      sku: '',
+      stock: 0,
+      minStock: 1,
+      unit: '',
+      taxRate: 16,
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  // Computed properties
+  get activeProducts(): Product[] {
+    return this.products.filter(p => p.isActive);
+  }
+
+  get lowStockProducts(): Product[] {
+    return this.products.filter(p => p.stock <= p.minStock);
+  }
+
+  get totalValue(): number {
+    return this.products.reduce((total, product) => total + (product.price * product.stock), 0);
+  }
+
+  // Pagination properties
+  get paginatedProducts(): Product[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  // Simplified categories
+  get simplifiedCategories(): { name: string; color: string }[] {
+    return [
+      { name: 'Producto', color: '#667eea' },
+      { name: 'Servicio', color: '#764ba2' }
+    ];
+  }
+
+  // Modal methods
+  openProductModal() {
+    this.isEditing = false;
+    this.currentProduct = this.createEmptyProduct();
+    this.showProductModal = true;
+  }
+
+  editProduct(product: Product) {
+    this.isEditing = true;
+    this.currentProduct = { ...product };
+    this.showProductModal = true;
+  }
+
+  closeProductModal() {
+    this.showProductModal = false;
+    this.currentProduct = this.createEmptyProduct();
+  }
+
+  // CRUD operations
+  saveProduct() {
+    if (this.isEditing) {
+      this.productsService.updateProduct(this.currentProduct.id, this.currentProduct);
+    } else {
+      this.productsService.addProduct(this.currentProduct);
+    }
+    this.closeProductModal();
+  }
+
+  deleteProduct(product: Product) {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
+      this.productsService.deleteProduct(product.id);
+    }
+  }
+
+  // Filter and search methods
+  filterProducts() {
+    let filtered = this.products;
+
+    // Filter by search term
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term) ||
+        product.sku.toLowerCase().includes(term) ||
+        product.category.toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by category
+    if (this.selectedCategory) {
+      filtered = filtered.filter(product => product.category === this.selectedCategory);
+    }
+
+    this.filteredProducts = filtered;
+    this.currentPage = 1; // Reset to first page when filtering
+  }
+
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    this.currentPage = 1; // Reset to first page when filtering
+    this.filterProducts();
+  }
+
+  // Pagination methods
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  // Utility methods
+  getCategoryColor(categoryName: string): string {
+    const category = this.simplifiedCategories.find(c => c.name === categoryName);
+    return category ? category.color : '#64748b';
+  }
 }
