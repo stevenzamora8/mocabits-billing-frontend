@@ -19,6 +19,11 @@ const routes: Routes = [
         title: 'Dashboard - Inicio'
       },
       {
+        path: 'clients',
+        loadComponent: () => import('./clients/clients.component').then(m => m.ClientsComponent),
+        title: 'Dashboard - Clientes'
+      },
+      {
         path: 'invoices',
         loadComponent: () => import('./invoices/invoices.component').then(m => m.InvoicesComponent),
         title: 'Dashboard - Facturas'

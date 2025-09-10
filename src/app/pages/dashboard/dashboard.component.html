@@ -1,4 +1,10 @@
 <div class="dashboard-layout">
+  <!-- Sidebar Overlay (para móviles/tablets) -->
+  <div class="sidebar-overlay" 
+       *ngIf="!isSidebarCollapsed && isMobileOrTablet" 
+       (click)="toggleSidebar()">
+  </div>
+
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
     <!-- Logo & Brand -->
@@ -82,6 +88,29 @@
             <path d="M3 12h18m-9 9l9-9-9-9"/>
           </svg>
         </button>
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav" *ngIf="breadcrumbs.length > 1">
+          <div class="breadcrumb-container">
+            <ol class="breadcrumb-list">
+              <li *ngFor="let crumb of breadcrumbs; let isLast = last" class="breadcrumb-item">
+                <a
+                  *ngIf="!isLast"
+                  [routerLink]="crumb.path"
+                  class="breadcrumb-link"
+                  [class.active]="crumb.active">
+                  {{ crumb.label }}
+                </a>
+                <span *ngIf="isLast" class="breadcrumb-current">
+                  {{ crumb.label }}
+                </span>
+                <svg *ngIf="!isLast" class="breadcrumb-separator" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 5l7 7-7 7"/>
+                </svg>
+              </li>
+            </ol>
+          </div>
+        </nav>
       </div>
       
       <div class="top-bar-right">
