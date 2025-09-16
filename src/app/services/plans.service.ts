@@ -11,6 +11,10 @@ export interface Plan {
   description: string;
   period: string;
   descriptions: string[];
+  maxInvoices: number;
+  isPopular: boolean;
+  color: string;
+  gradient: string;
 }
 
 export interface PlanDisplay {
@@ -64,56 +68,29 @@ export class PlansService {
    * Convierte un plan del backend al formato de display del frontend
    */
   transformPlanToDisplay(plan: Plan): PlanDisplay {
-    // Mapeo de colores y propiedades adicionales basado en el precio
-    const planMappings: { [key: number]: Partial<PlanDisplay> } = {
-      0: {
-        id: 'free',
-        invoices: 10,
-        invoicesLabel: '10 facturas al año',
-        color: '#10b981',
-        gradient: 'linear-gradient(135deg, #10b981, #059669)'
-      },
-      9.99: {
-        id: 'starter',
-        invoices: 50,
-        invoicesLabel: '50 facturas al año',
-        color: '#3b82f6',
-        gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
-      },
-      19.99: {
-        id: 'professional',
-        invoices: 200,
-        invoicesLabel: '200 facturas al año',
-        popular: true,
-        color: '#8b5cf6',
-        gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)'
-      },
-      29.99: {
-        id: 'enterprise',
-        invoices: -1,
-        invoicesLabel: 'Facturas ilimitadas',
-        color: '#f59e0b',
-        gradient: 'linear-gradient(135deg, #f59e0b, #d97706)'
-      }
-    };
-
-    const mapping = planMappings[plan.price];
+    // Generar label para facturas basado en maxInvoices del backend
+    let invoicesLabel: string;
+    if (plan.maxInvoices === -1) {
+      invoicesLabel = 'Facturas ilimitadas';
+    } else {
+      const periodText = plan.period === 'ANNUAL' ? 'al año' :
+                        plan.period === 'MONTHLY' ? 'al mes' : 'por período';
+      invoicesLabel = `${plan.maxInvoices} facturas ${periodText}`;
+    }
 
     return {
-      id: mapping?.id || `plan-${plan.id}`,
+      id: `plan-${plan.id}`,
       name: plan.name,
       price: plan.price,
       priceLabel: plan.price === 0 ? 'Gratis' : `$${plan.price}/año`,
-      invoices: mapping?.invoices || 10,
-      invoicesLabel: mapping?.invoicesLabel || '10 facturas al año',
-      features: plan.descriptions || ['Características básicas'], // Usar las descriptions del backend
-      popular: mapping?.popular || false,
-      color: mapping?.color || '#10b981',
-      gradient: mapping?.gradient || 'linear-gradient(135deg, #10b981, #059669)'
+      invoices: plan.maxInvoices,
+      invoicesLabel: invoicesLabel,
+      features: plan.descriptions || ['Características básicas'],
+      popular: plan.isPopular,
+      color: plan.color,
+      gradient: plan.gradient
     };
-  }
-
-  /**
+  }  /**
    * Obtiene los planes transformados para display
    */
   getPlansForDisplay(): Observable<PlanDisplay[]> {
