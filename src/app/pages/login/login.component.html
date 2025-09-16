@@ -106,6 +106,9 @@
         </div>
 
         <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <div class="server-error" *ngIf="serverError" style="color: #b91c1c; font-weight:600; text-align:center;">
+              {{ serverError }}
+            </div>
           <div class="form-group">
             <label for="email">Correo Electrónico</label>
             <div class="input-wrapper">
@@ -169,6 +172,24 @@
             <div class="field-error" *ngIf="passwordField.invalid && passwordField.touched">
               <span *ngIf="passwordField.errors?.['required']">La contraseña es requerida</span>
               <span *ngIf="passwordField.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
+            </div>
+          </div>
+
+          <!-- Advanced client credentials (optional) -->
+          <div class="advanced-toggle">
+            <button type="button" class="link-button" (click)="showAdvanced = !showAdvanced">
+              {{ showAdvanced ? 'Ocultar ajustes avanzados' : 'Ajustes avanzados (cliente)' }}
+            </button>
+          </div>
+
+          <div *ngIf="showAdvanced" class="advanced-section">
+            <div class="form-group">
+              <label for="clientId">Client ID (opcional)</label>
+              <input id="clientId" name="clientId" [(ngModel)]="clientId" class="form-input" placeholder="client-id" />
+            </div>
+            <div class="form-group">
+              <label for="clientSecret">Client Secret (opcional)</label>
+              <input id="clientSecret" name="clientSecret" [(ngModel)]="clientSecret" class="form-input" placeholder="client-secret" />
             </div>
           </div>
 

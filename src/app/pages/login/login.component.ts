@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -13,32 +16,43 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   email: string = '';
   password: string = '';
+  // Optional client credentials for Basic auth (can be left empty to use env.basicAuth)
+  clientId: string = environment['clientId'] || '';
+  clientSecret: string = environment['clientSecret'] || '';
   rememberMe: boolean = false;
   isLoading: boolean = false;
   showPassword: boolean = false;
   showSuccessMessage: boolean = false;
   loginAttempts: number = 0;
+  serverError: string | null = null;
+  showAdvanced: boolean = false;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     console.log('Rutas disponibles:', this.router.config.length);
   }
 
   onLogin() {
+    this.serverError = null;
     this.isLoading = true;
-    this.loginAttempts++;
-    
-    // Simulación de login con feedback mejorado
-    setTimeout(() => {
-      this.isLoading = false;
-      
-      // Simular login exitoso después de 2 intentos
-      if (this.loginAttempts >= 2) {
+
+    this.authService.login(this.email, this.password, this.clientId || undefined, this.clientSecret || undefined).subscribe({
+      next: (resp) => {
+        this.isLoading = false;
+        console.log('Login successful', resp);
         this.showSuccessAnimation();
-        console.log('Login successful:', { email: this.email });
-      } else {
-        this.showErrorMessage('Credenciales incorrectas. Intenta nuevamente.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
+        console.error('Login error', err);
+        if (err.error && typeof err.error === 'string') {
+          this.serverError = err.error;
+        } else if (err.error && err.error.message) {
+          this.serverError = err.error.message;
+        } else {
+          this.serverError = 'Ocurrió un error al iniciar sesión. Intenta nuevamente.';
+        }
       }
-    }, 1500);
+    });
   }
 
   onForgotPassword() {
