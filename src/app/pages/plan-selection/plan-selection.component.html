@@ -103,6 +103,14 @@
   <!-- Action Buttons -->
   <div class="actions-section">
     <div class="actions-container">
+      <!-- Botón de prueba para comparar con Postman -->
+      <button 
+        class="test-button"
+        (click)="testPostmanRequest()"
+        [disabled]="isLoading">
+        🧪 Probar solicitud idéntica a Postman
+      </button>
+      
       <button 
         class="skip-button"
         (click)="onSkip()"

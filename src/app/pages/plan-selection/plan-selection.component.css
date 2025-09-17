@@ -575,6 +575,43 @@
   transform: translateY(0);
 }
 
+/* BOTÓN DE PRUEBA */
+.test-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+.test-button:hover {
+  background: linear-gradient(135deg, #ff5252, #d84315);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.test-button:active {
+  transform: translateY(0);
+}
+
+.test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* RESPONSIVE FOR LOADING/ERROR */
 @media (max-width: 768px) {
   .loading-container,
@@ -590,5 +627,11 @@
   .retry-button {
     padding: 0.6rem 1.2rem;
     font-size: 0.8rem;
+  }
+
+  .test-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+    max-width: 280px;
   }
 }

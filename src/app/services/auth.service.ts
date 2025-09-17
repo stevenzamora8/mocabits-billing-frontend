@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 /**
@@ -18,6 +19,34 @@ export class AuthService {
   private readonly envBasic = environment.basicAuth || '';
 
   constructor(private http: HttpClient) {}
+
+  // Expose current access token as an observable so other services can react to changes
+  private _accessToken$ = new BehaviorSubject<string | null>(localStorage.getItem('accessToken'));
+  public readonly accessToken$: Observable<string | null> = this._accessToken$.asObservable();
+
+  /**
+   * Central helper to set token in localStorage and notify subscribers
+   */
+  private setAccessToken(token: string | null) {
+    try {
+      if (token) {
+        localStorage.setItem('accessToken', token);
+      } else {
+        localStorage.removeItem('accessToken');
+      }
+      this._accessToken$.next(token);
+      console.log('AuthService - setAccessToken:', !!token, token ? `len=${token.length}` : 'null');
+    } catch (e) {
+      console.warn('AuthService - Could not persist access token', e);
+    }
+  }
+
+  /**
+   * Read current token synchronously
+   */
+  public getAccessToken(): string | null {
+    return this._accessToken$.value;
+  }
 
   /**
    * Login with user email/password and optional client credentials.
@@ -38,20 +67,46 @@ export class AuthService {
       'Content-Type': 'application/json'
     });
 
-    const body = { email, password };
+    // Para Basic Auth, NO enviamos body JSON - las credenciales van solo en el header
+    // El backend extrae email/password del header Authorization
+    const body = null;
 
-    return this.http.post<any>(this.loginUrl, body, { headers }).pipe(
-      tap(resp => {
-        // Persist tokens and user info for later use
+    // Determinar si debemos enviar credenciales (cookies) según environment
+    const httpOptions: any = { headers };
+    if ((environment as any).withCredentials) {
+      httpOptions.withCredentials = true;
+      console.log('AuthService - will send request with credentials (withCredentials=true)');
+    }
+
+    console.log('AuthService - Login attempt with Basic Auth header');
+    console.log('AuthService - Authorization header preview:', basic.substring(0, 20) + '...');
+
+    return this.http.post(this.loginUrl, body, httpOptions).pipe(
+      tap((resp: any) => {
+        // Log completo para depuración: ayuda a detectar la forma exacta del token devuelto
+        console.log('AuthService - Login response payload:', resp);
+
+        // Persist tokens and user info for later use. Muchos backends devuelven distintas formas:
+        // { accessToken, refreshToken }, { token }, { data: { accessToken } }, etc.
         try {
-          if (resp?.accessToken) {
-            localStorage.setItem('accessToken', resp.accessToken);
+          const possibleAccessToken = resp?.accessToken || resp?.token || resp?.data?.accessToken || resp?.data?.token || resp?.tokens?.accessToken;
+          const possibleRefreshToken = resp?.refreshToken || resp?.data?.refreshToken || resp?.tokens?.refreshToken;
+
+          if (possibleAccessToken) {
+            this.setAccessToken(possibleAccessToken);
+          } else {
+            console.warn('AuthService - No access token found in response payload');
+            this.setAccessToken(null);
           }
-          if (resp?.refreshToken) {
-            localStorage.setItem('refreshToken', resp.refreshToken);
+
+          if (possibleRefreshToken) {
+            try { localStorage.setItem('refreshToken', possibleRefreshToken); } catch (e) { console.warn('Could not persist refresh token', e); }
+            console.log('AuthService - Refresh token saved to localStorage');
           }
+
           if (resp?.user) {
-            localStorage.setItem('user', JSON.stringify(resp.user));
+            try { localStorage.setItem('user', JSON.stringify(resp.user)); } catch (e) { console.warn('Could not persist user', e); }
+            console.log('AuthService - User info saved to localStorage');
           }
         } catch (e) {
           // localStorage might be unavailable in some environments

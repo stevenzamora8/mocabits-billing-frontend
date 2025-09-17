@@ -1,30 +1,25 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  
-  constructor(private router: Router) {}
+
+  constructor(private router: Router, private authService: AuthService) {}
 
   canActivate(): boolean {
-    const selectedPlan = localStorage.getItem('selectedPlan');
-    const setupCompleted = localStorage.getItem('setupCompleted');
-    
-    // Si no ha seleccionado plan, redirigir al login
-    if (!selectedPlan) {
+    const token = this.authService.getAccessToken();
+
+    // Verificar si el usuario está autenticado
+    if (!token) {
+      console.log('AuthGuard - No authentication token found, redirecting to login');
       this.router.navigate(['/login']);
       return false;
     }
-    
-    // Si ha seleccionado plan pero no ha completado la configuración, redirigir a setup
-    if (selectedPlan && !setupCompleted) {
-      this.router.navigate(['/setup']);
-      return false;
-    }
-    
-    // Si tiene plan y configuración completa, permitir acceso
+
+    // Usuario autenticado, permitir acceso
     return true;
   }
 }

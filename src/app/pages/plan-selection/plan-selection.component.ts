@@ -70,7 +70,7 @@ export class PlanSelectionComponent implements OnInit {
 
     // Asignar el plan al usuario
     this.plansService.assignPlanToUser(planId).subscribe({
-      next: (userPlan) => {
+      next: (userPlan: any) => {
         console.log('Plan assigned successfully:', userPlan);
 
         // Guardar información del plan seleccionado en localStorage
@@ -79,10 +79,21 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanPrice', selectedPlanData.price.toString());
 
         this.isLoading = false;
-        // Redirigir a setup después de asignar el plan
+        // Si el backend devuelve un código específico indicando que falta información del contribuyente
+        // (por ejemplo: status === 2004 o code === 2004), redirigimos al formulario de company-setup
+        const responseCode = userPlan?.status ?? userPlan?.code ?? userPlan?.responseCode ?? null;
+        console.log('PlanSelection - responseCode:', responseCode);
+
+        if (responseCode === 204) {
+          // Pasar un query param opcional para que la pantalla sepa que se debe completar datos
+          this.router.navigate(['/setup'], { queryParams: { reason: 'missing_contributor' } });
+          return;
+        }
+
+        // Redirigir a company-setup después de asignar el plan (fallback/general)
         this.router.navigate(['/setup']);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error assigning plan:', error);
         this.error = error.message || 'Error al asignar el plan. Inténtalo más tarde.';
         this.isLoading = false;
@@ -107,7 +118,7 @@ export class PlanSelectionComponent implements OnInit {
 
     // Asignar el plan gratuito al usuario
     this.plansService.assignPlanToUser(planId).subscribe({
-      next: (userPlan) => {
+      next: (userPlan: any) => {
         console.log('Free plan assigned successfully:', userPlan);
 
         // Guardar información del plan gratuito en localStorage
@@ -116,11 +127,41 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanPrice', freePlan.price.toString());
 
         this.isLoading = false;
+        const responseCode = userPlan?.status ?? userPlan?.code ?? userPlan?.responseCode ?? null;
+        console.log('PlanSelection - responseCode (skip):', responseCode);
+
+        if (responseCode === 204) {
+          this.router.navigate(['/setup'], { queryParams: { reason: 'missing_contributor' } });
+          return;
+        }
+
         this.router.navigate(['/setup']);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error assigning free plan:', error);
         this.error = error.message || 'Error al asignar el plan gratuito. Inténtalo más tarde.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  /**
+   * Función de prueba: enviar EXACTAMENTE la misma solicitud que funciona en Postman
+   */
+  testPostmanRequest() {
+    console.log('🧪 TEST: Ejecutando solicitud idéntica a Postman...');
+    this.isLoading = true;
+    this.error = null;
+
+    this.plansService.testExactPostmanRequest().subscribe({
+      next: (response) => {
+        console.log('✅ TEST SUCCESS: La solicitud idéntica a Postman funcionó!', response);
+        this.error = '✅ ÉXITO: La solicitud idéntica a Postman funcionó correctamente!';
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('❌ TEST FAILED: La solicitud idéntica a Postman falló:', error);
+        this.error = `❌ ERROR: La solicitud idéntica a Postman falló: ${error.message}`;
         this.isLoading = false;
       }
     });
