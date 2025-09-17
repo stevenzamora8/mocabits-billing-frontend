@@ -91,11 +91,14 @@ export class PlansService {
       gradient: plan.gradient
     };
   }  /**
-   * Obtiene los planes transformados para display
+   * Asigna un plan al usuario autenticado
    */
-  getPlansForDisplay(): Observable<PlanDisplay[]> {
-    return this.getPlans().pipe(
-      map(plans => plans.map(plan => this.transformPlanToDisplay(plan)))
+  assignPlanToUser(planId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    const body = { planId: planId };
+
+    return this.http.post(`${this.apiUrl}/user-plans`, body, { headers }).pipe(
+      catchError(this.handleError)
     );
   }
 

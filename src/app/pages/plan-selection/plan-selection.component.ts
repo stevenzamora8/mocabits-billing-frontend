@@ -59,32 +59,71 @@ export class PlanSelectionComponent implements OnInit {
     this.isLoading = true;
     const selectedPlanData = this.plans.find(p => p.id === this.selectedPlan);
 
-    // Guardar el plan seleccionado en localStorage
-    if (selectedPlanData) {
-      localStorage.setItem('selectedPlan', selectedPlanData.name);
-      localStorage.setItem('selectedPlanId', selectedPlanData.id);
-      localStorage.setItem('selectedPlanPrice', selectedPlanData.price.toString());
+    if (!selectedPlanData) {
+      this.error = 'Plan seleccionado no encontrado.';
+      this.isLoading = false;
+      return;
     }
 
-    // Simular procesamiento
-    setTimeout(() => {
-      console.log('Plan selected:', selectedPlanData);
-      this.isLoading = false;
-      // Redirigir a setup en lugar de dashboard
-      this.router.navigate(['/setup']);
-    }, 1500);
+    // Extraer el ID numérico del plan (remover el prefijo 'plan-')
+    const planId = parseInt(selectedPlanData.id.replace('plan-', ''));
+
+    // Asignar el plan al usuario
+    this.plansService.assignPlanToUser(planId).subscribe({
+      next: (userPlan) => {
+        console.log('Plan assigned successfully:', userPlan);
+
+        // Guardar información del plan seleccionado en localStorage
+        localStorage.setItem('selectedPlan', selectedPlanData.name);
+        localStorage.setItem('selectedPlanId', selectedPlanData.id);
+        localStorage.setItem('selectedPlanPrice', selectedPlanData.price.toString());
+
+        this.isLoading = false;
+        // Redirigir a setup después de asignar el plan
+        this.router.navigate(['/setup']);
+      },
+      error: (error) => {
+        console.error('Error assigning plan:', error);
+        this.error = error.message || 'Error al asignar el plan. Inténtalo más tarde.';
+        this.isLoading = false;
+      }
+    });
   }
 
   onSkip() {
-    // Permitir continuar sin seleccionar plan (asignar plan gratuito por defecto)
+    // Asignar automáticamente el plan gratuito (precio 0)
     const freePlan = this.plans.find(p => p.price === 0);
-    if (freePlan) {
-      this.selectedPlan = freePlan.id;
-      localStorage.setItem('selectedPlan', freePlan.name);
-      localStorage.setItem('selectedPlanId', freePlan.id);
-      localStorage.setItem('selectedPlanPrice', freePlan.price.toString());
+
+    if (!freePlan) {
+      this.error = 'No se encontró el plan gratuito.';
+      return;
     }
-    this.onContinue();
+
+    this.isLoading = true;
+    this.selectedPlan = freePlan.id;
+
+    // Extraer el ID numérico del plan gratuito
+    const planId = parseInt(freePlan.id.replace('plan-', ''));
+
+    // Asignar el plan gratuito al usuario
+    this.plansService.assignPlanToUser(planId).subscribe({
+      next: (userPlan) => {
+        console.log('Free plan assigned successfully:', userPlan);
+
+        // Guardar información del plan gratuito en localStorage
+        localStorage.setItem('selectedPlan', freePlan.name);
+        localStorage.setItem('selectedPlanId', freePlan.id);
+        localStorage.setItem('selectedPlanPrice', freePlan.price.toString());
+
+        this.isLoading = false;
+        this.router.navigate(['/setup']);
+      },
+      error: (error) => {
+        console.error('Error assigning free plan:', error);
+        this.error = error.message || 'Error al asignar el plan gratuito. Inténtalo más tarde.';
+        this.isLoading = false;
+      }
+    });
   }
 
   retryLoadPlans() {
