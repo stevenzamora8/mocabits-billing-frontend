@@ -78,20 +78,22 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanId', selectedPlanData.id);
         localStorage.setItem('selectedPlanPrice', selectedPlanData.price.toString());
 
-        this.isLoading = false;
-        // Si el backend devuelve un código específico indicando que falta información del contribuyente
-        // (por ejemplo: status === 2004 o code === 2004), redirigimos al formulario de company-setup
-        const responseCode = userPlan?.status ?? userPlan?.code ?? userPlan?.responseCode ?? null;
-        console.log('PlanSelection - responseCode:', responseCode);
+        // Verificar el estado del usuario después de asignar el plan
+        this.plansService.getUserSetupStatus().subscribe({
+          next: (status) => {
+            console.log('User setup status after plan assignment:', status);
+            this.isLoading = false;
 
-        if (responseCode === 204) {
-          // Pasar un query param opcional para que la pantalla sepa que se debe completar datos
-          this.router.navigate(['/setup'], { queryParams: { reason: 'missing_contributor' } });
-          return;
-        }
-
-        // Redirigir a company-setup después de asignar el plan (fallback/general)
-        this.router.navigate(['/setup']);
+            // Después de asignar un plan, siempre ir al setup
+            this.router.navigate(['/setup']);
+          },
+          error: (error) => {
+            console.error('Error getting user setup status after plan assignment:', error);
+            this.isLoading = false;
+            // En caso de error, ir a setup por defecto
+            this.router.navigate(['/setup']);
+          }
+        });
       },
       error: (error: any) => {
         console.error('Error assigning plan:', error);
@@ -126,16 +128,22 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanId', freePlan.id);
         localStorage.setItem('selectedPlanPrice', freePlan.price.toString());
 
-        this.isLoading = false;
-        const responseCode = userPlan?.status ?? userPlan?.code ?? userPlan?.responseCode ?? null;
-        console.log('PlanSelection - responseCode (skip):', responseCode);
+        // Verificar el estado del usuario después de asignar el plan
+        this.plansService.getUserSetupStatus().subscribe({
+          next: (status) => {
+            console.log('User setup status after free plan assignment:', status);
+            this.isLoading = false;
 
-        if (responseCode === 204) {
-          this.router.navigate(['/setup'], { queryParams: { reason: 'missing_contributor' } });
-          return;
-        }
-
-        this.router.navigate(['/setup']);
+            // Después de asignar un plan, siempre ir al setup
+            this.router.navigate(['/setup']);
+          },
+          error: (error) => {
+            console.error('Error getting user setup status after free plan assignment:', error);
+            this.isLoading = false;
+            // En caso de error, ir a setup por defecto
+            this.router.navigate(['/setup']);
+          }
+        });
       },
       error: (error: any) => {
         console.error('Error assigning free plan:', error);

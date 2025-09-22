@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
+import { CompanyService, Company, CompanyResponse } from '../../services/company.service';
 
 interface CompanyData {
   razonSocial: string;
@@ -24,7 +26,7 @@ interface EstablishmentData {
 @Component({
   selector: 'app-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -33,13 +35,13 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   
   currentStep = 1;
-  totalSteps = 4;
+  totalSteps = 3;
   isLoading = false;
   
   companyForm!: FormGroup;
   establishmentForm!: FormGroup;
-  logoFile: File | null = null;
   signatureFile: File | null = null;
+  signaturePassword: string = '';
 
   // Múltiples establecimientos
   establishments: EstablishmentData[] = [];
@@ -53,7 +55,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private companyService: CompanyService
   ) {}
 
   ngOnInit() {
@@ -383,15 +386,9 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         // Validar que al menos haya un establecimiento válido
         return this.establishmentForm.valid && this.establishments.length > 0;
       case 3:
-        const logoValid = this.logoFile !== null;
-        if (!logoValid) {
-          console.log('Validación paso 3: Logo requerido');
-        }
-        return logoValid;
-      case 4:
         const signatureValid = this.signatureFile !== null && this.signatureError === '';
         if (!signatureValid) {
-          console.log('Validación paso 4: Certificado requerido y válido');
+          console.log('Validación paso 3: Certificado requerido y válido');
           if (this.signatureError) {
             console.log('Error de certificado:', this.signatureError);
           }
@@ -412,18 +409,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLogoChange(event: any) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        console.warn('El archivo es muy grande. Máximo 5MB.');
-        return;
-      }
-      this.logoFile = file;
-      console.log('Logo seleccionado:', file.name);
-    } else {
-      console.warn('Por favor selecciona un archivo de imagen válido.');
-    }
+    // Logo step removed, keeping for compatibility
   }
 
   onSignatureChange(event: any) {
@@ -436,8 +422,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   async validateSignatureFile(file: File) {
     try {
       // Validar extensión
-      if (!(file.name.endsWith('.p12') || file.name.endsWith('.pfx'))) {
-        this.showSignatureError('El archivo debe tener extensión .p12 o .pfx');
+      if (!file.name.endsWith('.p12')) {
+        this.showSignatureError('El archivo debe tener extensión .p12');
         return;
       }
 
@@ -594,30 +580,36 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       
       const companyData = this.companyForm.value;
       
-      const setupData = {
+      const companyPayload = {
         razonSocial: companyData.razonSocial,
         nombreComercial: companyData.nombreComercial,
         ruc: companyData.ruc,
         codDoc: companyData.codDoc,
         dirMatriz: companyData.dirMatriz,
         obligadoContabilidad: companyData.obligadoContabilidad,
-        establishments: this.establishments, // Todos los establecimientos
-        logo: this.logoFile,
-        signature: this.signatureFile,
-        signatureValidated: true, // Indicar que la firma fue validada
-        setupCompleted: true,
-        setupDate: new Date().toISOString()
+        contribuyenteEspecial: 'NO',
+        guiaRemision: 'NO',
+        establecimientos: this.establishments
       };
 
-      console.log('Configuración completada:', setupData);
-      console.log('Establecimientos configurados:', this.establishments.length);
-      console.log('Certificado validado:', this.signatureFile?.name);
+      console.log('Completando setup con:', companyPayload);
       
-      // Simular guardado (reemplazar con llamada real al backend)
-      await this.simulateApiCall();
+      // Completar setup en una sola llamada
+      if (!this.signatureFile) {
+        throw new Error('Firma requerida');
+      }
+      if (!this.signaturePassword) {
+        throw new Error('Contraseña del certificado requerida');
+      }
+      const setupResponse = await this.companyService.completeSetup(companyPayload, this.signatureFile, this.signaturePassword).toPromise();
+      console.log('Setup completado:', setupResponse);
       
-      // Guardar datos en localStorage temporalmente
-      localStorage.setItem('companySetup', JSON.stringify(setupData));
+      // Guardar datos en localStorage
+      localStorage.setItem('companySetup', JSON.stringify({
+        ...companyPayload,
+        setupCompleted: true,
+        setupDate: new Date().toISOString()
+      }));
       localStorage.setItem('setupCompleted', 'true');
 
       // Redirigir al dashboard
@@ -631,11 +623,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private simulateApiCall(): Promise<void> {
-    return new Promise(resolve => {
-      setTimeout(resolve, 1500); // Simular tiempo de carga
-    });
-  }
+
 
   validateAllSteps(): boolean {
     // Guardar el establecimiento actual antes de validar
@@ -646,18 +634,17 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
            this.establishments.every(est => 
              est.estab && est.ptoEmi && est.secuencial && est.dirEstablecimiento
            );
-    const logoValid = this.logoFile !== null;
-    const signatureValid = this.signatureFile !== null && this.signatureError === '';
+    const signatureValid = this.signatureFile !== null && this.signatureError === '' && this.signaturePassword.trim() !== '';
     
     console.log('Validación final:', {
       company: companyValid,
       establishments: establishmentsValid,
-      logo: logoValid,
       signature: signatureValid,
-      signatureError: this.signatureError
+      signatureError: this.signatureError,
+      signaturePassword: this.signaturePassword
     });
     
-    return companyValid && establishmentsValid && logoValid && signatureValid;
+    return companyValid && establishmentsValid && signatureValid;
   }
 
   getStepTitle(): string {
@@ -667,8 +654,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       case 2:
         return 'Establecimientos';
       case 3:
-        return 'Logo de la Empresa';
-      case 4:
         return 'Firma Electrónica';
       default:
         return 'Configuración';
@@ -682,8 +667,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       case 2:
         return 'Configura tus puntos de emisión de facturas';
       case 3:
-        return 'Logo que aparecerá en tus documentos';
-      case 4:
         return 'Certificado para firmar electrónicamente';
       default:
         return '';
@@ -733,7 +716,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     console.log('Company Form Value:', this.companyForm.value);
     console.log('Establishment Form Valid:', this.establishmentForm.valid);
     console.log('Establishment Form Value:', this.establishmentForm.value);
-    console.log('Logo File:', this.logoFile);
     console.log('Signature File:', this.signatureFile);
     console.log('Validate Current Step Result:', this.validateCurrentStep());
     

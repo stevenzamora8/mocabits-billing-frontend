@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 /**
@@ -146,5 +146,36 @@ export class AuthService {
 
     const encoded = btoa(`${email}:${password}`);
     return `Basic ${encoded}`;
+  }
+
+  resetPassword(uid: string, newPassword: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/auth/reset-password/${uid}`;
+    const body = { newPassword };
+
+    return this.http.post(url, body).pipe(
+      tap((response: any) => {
+        console.log('Password reset successful:', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        console.error('Password reset error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  validateResetToken(uid: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/auth/validate-reset-token/${uid}`;
+
+    return this.http.get(url).pipe(
+      tap((response: any) => {
+        console.log('Reset token validation successful:', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        console.error('Reset token validation error:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

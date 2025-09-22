@@ -48,7 +48,7 @@
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
           <svg *ngIf="currentStep === 3" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <svg *ngIf="currentStep === 4" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -61,7 +61,7 @@
             <span class="tip-icon">💡</span>
             <span *ngIf="currentStep === 1">Necesitarás tu RUC y datos de tu empresa a mano</span>
             <span *ngIf="currentStep === 2">Puedes configurar múltiples establecimientos si los necesitas</span>
-            <span *ngIf="currentStep === 3">Tu logo aparecerá en todas las facturas generadas</span>
+            <span *ngIf="currentStep === 3">La firma electrónica es requerida para facturación válida</span>
             <span *ngIf="currentStep === 4">La firma electrónica es requerida para facturación válida</span>
           </div>
         </div>
@@ -304,55 +304,15 @@
         </div>
       </div>
 
-      <!-- Step 3: Logo -->
+      <!-- Step 3: Firma Electrónica -->
       <div *ngIf="currentStep === 3" class="step-content">
-        <div class="upload-section">
-          <div class="upload-area" [class.has-file]="logoFile">
-            <input 
-              type="file" 
-              id="logo" 
-              (change)="onLogoChange($event)" 
-              accept="image/*" 
-              class="file-input">
-            <label for="logo" class="upload-label">
-              <div class="upload-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8s0 0 0 0l-6-6s0 0 0 0z"/>
-                  <path d="M14 2v6h6"/>
-                  <path d="M16 13H8"/>
-                  <path d="M16 17H8"/>
-                  <path d="M10 9H8"/>
-                </svg>
-              </div>
-              <div class="upload-text">
-                <h3>{{ logoFile ? logoFile.name : 'Subir Logo' }}</h3>
-                <p>{{ logoFile ? 'Archivo seleccionado' : 'Arrastra un archivo aquí o haz clic para seleccionar' }}</p>
-                <small>PNG, JPG, GIF hasta 5MB</small>
-              </div>
-            </label>
-          </div>
-          
-          <div class="upload-requirements">
-            <h4>Requisitos del logo:</h4>
-            <ul>
-              <li>Formato: PNG, JPG o GIF</li>
-              <li>Tamaño máximo: 5MB</li>
-              <li>Dimensiones recomendadas: 300x300px</li>
-              <li>Fondo transparente (recomendado)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4: Firma Electrónica -->
-      <div *ngIf="currentStep === 4" class="step-content">
         <div class="upload-section">
           <div class="upload-area" [class.has-file]="signatureFile" [class.has-error]="getSignatureError()">
             <input 
               type="file" 
               id="signature" 
               (change)="onSignatureChange($event)" 
-              accept=".p12,.pfx" 
+              accept="" 
               class="file-input">
             <label for="signature" class="upload-label">
               <div class="upload-icon">
@@ -368,7 +328,85 @@
                 <p *ngIf="!signatureFile && !getSignatureError()">Arrastra tu certificado .p12 aquí o haz clic para seleccionar</p>
                 <p *ngIf="signatureFile && !getSignatureError()" class="success-text">✓ Certificado válido seleccionado</p>
                 <p *ngIf="getSignatureError()" class="error-text">{{ getSignatureError() }}</p>
-                <small>Archivo .p12 o .pfx (máximo 5MB)</small>
+                <small>Archivo .p12 (máximo 5MB)</small>
+              </div>
+            </label>
+          </div>
+          
+          <!-- Mensaje de error detallado -->
+          <div *ngIf="getSignatureError()" class="validation-error">
+            <div class="error-content">
+              <p>{{ getSignatureError() }}</p>
+              <ul class="error-suggestions">
+                <li>Verifica que el archivo sea un certificado digital válido (.p12)</li>
+                <li>Asegúrate de que el archivo no esté corrupto</li>
+                <li>El certificado debe estar vigente y emitido por una autoridad certificadora</li>
+                <li>El tamaño del archivo no debe exceder 5MB</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Estado de validación exitosa -->
+          <div *ngIf="signatureFile && !getSignatureError()" class="validation-success">
+            <div class="success-content">
+              <p>El archivo {{ signatureFile.name }} ha sido validado correctamente.</p>
+              <div class="file-details">
+                <span class="detail-item">Tamaño: {{ formatFileSize(signatureFile.size) }}</span>
+                <span class="detail-item">Tipo: Certificado PKCS#12</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="upload-requirements">
+            <h4>Sobre el certificado de firma electrónica:</h4>
+            <ul>
+              <li>Debe ser un archivo .p12 válido</li>
+              <li>Emitido por una autoridad certificadora autorizada (UANATACA, ECLIPSOFT, etc.)</li>
+              <li>Debe estar vigente y no expirado</li>
+              <li>Necesario para firmar facturas electrónicas según la normativa del SRI</li>
+              <li>El archivo será validado automáticamente al seleccionarlo</li>
+            </ul>
+          </div>
+          
+          <!-- Contraseña del certificado -->
+          <div *ngIf="signatureFile" class="password-section">
+            <label for="signaturePassword">Contraseña del certificado *</label>
+            <input 
+              type="password" 
+              id="signaturePassword" 
+              [(ngModel)]="signaturePassword" 
+              placeholder="Ingresa la contraseña de tu certificado"
+              class="setup-input">
+            <small>La contraseña es requerida para usar el certificado</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Firma Electrónica -->
+      <div *ngIf="currentStep === 4" class="step-content">
+        <div class="upload-section">
+          <div class="upload-area" [class.has-file]="signatureFile" [class.has-error]="getSignatureError()">
+            <input 
+              type="file" 
+              id="signature" 
+              (change)="onSignatureChange($event)" 
+              accept="" 
+              class="file-input">
+            <label for="signature" class="upload-label">
+              <div class="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6z"/>
+                  <path d="M14 2v6h6"/>
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path d="M6 18v-1a2 2 0 012-2h4a2 2 0 012 2v1"/>
+                </svg>
+              </div>
+              <div class="upload-text">
+                <h3>{{ signatureFile ? signatureFile.name : 'Subir Certificado' }}</h3>
+                <p *ngIf="!signatureFile && !getSignatureError()">Arrastra tu certificado .p12 aquí o haz clic para seleccionar</p>
+                <p *ngIf="signatureFile && !getSignatureError()" class="success-text">✓ Certificado válido seleccionado</p>
+                <p *ngIf="getSignatureError()" class="error-text">{{ getSignatureError() }}</p>
+                <small>Archivo .p12 (máximo 5MB)</small>
               </div>
             </label>
           </div>
@@ -400,7 +438,7 @@
           <div class="upload-requirements">
             <h4>Sobre el certificado de firma electrónica:</h4>
             <ul>
-              <li>Debe ser un archivo .p12 o .pfx válido</li>
+              <li>Debe ser un archivo .p12 válido</li>
               <li>Emitido por una autoridad certificadora autorizada (UANATACA, ECLIPSOFT, etc.)</li>
               <li>Debe estar vigente y no expirado</li>
               <li>Necesario para firmar facturas electrónicas según la normativa del SRI</li>

@@ -1334,16 +1334,49 @@ textarea.error:focus {
   }
 }
 
-/* Responsive para validaciones */
-@media (max-width: 768px) {
-  .validation-error,
-  .validation-success {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .file-details {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+/* Contraseña del certificado */
+.password-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.password-section label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.password-section input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: white;
+  color: #111827;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.password-section input:focus {
+  outline: none;
+  border: 2px solid #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  transform: scale(1.02);
+}
+
+.password-section small {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 0.5rem;
+  display: block;
 }

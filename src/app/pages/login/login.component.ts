@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PlansService } from '../../services/plans.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
@@ -27,7 +28,7 @@ export class LoginComponent {
   serverError: string | null = null;
   showAdvanced: boolean = false;
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router, private authService: AuthService, private plansService: PlansService) {
     console.log('Rutas disponibles:', this.router.config.length);
   }
 
@@ -73,10 +74,28 @@ export class LoginComponent {
 
   private showSuccessAnimation() {
     this.showSuccessMessage = true;
-    // Redirigir a selección de planes después de mostrar éxito
+    // Llamar al endpoint de status para determinar a dónde redirigir
     setTimeout(() => {
-      console.log('Redirecting to plan selection...');
-      this.router.navigate(['/plan-selection']);
+      this.plansService.getUserSetupStatus().subscribe({
+        next: (status) => {
+          console.log('User setup status:', status);
+          this.showSuccessMessage = false;
+
+          if (!status.hasActivePlan) {
+            // No tiene plan activo, ir a selección de planes
+            this.router.navigate(['/plan-selection']);
+          } else {
+            // Tiene plan activo, ir a setup (independientemente de hasCompanyInfo)
+            this.router.navigate(['/setup']);
+          }
+        },
+        error: (error) => {
+          console.error('Error getting user setup status:', error);
+          this.showSuccessMessage = false;
+          // En caso de error, ir a plan-selection por defecto
+          this.router.navigate(['/plan-selection']);
+        }
+      });
     }, 2000);
   }
 

@@ -75,7 +75,18 @@ export class CompanyService {
     );
   }
 
-  getCompany(companyId: number): Observable<Company> {
-    return this.http.get<Company>(`${this.apiUrl}/${companyId}`, { headers: this.getHeaders() });
+  completeSetup(companyData: any, signatureFile: File, signaturePassword?: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('companyData', JSON.stringify(companyData));
+    formData.append('signatureFile', signatureFile);
+    if (signaturePassword) {
+      formData.append('signaturePassword', signaturePassword);
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.authService.getAccessToken()}`
+    });
+
+    return this.http.post(`${this.apiUrl}/complete-setup`, formData, { headers });
   }
 }

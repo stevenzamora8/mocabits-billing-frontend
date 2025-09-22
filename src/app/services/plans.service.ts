@@ -211,21 +211,22 @@ export class PlansService {
   }
 
   /**
-   * Función de comparación: envía la solicitud normal vs la de Postman
+   * Obtiene el estado de setup del usuario (si tiene plan activo y info de compañía)
    */
-  compareRequests(planId: number): Observable<any> {
-    console.log('=== COMPARISON: Normal request vs Postman request ===');
+  getUserSetupStatus(): Observable<{ hasActivePlan: boolean; hasCompanyInfo: boolean }> {
+    console.log('PlansService - getUserSetupStatus: Fetching user setup status');
+    const headers = this.getAuthHeaders();
+    const url = `${this.apiUrl}/plans/user-setup-status`;
 
-    // 1. Solicitud normal (que falla)
-    const normalRequest = this.assignPlanToUser(planId);
-
-    // 2. Solicitud exacta de Postman (que funciona)
-    const postmanRequest = this.testExactPostmanRequest();
-
-    // Ejecutar ambas y comparar resultados
-    return normalRequest.pipe(
-      map(result => ({ type: 'normal', result })),
-      catchError(error => throwError(() => ({ type: 'normal', error })))
+    return this.http.get<{ hasActivePlan: boolean; hasCompanyInfo: boolean }>(url, { headers }).pipe(
+      map(response => {
+        console.log('PlansService - getUserSetupStatus success:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('PlansService - getUserSetupStatus error:', error);
+        return throwError(() => error);
+      })
     );
   }
 }
