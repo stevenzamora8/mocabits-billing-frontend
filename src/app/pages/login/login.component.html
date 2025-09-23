@@ -1,3 +1,6 @@
+<!-- Contenedor de notificaciones -->
+<app-notification-container></app-notification-container>
+
 <div class="login-container">
   <!-- Panel izquierdo con ilustración -->
   <div class="illustration-panel">
@@ -117,6 +120,8 @@
                 id="email" 
                 name="email"
                 [(ngModel)]="email"
+                (input)="onEmailInput()"
+                (keydown.enter)="onEmailEnter()"
                 placeholder="correo@empresa.com"
                 class="form-input"
                 required
@@ -124,14 +129,23 @@
                 autocomplete="email"
                 #emailField="ngModel"
                 [class.error]="emailField.invalid && emailField.touched"
-                [class.success]="isEmailValid(email) && email.length > 0">
+                [class.success]="isEmailValid(email) && email.length > 0"
+                [attr.aria-describedby]="emailField.invalid && emailField.touched ? 'email-error' : null"
+                [attr.aria-invalid]="emailField.invalid && emailField.touched">
               <span class="input-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
               </span>
+              <div class="input-feedback" *ngIf="email && email.length > 0">
+                <span class="success-check" *ngIf="isEmailValid(email)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                </span>
+              </div>
             </div>
-            <div class="field-error" *ngIf="emailField.invalid && emailField.touched">
+            <div class="field-error" id="email-error" *ngIf="emailField.invalid && emailField.touched" role="alert">
               <span *ngIf="emailField.errors?.['required']">El correo electrónico es requerido</span>
               <span *ngIf="emailField.errors?.['email']">Por favor ingresa un correo válido</span>
             </div>
@@ -145,13 +159,16 @@
                 id="password" 
                 name="password"
                 [(ngModel)]="password"
+                (input)="onPasswordInput()"
                 placeholder="Ingresa tu contraseña"
                 class="form-input"
                 required
                 minlength="6"
                 autocomplete="current-password"
                 #passwordField="ngModel"
-                [class.error]="passwordField.invalid && passwordField.touched">
+                [class.error]="passwordField.invalid && passwordField.touched"
+                [attr.aria-describedby]="passwordField.invalid && passwordField.touched ? 'password-error' : null"
+                [attr.aria-invalid]="passwordField.invalid && passwordField.touched">
               <span class="input-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
@@ -160,7 +177,9 @@
               <button 
                 type="button" 
                 class="password-toggle"
-                (click)="togglePasswordVisibility()">
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" *ngIf="!showPassword">
                   <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                 </svg>
@@ -169,7 +188,7 @@
                 </svg>
               </button>
             </div>
-            <div class="field-error" *ngIf="passwordField.invalid && passwordField.touched">
+            <div class="field-error" id="password-error" *ngIf="passwordField.invalid && passwordField.touched" role="alert">
               <span *ngIf="passwordField.errors?.['required']">La contraseña es requerida</span>
               <span *ngIf="passwordField.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
             </div>
@@ -198,9 +217,17 @@
               type="submit" 
               class="primary-button"
               [disabled]="loginForm.invalid || isLoading"
-              [class.loading]="isLoading">
-              <span *ngIf="!isLoading">Iniciar Sesión</span>
-              <div *ngIf="isLoading" class="button-spinner"></div>
+              [class.loading]="isLoading"
+              [attr.aria-describedby]="isLoading ? 'loading-text' : null">
+              <div class="button-content">
+                <svg *ngIf="!isLoading" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="button-icon">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <div *ngIf="isLoading" class="button-spinner" aria-hidden="true"></div>
+                <span *ngIf="!isLoading">Iniciar Sesión</span>
+                <span *ngIf="isLoading" id="loading-text">Validando credenciales...</span>
+              </div>
+              <div class="button-progress" *ngIf="isLoading"></div>
             </button>
           </div>
 

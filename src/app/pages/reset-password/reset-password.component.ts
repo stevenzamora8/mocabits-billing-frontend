@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ErrorHandlerService } from '../../services/error-handler.service';
+import { NotificationService } from '../../services/notification.service';
+import { NotificationContainerComponent } from '../../components/notification-container/notification-container.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 const MESSAGES = {
   TITLE: 'Restablecer Contraseña',
@@ -29,7 +33,7 @@ const PASSWORD_MIN_LENGTH = 8;
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NotificationContainerComponent],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css']
 })
@@ -38,6 +42,8 @@ export class ResetPasswordComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly errorHandler = inject(ErrorHandlerService);
+  private readonly notificationService = inject(NotificationService);
 
   readonly MESSAGES = MESSAGES;
 
@@ -48,6 +54,7 @@ export class ResetPasswordComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   uid = '';
+  showPassword = false;
 
   ngOnInit(): void {
     this.initializeComponent();
@@ -65,16 +72,24 @@ export class ResetPasswordComponent implements OnInit {
     this.validateResetToken();
   }
 
-  private async validateResetToken(): Promise<void> {
-    try {
-      await this.authService.validateResetToken(this.uid).toPromise();
-      // Token válido, mostrar formulario
-      this.initializeForm();
-      this.isLoading = false;
-    } catch (error) {
-      // Token inválido, mostrar mensaje de error
-      this.handleInvalidLink();
-    }
+  private validateResetToken(): void {
+    this.authService.validateResetToken(this.uid).subscribe({
+      next: () => {
+        // Token válido, mostrar formulario
+        this.initializeForm();
+        this.isLoading = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Token validation error:', error);
+        
+        // Usar el servicio de manejo de errores
+        const errorResult = this.errorHandler.handleError(error);
+        this.notificationService.showError(errorResult.message, 'Enlace Inválido');
+        
+        // Token inválido, mostrar mensaje de error
+        this.handleInvalidLink();
+      }
+    });
   }
 
   private initializeForm(): void {
@@ -105,20 +120,40 @@ export class ResetPasswordComponent implements OnInit {
     this.isLoading = false;
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.resetForm.invalid) return;
+  onSubmit(): void {
+    if (this.resetForm.invalid) {
+      this.notificationService.showError('Por favor completa todos los campos correctamente', 'Formulario Inválido');
+      return;
+    }
 
     this.setSubmittingState(true);
     this.clearMessages();
 
-    try {
-      await this.performPasswordReset();
-      this.handleSuccess();
-    } catch (error: any) {
-      this.handleError(error);
-    } finally {
-      this.setSubmittingState(false);
-    }
+    this.authService.resetPassword(this.uid, this.resetForm.value.password).subscribe({
+      next: () => {
+        this.handleSuccess();
+        this.setSubmittingState(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Reset password error:', error);
+        
+        // Usar el servicio de manejo de errores
+        const errorResult = this.errorHandler.handleError(error);
+        
+        if (errorResult.shouldRetry) {
+          this.notificationService.showErrorWithRetry(
+            errorResult.message,
+            () => this.onSubmit(),
+            'Error al Restablecer'
+          );
+        } else {
+          this.notificationService.showError(errorResult.message, 'Error de Restablecimiento');
+        }
+        
+        this.handleError(errorResult.message);
+        this.setSubmittingState(false);
+      }
+    });
   }
 
   private setSubmittingState(isSubmitting: boolean): void {
@@ -127,14 +162,15 @@ export class ResetPasswordComponent implements OnInit {
 
   private clearMessages(): void {
     this.errorMessage = '';
-  }
-
-  private async performPasswordReset(): Promise<void> {
-    await this.authService.resetPassword(this.uid, this.resetForm.value.password).toPromise();
+    this.successMessage = '';
   }
 
   private handleSuccess(): void {
     this.successMessage = MESSAGES.SUCCESS_MESSAGE;
+    this.notificationService.showSuccess(
+      'Tu contraseña ha sido restablecida exitosamente. Redirigiendo al inicio de sesión...', 
+      '¡Éxito!'
+    );
     this.resetForm.reset();
     // Redirigir automáticamente al login después de 2 segundos
     setTimeout(() => {
@@ -142,8 +178,8 @@ export class ResetPasswordComponent implements OnInit {
     }, 2000);
   }
 
-  private handleError(error: any): void {
-    this.errorMessage = error.error?.message || MESSAGES.ERROR_MESSAGE;
+  private handleError(message: string): void {
+    this.errorMessage = message;
   }
 
   navigateToLogin(): void {
@@ -152,5 +188,38 @@ export class ResetPasswordComponent implements OnInit {
 
   navigateToForgotPassword(): void {
     this.router.navigate(['/forgot-password']);
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  getPasswordStrength(): string {
+    const password = this.resetForm.get('password')?.value || '';
+    const hasNumbers = /\d/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (hasNumbers) score++;
+    if (hasLowerCase) score++;
+    if (hasUpperCase) score++;
+    if (hasSpecialChars) score++;
+
+    if (score < 2) return 'weak';
+    if (score < 4) return 'medium';
+    return 'strong';
+  }
+
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    const textMap = {
+      'weak': 'Débil',
+      'medium': 'Mediana',
+      'strong': 'Fuerte'
+    };
+    return textMap[strength as keyof typeof textMap];
   }
 }

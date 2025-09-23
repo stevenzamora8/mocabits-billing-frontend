@@ -4,13 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PlansService } from '../../services/plans.service';
+import { ErrorHandlerService } from '../../services/error-handler.service';
+import { NotificationService } from '../../services/notification.service';
+import { NotificationContainerComponent } from '../../components/notification-container/notification-container.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationContainerComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -28,30 +31,49 @@ export class LoginComponent {
   serverError: string | null = null;
   showAdvanced: boolean = false;
 
-  constructor(private router: Router, private authService: AuthService, private plansService: PlansService) {
+  constructor(
+    private readonly router: Router, 
+    private readonly authService: AuthService, 
+    private readonly plansService: PlansService,
+    private readonly errorHandler: ErrorHandlerService,
+    private readonly notificationService: NotificationService
+  ) {
     console.log('Rutas disponibles:', this.router.config.length);
   }
 
   onLogin() {
     this.serverError = null;
     this.isLoading = true;
+    this.loginAttempts++;
 
     this.authService.login(this.email, this.password, this.clientId || undefined, this.clientSecret || undefined).subscribe({
-      next: (resp) => {
+      next: (resp: any) => {
         this.isLoading = false;
         console.log('Login successful', resp);
+        this.notificationService.showSuccess('¡Bienvenido! Iniciando sesión...');
         this.showSuccessAnimation();
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading = false;
         console.error('Login error', err);
-        if (err.error && typeof err.error === 'string') {
-          this.serverError = err.error;
-        } else if (err.error && err.error.message) {
-          this.serverError = err.error.message;
+        
+        // Usar el servicio de manejo de errores
+        const errorResult = this.errorHandler.handleError(err);
+        
+        if (errorResult.shouldRetry && this.loginAttempts < 3) {
+          // Mostrar error con opción de reintento
+          this.notificationService.showErrorWithRetry(
+            errorResult.message, 
+            () => this.onLogin(),
+            'Error de Conexión'
+          );
         } else {
-          this.serverError = 'Ocurrió un error al iniciar sesión. Intenta nuevamente.';
+          // Mostrar error normal
+          this.notificationService.showError(errorResult.message, 'Error de Inicio de Sesión');
         }
+        
+        // También mantener el error en la UI para compatibilidad
+        this.serverError = errorResult.message;
       }
     });
   }
@@ -109,6 +131,23 @@ export class LoginComponent {
   isEmailValid(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }
+
+  // Enhanced UX methods
+  onEmailInput() {
+    this.clearServerError();
+  }
+
+  onPasswordInput() {
+    this.clearServerError();
+    // También cerrar notificaciones de error previas
+    this.notificationService.closeByType('error');
+  }
+
+  private clearServerError() {
+    if (this.serverError) {
+      this.serverError = null;
+    }
   }
 
   // Auto-focus para mejor UX
