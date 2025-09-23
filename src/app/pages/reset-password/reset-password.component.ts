@@ -20,7 +20,7 @@ const MESSAGES = {
   RESETTING: 'Restableciendo...',
   RESET_PASSWORD: 'Restablecer Contraseña',
   GO_TO_LOGIN: 'Ir al Login',
-  SUCCESS_MESSAGE: 'Contraseña restablecida exitosamente. Puedes iniciar sesión ahora.',
+  SUCCESS_MESSAGE: 'Contraseña restablecida exitosamente. Redirigiendo al login...',
   ERROR_MESSAGE: 'Error al restablecer la contraseña. Inténtalo de nuevo.'
 } as const;
 
@@ -61,8 +61,20 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
-    this.initializeForm();
-    this.isLoading = false;
+    // Validar el token con el backend antes de mostrar el formulario
+    this.validateResetToken();
+  }
+
+  private async validateResetToken(): Promise<void> {
+    try {
+      await this.authService.validateResetToken(this.uid).toPromise();
+      // Token válido, mostrar formulario
+      this.initializeForm();
+      this.isLoading = false;
+    } catch (error) {
+      // Token inválido, mostrar mensaje de error
+      this.handleInvalidLink();
+    }
   }
 
   private initializeForm(): void {
@@ -124,6 +136,10 @@ export class ResetPasswordComponent implements OnInit {
   private handleSuccess(): void {
     this.successMessage = MESSAGES.SUCCESS_MESSAGE;
     this.resetForm.reset();
+    // Redirigir automáticamente al login después de 2 segundos
+    setTimeout(() => {
+      this.navigateToLogin();
+    }, 2000);
   }
 
   private handleError(error: any): void {

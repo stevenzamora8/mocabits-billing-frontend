@@ -58,7 +58,7 @@ export class LoginComponent {
 
   onForgotPassword() {
     console.log('Navegando a forgot-password...');
-    // Usar window.location para navegación directa
+    // Ya no necesitamos guardar el email, el backend lo identifica automáticamente
     window.location.href = '/forgot-password';
   }
 

@@ -148,9 +148,25 @@ export class AuthService {
     return `Basic ${encoded}`;
   }
 
+  forgotPassword(email?: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/security/v1/auth/forgot-password`;
+    const body = email ? { email } : {};
+
+    return this.http.post(url, body).pipe(
+      tap((response: any) => {
+        console.log('Forgot password request successful:', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        console.error('Forgot password error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   resetPassword(uid: string, newPassword: string): Observable<any> {
-    const url = `${environment.apiBaseUrl}/auth/reset-password/${uid}`;
-    const body = { newPassword };
+    const url = `${environment.apiBaseUrl}/security/v1/auth/reset-password`;
+    const body = { resetCode: uid, newPassword };
 
     return this.http.post(url, body).pipe(
       tap((response: any) => {
@@ -165,9 +181,9 @@ export class AuthService {
   }
 
   validateResetToken(uid: string): Observable<any> {
-    const url = `${environment.apiBaseUrl}/auth/validate-reset-token/${uid}`;
+    const url = `${environment.apiBaseUrl}/security/v1/auth/validate-reset-token/${uid}`;
 
-    return this.http.get(url).pipe(
+    return this.http.post(url, {}).pipe(
       tap((response: any) => {
         console.log('Reset token validation successful:', response);
         return response;
