@@ -5,22 +5,22 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PlansService } from '../../services/plans.service';
 import { ErrorHandlerService } from '../../services/error-handler.service';
-import { NotificationService } from '../../services/notification.service';
-import { NotificationContainerComponent } from '../../components/notification-container/notification-container.component';
+import { BrandService } from '../../services/brand.service';
+import { AlertComponent, AlertType } from '../../components/alert/alert.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, NotificationContainerComponent],
+  imports: [CommonModule, FormsModule, AlertComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   email: string = '';
   password: string = '';
-  // Optional client credentials for Basic auth (can be left empty to use env.basicAuth)
+  // Optional client credentials for Basic auth (can be left empty to use env.basicAuth)  
   clientId: string = environment['clientId'] || '';
   clientSecret: string = environment['clientSecret'] || '';
   rememberMe: boolean = false;
@@ -28,21 +28,47 @@ export class LoginComponent {
   showPassword: boolean = false;
   showSuccessMessage: boolean = false;
   loginAttempts: number = 0;
-  serverError: string | null = null;
-  showAdvanced: boolean = false;
+  
+  // Alert properties
+  alertMessage: string = '';
+  alertType: AlertType = 'danger';
+  currentYear: number = new Date().getFullYear();
+
+  // Brand properties
+  brandName: string = '';
+  brandSubtitle: string = '';
+  brandTagline: string = '';
+  brandDescription: string = '';
+  brandVersion: string = '';
+  useCustomLogo: boolean = false;
+  customLogoPath: string = '';
 
   constructor(
     private readonly router: Router, 
     private readonly authService: AuthService, 
     private readonly plansService: PlansService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly notificationService: NotificationService
+    private readonly brandService: BrandService
   ) {
     console.log('Rutas disponibles:', this.router.config.length);
+    this.initializeBrandData();
+  }
+
+  /**
+   * Inicializa los datos de branding desde el servicio
+   */
+  private initializeBrandData(): void {
+    this.brandName = this.brandService.getBrandName();
+    this.brandSubtitle = this.brandService.getBrandSubtitle();
+    this.brandTagline = this.brandService.getBrandTagline();
+    this.brandDescription = this.brandService.getBrandDescription();
+    this.brandVersion = this.brandService.getBrandVersion();
+    this.useCustomLogo = this.brandService.useCustomLogo();
+    this.customLogoPath = this.brandService.getCustomLogoPath() || '';
   }
 
   onLogin() {
-    this.serverError = null;
+    this.clearAlert();
     this.isLoading = true;
     this.loginAttempts++;
 
@@ -50,7 +76,7 @@ export class LoginComponent {
       next: (resp: any) => {
         this.isLoading = false;
         console.log('Login successful', resp);
-        this.notificationService.showSuccess('¡Bienvenido! Iniciando sesión...');
+        this.showAlert('¡Bienvenido! Iniciando sesión...', 'success');
         this.showSuccessAnimation();
       },
       error: (err: HttpErrorResponse) => {
@@ -59,21 +85,7 @@ export class LoginComponent {
         
         // Usar el servicio de manejo de errores
         const errorResult = this.errorHandler.handleError(err);
-        
-        if (errorResult.shouldRetry && this.loginAttempts < 3) {
-          // Mostrar error con opción de reintento
-          this.notificationService.showErrorWithRetry(
-            errorResult.message, 
-            () => this.onLogin(),
-            'Error de Conexión'
-          );
-        } else {
-          // Mostrar error normal
-          this.notificationService.showError(errorResult.message, 'Error de Inicio de Sesión');
-        }
-        
-        // También mantener el error en la UI para compatibilidad
-        this.serverError = errorResult.message;
+        this.showAlert(errorResult.message, 'danger');
       }
     });
   }
@@ -133,21 +145,47 @@ export class LoginComponent {
     return emailRegex.test(email);
   }
 
+  // Detectar si es un error de validación de campo (no debería mostrarse como alerta)
+  isFieldValidationError(message: string): boolean {
+    const fieldValidationMessages = [
+      'El correo electrónico es requerido',
+      'Por favor ingresa un correo válido',
+      'La contraseña es requerida',
+      'La contraseña debe tener al menos',
+      'Campo requerido',
+      'Formato inválido'
+    ];
+    
+    return fieldValidationMessages.some(msg => message.includes(msg));
+  }
+
   // Enhanced UX methods
   onEmailInput() {
-    this.clearServerError();
+    // Solo limpiar alertas del servidor al escribir en email
+    if (this.alertMessage && !this.isFieldValidationError(this.alertMessage)) {
+      this.clearAlert();
+    }
   }
 
   onPasswordInput() {
-    this.clearServerError();
-    // También cerrar notificaciones de error previas
-    this.notificationService.closeByType('error');
+    // Solo limpiar alertas del servidor al escribir en contraseña
+    if (this.alertMessage && !this.isFieldValidationError(this.alertMessage)) {
+      this.clearAlert();
+    }
   }
 
-  private clearServerError() {
-    if (this.serverError) {
-      this.serverError = null;
-    }
+  // Métodos para manejar alerts
+  showAlert(message: string, type: AlertType) {
+    this.alertMessage = message;
+    this.alertType = type;
+  }
+
+  clearAlert() {
+    this.alertMessage = '';
+  }
+
+  onAlertClosed() {
+    this.clearAlert();
   }
 
   // Auto-focus para mejor UX

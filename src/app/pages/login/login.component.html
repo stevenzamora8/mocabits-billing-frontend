@@ -1,32 +1,44 @@
-<!-- Contenedor de notificaciones -->
-<app-notification-container></app-notification-container>
-
 <div class="login-container">
   <!-- Panel izquierdo con ilustración -->
   <div class="illustration-panel">
     <!-- Logo y branding flotante -->
     <div class="brand-header">
       <div class="brand-logo">
-        <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-          <rect width="100" height="100" rx="20" fill="url(#brandGradient)"/>
-          <path d="M30 35h40v30H30z" fill="white" opacity="0.9"/>
-          <path d="M35 45h30v2H35zm0 6h25v2H35zm0 6h20v2H35z" fill="url(#textGradient)"/>
+        <!-- Logo personalizado (cuando está disponible) -->
+        <img *ngIf="useCustomLogo && customLogoPath" 
+             [src]="customLogoPath" 
+             [alt]="brandName + ' Logo'" 
+             class="brand-logo-image">
+        
+        <!-- Logo SVG temporal (por defecto) -->
+        <svg *ngIf="!useCustomLogo" width="50" height="50" viewBox="0 0 100 100" fill="none">
+          <!-- Logo principal de MocaBits -->
+          <rect width="100" height="100" rx="22" fill="url(#brandGradient)"/>
+          
+          <!-- Letra "M" estilizada -->
+          <path d="M20 30 L20 70 L25 70 L25 40 L35 55 L40 55 L50 40 L50 70 L55 70 L55 30 L48 30 L37.5 48 L27 30 Z" fill="white"/>
+          
+          <!-- Letra "B" estilizada -->
+          <path d="M62 30 L62 70 L75 70 Q82 70 82 62.5 Q82 55 75 55 Q82 55 82 42.5 Q82 30 75 30 Z M67 35 L75 35 Q77 35 77 42.5 Q77 50 75 50 L67 50 Z M67 55 L75 55 Q77 55 77 62.5 Q77 70 75 70 L67 70 Z" fill="white"/>
+          
+          <!-- Elementos decorativos tipo "bits" -->
+          <circle cx="25" cy="22" r="2" fill="rgba(255,255,255,0.8)"/>
+          <circle cx="40" cy="18" r="1.5" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="55" cy="22" r="2" fill="rgba(255,255,255,0.8)"/>
+          <circle cx="75" cy="18" r="1.5" fill="rgba(255,255,255,0.6)"/>
+          
           <defs>
             <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#667eea"/>
-              <stop offset="50%" style="stop-color:#764ba2"/>
-              <stop offset="100%" style="stop-color:#f093fb"/>
-            </linearGradient>
-            <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#667eea"/>
-              <stop offset="100%" style="stop-color:#764ba2"/>
+              <stop offset="0%" style="stop-color:var(--logo-primary-color)"/>
+              <stop offset="50%" style="stop-color:var(--logo-secondary-color)"/>
+              <stop offset="100%" style="stop-color:var(--logo-accent-color)"/>
             </linearGradient>
           </defs>
         </svg>
       </div>
       <div class="brand-text">
-        <h1 class="brand-title">MocaFacts</h1>
-        <p class="brand-subtitle">Sistema de Facturación</p>
+        <h1 class="brand-title">{{ brandName }}</h1>
+        <p class="brand-subtitle">{{ brandSubtitle }}</p>
       </div>
     </div>
 
@@ -95,6 +107,12 @@
         <span>Datos Protegidos</span>
       </div>
     </div>
+
+    <!-- Copyright -->
+    <div class="copyright">
+      <p>&copy; {{ currentYear }} {{ brandName }}. Todos los derechos reservados.</p>
+      <p class="copyright-detail">{{ brandDescription }}</p>
+    </div>
   </div>
 
   <!-- Panel derecho con formulario -->
@@ -104,14 +122,23 @@
       <!-- Formulario de Login -->
       <div *ngIf="!showSuccessMessage" class="auth-section">
         <div class="welcome-header">
-          <h1>¡Bienvenido de vuelta!</h1>
-          <p class="welcome-subtitle">Inicia sesión en tu cuenta de MocaFacts</p>
+          <h1>¡Bienvenido a MocaBits!</h1>
+          <p class="welcome-subtitle">Inicia sesión en tu cuenta</p>
         </div>
 
+        <!-- Alert Mejorado - Solo para errores del servidor -->
+        <app-alert 
+          *ngIf="alertMessage && !isFieldValidationError(alertMessage)"
+          [message]="alertMessage" 
+          [type]="alertType" 
+          [dismissible]="true"
+          [autoDismiss]="true"
+          [autoDismissTime]="4000"
+          (closed)="onAlertClosed()"
+          class="alert-enhanced">
+        </app-alert>
+
         <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
-            <div class="server-error" *ngIf="serverError" style="color: #b91c1c; font-weight:600; text-align:center;">
-              {{ serverError }}
-            </div>
           <div class="form-group">
             <label for="email">Correo Electrónico</label>
             <div class="input-wrapper">
@@ -194,23 +221,7 @@
             </div>
           </div>
 
-          <!-- Advanced client credentials (optional) -->
-          <div class="advanced-toggle">
-            <button type="button" class="link-button" (click)="showAdvanced = !showAdvanced">
-              {{ showAdvanced ? 'Ocultar ajustes avanzados' : 'Ajustes avanzados (cliente)' }}
-            </button>
-          </div>
 
-          <div *ngIf="showAdvanced" class="advanced-section">
-            <div class="form-group">
-              <label for="clientId">Client ID (opcional)</label>
-              <input id="clientId" name="clientId" [(ngModel)]="clientId" class="form-input" placeholder="client-id" />
-            </div>
-            <div class="form-group">
-              <label for="clientSecret">Client Secret (opcional)</label>
-              <input id="clientSecret" name="clientSecret" [(ngModel)]="clientSecret" class="form-input" placeholder="client-secret" />
-            </div>
-          </div>
 
           <div class="form-actions">
             <button 
@@ -253,7 +264,7 @@
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
           </svg>
         </div>
-        <h3>¡Bienvenido a MocaFacts!</h3>
+        <h3>¡Bienvenido a MocaBits!</h3>
         <p>Inicio de sesión exitoso. Redirigiendo al dashboard...</p>
         <div class="loading-bar">
           <div class="progress"></div>
@@ -261,5 +272,38 @@
       </div>
       
     </div>
+
+    <!-- Firma de la empresa -->
+    <div class="company-signature">
+      <div class="signature-line"></div>
+      <div class="signature-content">
+        <div class="signature-logo">
+          <!-- Logo personalizado para la firma -->
+          <img *ngIf="useCustomLogo && customLogoPath" 
+               [src]="customLogoPath" 
+               [alt]="brandName + ' Logo'" 
+               class="signature-logo-image">
+          
+          <!-- Logo SVG para la firma -->
+          <svg *ngIf="!useCustomLogo" width="24" height="24" viewBox="0 0 100 100" fill="none">
+            <rect width="100" height="100" rx="22" fill="url(#signatureGradient)"/>
+            <path d="M20 30 L20 70 L25 70 L25 40 L35 55 L40 55 L50 40 L50 70 L55 70 L55 30 L48 30 L37.5 48 L27 30 Z" fill="white"/>
+            <path d="M62 30 L62 70 L75 70 Q82 70 82 62.5 Q82 55 75 55 Q82 55 82 42.5 Q82 30 75 30 Z M67 35 L75 35 Q77 35 77 42.5 Q77 50 75 50 L67 50 Z M67 55 L75 55 Q77 55 77 62.5 Q77 70 75 70 L67 70 Z" fill="white"/>
+            <defs>
+              <linearGradient id="signatureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#6b7280"/>
+                <stop offset="100%" style="stop-color:#9ca3af"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="signature-text">
+          <span class="company-name">{{ brandName }}</span>
+          <span class="company-tagline">{{ brandTagline }}</span>
+        </div>
+      </div>
+      <div class="signature-version">{{ brandVersion }}</div>
+    </div>
+
   </div>
 </div>

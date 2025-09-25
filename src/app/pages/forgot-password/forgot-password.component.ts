@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../services/error-handler.service';
-import { NotificationService } from '../../services/notification.service';
-import { NotificationContainerComponent } from '../../components/notification-container/notification-container.component';
+import { AlertComponent, AlertType } from '../../components/alert/alert.component';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, NotificationContainerComponent],
+  imports: [CommonModule, FormsModule, AlertComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css'
 })
@@ -19,7 +18,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly errorHandler = inject(ErrorHandlerService);
-  private readonly notificationService = inject(NotificationService);
 
   isLoading: boolean = false;
   currentStep: string = 'form';
@@ -28,6 +26,11 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   countdown: number = 5;
   countdownDuration: number = 5000;
   private countdownInterval?: any;
+
+  // Alert properties
+  alertMessage: string = '';
+  alertType: AlertType = 'info';
+  showAlertComponent: boolean = false;
 
   ngOnInit() {
     console.log('ForgotPasswordComponent constructor ejecutado');
@@ -56,12 +59,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   onSendRecoveryEmail() {
     if (!this.recoveryEmail || this.recoveryEmail.trim() === '') {
-      this.notificationService.showError('El email es requerido', 'Campo Requerido');
+      this.showAlert('El email es requerido', 'danger');
       return;
     }
 
     if (!this.isEmailValid()) {
-      this.notificationService.showError('Por favor ingresa un correo electrónico válido', 'Email Inválido');
+      this.showAlert('Por favor ingresa un correo electrónico válido', 'danger');
       return;
     }
 
@@ -72,10 +75,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       next: () => {
         this.isLoading = false;
         this.currentStep = 'success';
-        this.notificationService.showSuccess(
-          `Se ha enviado un correo de recuperación a ${this.recoveryEmail}`, 
-          'Correo Enviado'
-        );
+        this.showAlert(`Se ha enviado un correo de recuperación a ${this.recoveryEmail}`, 'success');
         console.log('Correo de recuperación enviado exitosamente');
         this.startCountdown();
       },
@@ -87,13 +87,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         const errorResult = this.errorHandler.handleError(error);
         
         if (errorResult.shouldRetry) {
-          this.notificationService.showErrorWithRetry(
-            errorResult.message,
-            () => this.onSendRecoveryEmail(),
-            'Error de Envío'
-          );
+          this.showAlert(`${errorResult.message} - Puedes intentar nuevamente`, 'warning');
         } else {
-          this.notificationService.showError(errorResult.message, 'Error de Recuperación');
+          this.showAlert(errorResult.message, 'danger');
         }
         
         // Mantener compatibilidad con la UI actual
@@ -122,5 +118,21 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearCountdown();
+  }
+
+  // Alert methods
+  showAlert(message: string, type: AlertType): void {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertComponent = true;
+  }
+
+  clearAlert(): void {
+    this.showAlertComponent = false;
+    this.alertMessage = '';
+  }
+
+  onAlertClosed(): void {
+    this.clearAlert();
   }
 }

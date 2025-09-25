@@ -4,8 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../services/error-handler.service';
-import { NotificationService } from '../../services/notification.service';
-import { NotificationContainerComponent } from '../../components/notification-container/notification-container.component';
+import { AlertComponent, AlertType } from '../../components/alert/alert.component';
 import { HttpErrorResponse } from '@angular/common/http';
 
 const MESSAGES = {
@@ -33,7 +32,7 @@ const PASSWORD_MIN_LENGTH = 8;
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NotificationContainerComponent],
+  imports: [CommonModule, ReactiveFormsModule, AlertComponent],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css']
 })
@@ -43,7 +42,6 @@ export class ResetPasswordComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly errorHandler = inject(ErrorHandlerService);
-  private readonly notificationService = inject(NotificationService);
 
   readonly MESSAGES = MESSAGES;
 
@@ -55,6 +53,11 @@ export class ResetPasswordComponent implements OnInit {
   errorMessage = '';
   uid = '';
   showPassword = false;
+
+  // Alert properties
+  alertMessage: string = '';
+  alertType: AlertType = 'danger';
+  showAlertComponent: boolean = false;
 
   ngOnInit(): void {
     this.initializeComponent();
@@ -84,7 +87,7 @@ export class ResetPasswordComponent implements OnInit {
         
         // Usar el servicio de manejo de errores
         const errorResult = this.errorHandler.handleError(error);
-        this.notificationService.showError(errorResult.message, 'Enlace Inválido');
+        this.showAlert(errorResult.message, 'danger');
         
         // Token inválido, mostrar mensaje de error
         this.handleInvalidLink();
@@ -122,7 +125,7 @@ export class ResetPasswordComponent implements OnInit {
 
   onSubmit(): void {
     if (this.resetForm.invalid) {
-      this.notificationService.showError('Por favor completa todos los campos correctamente', 'Formulario Inválido');
+      this.showAlert('Por favor completa todos los campos correctamente', 'danger');
       return;
     }
 
@@ -141,13 +144,9 @@ export class ResetPasswordComponent implements OnInit {
         const errorResult = this.errorHandler.handleError(error);
         
         if (errorResult.shouldRetry) {
-          this.notificationService.showErrorWithRetry(
-            errorResult.message,
-            () => this.onSubmit(),
-            'Error al Restablecer'
-          );
+          this.showAlert(`${errorResult.message} - Puedes intentar nuevamente`, 'warning');
         } else {
-          this.notificationService.showError(errorResult.message, 'Error de Restablecimiento');
+          this.showAlert(errorResult.message, 'danger');
         }
         
         this.handleError(errorResult.message);
@@ -167,10 +166,7 @@ export class ResetPasswordComponent implements OnInit {
 
   private handleSuccess(): void {
     this.successMessage = MESSAGES.SUCCESS_MESSAGE;
-    this.notificationService.showSuccess(
-      'Tu contraseña ha sido restablecida exitosamente. Redirigiendo al inicio de sesión...', 
-      '¡Éxito!'
-    );
+    this.showAlert('Tu contraseña ha sido restablecida exitosamente. Redirigiendo al inicio de sesión...', 'success');
     this.resetForm.reset();
     // Redirigir automáticamente al login después de 2 segundos
     setTimeout(() => {
@@ -221,5 +217,21 @@ export class ResetPasswordComponent implements OnInit {
       'strong': 'Fuerte'
     };
     return textMap[strength as keyof typeof textMap];
+  }
+
+  // Alert methods
+  showAlert(message: string, type: AlertType): void {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlertComponent = true;
+  }
+
+  clearAlert(): void {
+    this.showAlertComponent = false;
+    this.alertMessage = '';
+  }
+
+  onAlertClosed(): void {
+    this.clearAlert();
   }
 }
