@@ -18,21 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
     title: 'MocaBits - Test Reset'
   },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/auth', pathMatch: 'full' },
   {
-    path: 'login',
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
-    title: 'MocaBits - Iniciar Sesión'
-  },
-  {
-    path: 'forgot-password',
-    loadComponent: () => import('./pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
-    title: 'MocaBits - Recuperar Contraseña'
-  },
-  {
-    path: 'create-user',
-    loadComponent: () => import('./pages/create-user/create-user.component').then(m => m.CreateUserComponent),
-    title: 'MocaBits - Crear Cuenta'
+    path: 'auth',
+    loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthModule)
   },
   {
     path: 'plan-selection',
@@ -57,5 +46,5 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     title: 'MocaBits - Dashboard'
   },
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/auth/login' }
 ];

@@ -2,7 +2,7 @@
   display: block;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #374151 100%);
+  background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 50%, var(--logo-accent-color) 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   overflow: hidden;
   position: fixed;
@@ -16,11 +16,11 @@
   --brand-description: 'Sistema de Facturación Electrónica Empresarial';
   --brand-version: 'v1.0.0';
   
-  /* COLORES DEL LOGO */
-  --logo-primary-color: #1e3a8a;
-  --logo-secondary-color: #3b82f6;
-  --logo-accent-color: #374151;
-  --logo-text-color: white;
+  /* COLORES DEL LOGO - CONFIGURADOS GLOBALMENTE POR BrandService */
+  /* --logo-primary-color: #1e3a8a; */
+  /* --logo-secondary-color: #3b82f6; */
+  /* --logo-accent-color: #374151; */
+  /* --logo-text-color: white; */
   
   /* TAMAÑOS DEL LOGO */
   --logo-size-main: 50px;
@@ -81,7 +81,7 @@
 
 /* PANEL IZQUIERDO - ILUSTRACIÓN */
 .illustration-panel {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #374151 100%);
+  background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 50%, var(--logo-accent-color) 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -232,7 +232,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #1e3a8a, #3b82f6, #374151);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color), var(--logo-accent-color));
 }
 
 .form-container {
@@ -507,7 +507,7 @@
 .primary-button {
   width: 100% !important;
   height: clamp(2.25rem, 5vh, 3rem) !important;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 100%) !important;
   color: white !important;
   border: none !important;
   border-radius: 12px !important;
@@ -1230,7 +1230,7 @@
   left: 1.5rem;
   right: 1.5rem;
   height: 2px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed, #db2777);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color), #db2777);
   border-radius: 1px;
 }
 

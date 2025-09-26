@@ -2,15 +2,16 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertComponent } from '../../../components/alert/alert.component';
 
 @Component({
-  selector: 'app-create-user',
+  selector: 'app-create-user-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './create-user.component.html',
-  styleUrl: './create-user.component.css'
+  imports: [CommonModule, FormsModule, AlertComponent],
+  templateUrl: './create-user-form.component.html',
+  styleUrl: './create-user-form.component.css'
 })
-export class CreateUserComponent {
+export class CreateUserFormComponent {
   firstName: string = '';
   lastName: string = '';
   email: string = '';
@@ -19,14 +20,23 @@ export class CreateUserComponent {
   currentStep: string = 'form';
   showPassword: boolean = false;
 
+  // Alert properties
+  alertMessage: string = '';
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
+  showAlertComponent: boolean = false;
+
   constructor(private router: Router) {
-    console.log('CreateUserComponent constructor ejecutado');
+    console.log('CreateUserFormComponent constructor ejecutado');
     console.log('localStorage selectedPlan:', localStorage.getItem('selectedPlan'));
     console.log('localStorage setupCompleted:', localStorage.getItem('setupCompleted'));
   }
 
   goToLogin() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
+  }
+
+  onAlertClosed() {
+    this.showAlertComponent = false;
   }
 
   onSubmitRequest() {
