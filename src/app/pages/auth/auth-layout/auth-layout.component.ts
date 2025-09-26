@@ -55,6 +55,8 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
           this.currentRoute = 'forgot-password';
         } else if (url.includes('/create-user')) {
           this.currentRoute = 'create-user';
+        } else if (url.includes('/reset-password')) {
+          this.currentRoute = 'reset-password';
         }
       });
 
@@ -66,6 +68,8 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
       this.currentRoute = 'forgot-password';
     } else if (currentUrl.includes('/create-user')) {
       this.currentRoute = 'create-user';
+    } else if (currentUrl.includes('/reset-password')) {
+      this.currentRoute = 'reset-password';
     }
   }
 

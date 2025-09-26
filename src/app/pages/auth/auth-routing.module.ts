@@ -19,6 +19,10 @@ const routes: Routes = [
         path: 'create-user',
         loadComponent: () => import('./create-user-form/create-user-form.component').then(m => m.CreateUserFormComponent)
       },
+      {
+        path: 'reset-password/:uid',
+        loadComponent: () => import('./reset-password-form/reset-password-form.component').then(m => m.ResetPasswordFormComponent)
+      },
     ]
   }
 ];

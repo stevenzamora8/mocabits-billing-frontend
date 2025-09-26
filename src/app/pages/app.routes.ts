@@ -30,10 +30,5 @@ export const routes: Routes = [
     loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
     title: 'MocaBits - Dashboard'
   },
-  { 
-    path: 'reset-password/:uid', 
-    loadComponent: () => import('./reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
-    title: 'MocaBits - Restablecer Contraseña'
-  },
   { path: '**', redirectTo: '/auth' }
 ];

@@ -224,6 +224,63 @@
           </linearGradient>
         </defs>
       </svg>
+
+      <!-- Ilustración para Reset Password -->
+      <svg *ngIf="currentRoute === 'reset-password'" width="280" height="280" viewBox="0 0 400 400" fill="none" class="main-illustration">
+        <!-- Fondo con círculos decorativos -->
+        <circle cx="100" cy="80" r="30" fill="rgba(255,255,255,0.1)" class="floating-circle"/>
+        <circle cx="320" cy="120" r="20" fill="rgba(255,255,255,0.15)" class="floating-circle floating-delay-1"/>
+        <circle cx="80" cy="320" r="25" fill="rgba(255,255,255,0.1)" class="floating-circle floating-delay-2"/>
+        <circle cx="350" cy="300" r="15" fill="rgba(255,255,255,0.2)" class="floating-circle floating-delay-3"/>
+
+        <!-- Dispositivo principal - Formulario de reset -->
+        <rect x="120" y="120" width="160" height="160" rx="12" fill="white" stroke="rgba(102,126,234,0.2)" stroke-width="2" class="device-main"/>
+
+        <!-- Campos del formulario de reset -->
+        <rect x="135" y="140" width="130" height="6" rx="3" fill="#e0e0e0"/>
+        <rect x="135" y="155" width="130" height="6" rx="3" fill="#e0e0e0"/>
+        <rect x="135" y="170" width="130" height="6" rx="3" fill="#e0e0e0"/>
+        <rect x="135" y="185" width="130" height="6" rx="3" fill="#e0e0e0"/>
+
+        <!-- Botón de reset -->
+        <rect x="135" y="205" width="130" height="12" rx="6" fill="url(#resetButtonGradient)" class="pulse-animation"/>
+
+        <!-- Icono principal de candado siendo abierto -->
+        <circle cx="200" cy="250" r="25" fill="rgba(102,126,234,0.1)"/>
+        <rect x="185" y="235" width="30" height="20" rx="3" fill="none" stroke="url(#lockGradient)" stroke-width="3"/>
+        <rect x="190" y="240" width="20" height="15" rx="2" fill="url(#lockGradient)"/>
+        <circle cx="200" y="242" r="3" fill="white"/>
+        <rect x="195" y="245" width="10" height="8" rx="1" fill="white"/>
+
+        <!-- Llave flotando hacia el candado -->
+        <circle cx="160" cy="200" r="8" fill="rgba(240,147,251,0.2)" class="floating-circle floating-delay-1"/>
+        <path d="M155 195 Q160 190 165 195 Q170 200 165 205 Q160 210 155 205 Q150 200 155 195" fill="url(#keyGradient)" class="key-animation"/>
+
+        <!-- Partículas de éxito -->
+        <circle cx="240" cy="180" r="4" fill="rgba(34,197,94,0.3)" class="floating-circle floating-delay-2"/>
+        <circle cx="260" cy="200" r="3" fill="rgba(34,197,94,0.4)" class="floating-circle floating-delay-3"/>
+        <circle cx="220" cy="220" r="5" fill="rgba(34,197,94,0.2)" class="floating-circle floating-delay-1"/>
+
+        <!-- Elementos decorativos -->
+        <path d="M60 200 Q80 180 100 200 T140 200" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none" class="floating-path"/>
+        <path d="M280 220 Q300 200 320 220 T360 220" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none" class="floating-path floating-delay-1"/>
+
+        <!-- Gradientes y efectos -->
+        <defs>
+          <linearGradient id="resetButtonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#22c55e"/>
+            <stop offset="100%" style="stop-color:#16a34a"/>
+          </linearGradient>
+          <linearGradient id="lockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#22c55e"/>
+            <stop offset="100%" style="stop-color:#16a34a"/>
+          </linearGradient>
+          <linearGradient id="keyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#f093fb"/>
+            <stop offset="100%" style="stop-color:#667eea"/>
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
 
     <!-- Badges de características -->
