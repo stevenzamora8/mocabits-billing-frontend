@@ -194,4 +194,14 @@ export class AuthService {
       })
     );
   }
+
+  /**
+   * Logout method to clear authentication data
+   */
+  logout(): void {
+    this.setAccessToken(null);
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    console.log('AuthService - User logged out, tokens cleared');
+  }
 }

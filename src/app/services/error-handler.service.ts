@@ -377,7 +377,7 @@ export class ErrorHandlerService {
     
     // Redirigir a login después de un pequeño delay para mostrar el mensaje
     setTimeout(() => {
-      this.router.navigate(['/login'], { 
+      this.router.navigate(['/auth/login'], { 
         queryParams: { sessionExpired: 'true' } 
       });
     }, 2000);

@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
     // Verificar si el usuario está autenticado
     if (!token) {
       console.log('AuthGuard - No authentication token found, redirecting to login');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
       return false;
     }
 

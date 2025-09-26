@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface NavigationItem {
   path: string;
@@ -73,7 +74,7 @@ export class DashboardService {
     }
   ]);
 
-  constructor() {
+  constructor(private authService: AuthService) {
     this.loadUserData();
   }
 
@@ -124,7 +125,22 @@ export class DashboardService {
   }
 
   logout(): void {
+    // Limpiar tokens de autenticación usando AuthService
+    this.authService.logout();
+    
+    // Limpiar datos del dashboard
     localStorage.removeItem('selectedPlan');
-    // Reset user data if needed
+    
+    // Reset user data
+    this.currentUserSubject.next({
+      name: 'Usuario',
+      email: '',
+      plan: 'Gratis',
+      totalInvoices: 0,
+      totalClients: 0,
+      totalRevenue: 0,
+      memberSince: '',
+      lastActivity: ''
+    });
   }
 }

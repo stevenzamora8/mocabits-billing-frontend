@@ -80,14 +80,14 @@ export class PlanSelectionComponent implements OnInit {
 
         // Verificar el estado del usuario después de asignar el plan
         this.plansService.getUserSetupStatus().subscribe({
-          next: (status) => {
+          next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
             console.log('User setup status after plan assignment:', status);
             this.isLoading = false;
 
             // Después de asignar un plan, siempre ir al setup
             this.router.navigate(['/setup']);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error getting user setup status after plan assignment:', error);
             this.isLoading = false;
             // En caso de error, ir a setup por defecto
@@ -130,14 +130,14 @@ export class PlanSelectionComponent implements OnInit {
 
         // Verificar el estado del usuario después de asignar el plan
         this.plansService.getUserSetupStatus().subscribe({
-          next: (status) => {
+          next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
             console.log('User setup status after free plan assignment:', status);
             this.isLoading = false;
 
             // Después de asignar un plan, siempre ir al setup
             this.router.navigate(['/setup']);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error getting user setup status after free plan assignment:', error);
             this.isLoading = false;
             // En caso de error, ir a setup por defecto

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { PlansService } from '../../../services/plans.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
 
 @Component({
@@ -28,6 +29,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private plansService: PlansService,
     private router: Router
   ) {}
 
@@ -74,11 +76,39 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     this.authService.login(this.email, this.password).subscribe({
       next: (result) => {
         console.log('Login successful', result);
-        this.showSuccessMessage = true;
-        // Redirect after showing success message
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 2000);
+        
+        // Verificar el estado de setup del usuario para determinar a dónde redirigir
+        this.plansService.getUserSetupStatus().subscribe({
+          next: (setupStatus) => {
+            console.log('User setup status:', setupStatus);
+            
+            const { hasActivePlan, hasCompanyInfo } = setupStatus;
+            
+            this.showSuccessMessage = true;
+            
+            // Redirigir basado en el estado de setup
+            setTimeout(() => {
+              if (hasActivePlan && hasCompanyInfo) {
+                // Usuario completamente configurado - ir al dashboard
+                this.router.navigate(['/dashboard']);
+              } else if (!hasActivePlan && !hasCompanyInfo) {
+                // Usuario sin plan ni compañía - ir a selección de plan
+                this.router.navigate(['/plan-selection']);
+              } else if (hasActivePlan && !hasCompanyInfo) {
+                // Usuario con plan pero sin info de compañía - ir al setup
+                this.router.navigate(['/setup']);
+              }
+            }, 2000);
+          },
+          error: (setupError) => {
+            console.warn('Could not get user setup status:', setupError);
+            // En caso de error, ir al dashboard por defecto
+            this.showSuccessMessage = true;
+            setTimeout(() => {
+              this.router.navigate(['/dashboard']);
+            }, 2000);
+          }
+        });
       },
       error: (error: any) => {
         console.error('Login error', error);

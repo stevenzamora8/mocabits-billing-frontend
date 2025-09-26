@@ -13,7 +13,7 @@ export class SetupGuard implements CanActivate {
     return new Promise((resolve) => {
       // Verificar el estado real del usuario desde el backend
       this.plansService.getUserSetupStatus().subscribe({
-        next: (status) => {
+        next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
           console.log('SetupGuard - User setup status:', status);
 
           if (!status.hasActivePlan) {
@@ -29,7 +29,7 @@ export class SetupGuard implements CanActivate {
             resolve(false);
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('SetupGuard - Error getting user setup status:', error);
           // En caso de error, permitir acceso por defecto (para evitar bloqueos)
           resolve(true);

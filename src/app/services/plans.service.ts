@@ -211,6 +211,26 @@ export class PlansService {
   }
 
   /**
+   * Obtiene los planes asignados al usuario autenticado
+   */
+  getUserPlans(): Observable<any> {
+    console.log('PlansService - getUserPlans: Fetching user plans');
+    const headers = this.getAuthHeaders();
+    const url = `${this.apiUrl}/plans/user-plans`;
+
+    return this.http.get(url, { headers }).pipe(
+      map(response => {
+        console.log('PlansService - getUserPlans success:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('PlansService - getUserPlans error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Obtiene el estado de setup del usuario (si tiene plan activo y info de compañía)
    */
   getUserSetupStatus(): Observable<{ hasActivePlan: boolean; hasCompanyInfo: boolean }> {
