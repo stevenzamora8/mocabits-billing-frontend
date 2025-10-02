@@ -43,6 +43,10 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   signatureFile: File | null = null;
   signaturePassword: string = '';
 
+  // Logo configuration
+  logoFile: File | null = null;
+  logoOption: 'temporary' | 'custom' = 'temporary';
+
   // Múltiples establecimientos
   establishments: EstablishmentData[] = [];
   currentEstablishmentIndex = 0;
@@ -53,6 +57,9 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     establishment: false
   };
 
+  // Signature error tracking
+  private signatureError: string = '';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -62,102 +69,38 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     this.initializeForms();
     this.setupFormSubscriptions();
-    // Asegurar estilos de inputs después de la inicialización
-    setTimeout(() => {
-      this.forceInputStyles();
-    }, 100);
   }
 
   ngAfterViewInit() {
-    // Forzar estilos de inputs después de que la vista se inicialice
-    this.forceInputStyles();
-  }
-
-  private forceInputStyles() {
-    const inputs = document.querySelectorAll('.setup-container input, .setup-container select, .setup-container textarea');
-    console.log('Forzando estilos en', inputs.length, 'elementos');
-    
-    inputs.forEach((input: any, index) => {
-      // Eliminar todos los event listeners previos
-      input.removeEventListener('focus', this.onInputFocus);
-      input.removeEventListener('blur', this.onInputBlur);
-      
-      // Aplicar estilos base
-      this.applyBaseStyles(input);
-      
-      // Agregar nuevos event listeners
-      input.addEventListener('focus', this.onInputFocus.bind(this));
-      input.addEventListener('blur', this.onInputBlur.bind(this));
-      
-      console.log(`Input ${index} estilizado`);
-    });
-    
-    // Usar MutationObserver para detectar cambios en el DOM
-    this.setupMutationObserver();
-  }
-
-  private applyBaseStyles(input: any) {
-    const isError = input.classList.contains('error');
-    
-    // Aplicar estilos directamente al elemento
-    input.style.setProperty('border', isError ? '2px solid #ef4444' : '2px solid #d1d5db', 'important');
-    input.style.setProperty('border-width', '2px', 'important');
-    input.style.setProperty('border-style', 'solid', 'important');
-    input.style.setProperty('border-color', isError ? '#ef4444' : '#d1d5db', 'important');
-    input.style.setProperty('outline', 'none', 'important');
-    input.style.setProperty('background-color', isError ? '#fef2f2' : '#ffffff', 'important');
-    input.style.setProperty('box-shadow', isError ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : 'none', 'important');
-  }
-
-  private onInputFocus = (event: any) => {
-    const input = event.target;
-    const isError = input.classList.contains('error');
-    
-    console.log('Focus detectado en:', input);
-    
-    if (isError) {
-      input.style.setProperty('border', '2px solid #ef4444', 'important');
-      input.style.setProperty('border-color', '#ef4444', 'important');
-      input.style.setProperty('box-shadow', '0 0 0 4px rgba(239, 68, 68, 0.2)', 'important');
-      input.style.setProperty('background-color', '#fef2f2', 'important');
-    } else {
-      input.style.setProperty('border', '2px solid #3b82f6', 'important');
-      input.style.setProperty('border-color', '#3b82f6', 'important');
-      input.style.setProperty('box-shadow', '0 0 0 4px rgba(59, 130, 246, 0.2)', 'important');
-      input.style.setProperty('background-color', '#ffffff', 'important');
-    }
-    input.style.setProperty('outline', 'none', 'important');
-  }
-
-  private onInputBlur = (event: any) => {
-    const input = event.target;
-    console.log('Blur detectado en:', input);
-    this.applyBaseStyles(input);
-  }
-
-  private setupMutationObserver() {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          const target = mutation.target as HTMLElement;
-          if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA') {
-            setTimeout(() => this.applyBaseStyles(target), 10);
-          }
-        }
-      });
-    });
-
-    observer.observe(document.querySelector('.setup-container') || document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      attributeFilter: ['class']
-    });
+    // Aplicar estilos después de que la vista se inicialice
+    setTimeout(() => {
+      this.applyInputStyles();
+      this.enhanceFormInteractions();
+    }, 100);
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private applyInputStyles() {
+    const inputs = document.querySelectorAll('.setup-container input, .setup-container select, .setup-container textarea');
+    inputs.forEach((input: any) => {
+      this.setInputBaseStyles(input);
+    });
+  }
+
+  private setInputBaseStyles(input: any) {
+    const isError = input.classList.contains('error');
+    
+    if (isError) {
+      input.style.setProperty('border-color', '#ef4444', 'important');
+      input.style.setProperty('background-color', '#fef2f2', 'important');
+    } else {
+      input.style.setProperty('border-color', '#94a3b8', 'important');
+      input.style.setProperty('background-color', '#f9fafb', 'important');
+    }
   }
 
   setupFormSubscriptions() {
@@ -304,13 +247,17 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
           this.saveCurrentEstablishmentData();
         }
         
+        // Animar transición
+        this.animateStepTransition();
+        
         this.currentStep++;
         this.scrollToTop();
         
-        // Reforzar estilos después de cambio de paso
+        // Aplicar estilos después de cambio de paso
         setTimeout(() => {
-          this.forceInputStyles();
-        }, 100);
+          this.applyInputStyles();
+          this.enhanceFormInteractions();
+        }, 300);
       } else {
         this.showValidationErrors();
       }
@@ -322,18 +269,15 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       this.currentStep--;
       this.scrollToTop();
       
-      // Reforzar estilos después de cambio de paso
+      // Aplicar estilos después de cambio de paso
       setTimeout(() => {
-        this.forceInputStyles();
+        this.applyInputStyles();
       }, 100);
     }
   }
 
   scrollToTop() {
-    const setupCard = document.querySelector('.setup-card');
-    if (setupCard) {
-      setupCard.scrollTop = 0;
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   showValidationErrors() {
@@ -346,13 +290,14 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         console.log('Error en datos del establecimiento. Revisa los campos requeridos.');
         break;
       case 3:
-        console.log('Debes subir un logo para tu empresa.');
-        break;
-      case 4:
         if (this.signatureError) {
           console.log('Error en certificado:', this.signatureError);
-        } else {
+        } else if (!this.signatureFile) {
           console.log('Debes subir un certificado de firma electrónica válido.');
+        } else if (!this.signaturePassword.trim()) {
+          console.log('Debes ingresar la contraseña del certificado.');
+        } else if (this.logoOption === 'custom' && !this.logoFile) {
+          console.log('Si eliges logo personalizado, debes subir un archivo de logo.');
         }
         break;
       default:
@@ -373,27 +318,13 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   validateCurrentStep(): boolean {
     switch (this.currentStep) {
       case 1:
-        console.log('Validando paso 1 - Company Form:', this.companyForm.valid);
-        console.log('Company Form errors:', this.companyForm.errors);
-        console.log('Company Form value:', this.companyForm.value);
-        this.logFormErrors(this.companyForm);
         return this.companyForm.valid;
       case 2:
-        console.log('Validando paso 2 - Establishment Form:', this.establishmentForm.valid);
-        console.log('Establishment Form errors:', this.establishmentForm.errors);
-        console.log('Establishment Form value:', this.establishmentForm.value);
-        this.logFormErrors(this.establishmentForm);
-        // Validar que al menos haya un establecimiento válido
         return this.establishmentForm.valid && this.establishments.length > 0;
       case 3:
-        const signatureValid = this.signatureFile !== null && this.signatureError === '';
-        if (!signatureValid) {
-          console.log('Validación paso 3: Certificado requerido y válido');
-          if (this.signatureError) {
-            console.log('Error de certificado:', this.signatureError);
-          }
-        }
-        return signatureValid;
+        const signatureValid = this.signatureFile !== null && this.signatureError === '' && this.signaturePassword.trim() !== '';
+        const logoValid = this.logoOption === 'temporary' || (this.logoOption === 'custom' && this.logoFile !== null);
+        return signatureValid && logoValid;
       default:
         return true;
     }
@@ -408,10 +339,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  onLogoChange(event: any) {
-    // Logo step removed, keeping for compatibility
-  }
-
   onSignatureChange(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -422,8 +349,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   async validateSignatureFile(file: File) {
     try {
       // Validar extensión
-      if (!file.name.endsWith('.p12')) {
-        this.showSignatureError('El archivo debe tener extensión .p12');
+      if (!file.name.match(/\.(p12|pfx)$/i)) {
+        this.showSignatureError('El archivo debe tener extensión .p12 o .pfx');
         return;
       }
 
@@ -466,8 +393,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
           const bytes = new Uint8Array(arrayBuffer.slice(0, 16));
           
           // Verificar magic bytes típicos de PKCS#12
-          // Los archivos PKCS#12 típicamente empiezan con una secuencia ASN.1
-          // Buscar patrones típicos: 0x30 (SEQUENCE), seguido de longitud
           if (bytes.length >= 2) {
             // Verificar que empiece con SEQUENCE (0x30)
             if (bytes[0] === 0x30) {
@@ -496,8 +421,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       reader.readAsArrayBuffer(file.slice(0, 16));
     });
   }
-
-  private signatureError: string = '';
 
   showSignatureError(message: string) {
     this.signatureError = message;
@@ -533,37 +456,83 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
-  // Métodos para manejar focus y blur directamente desde el template
-  onInputFocusTemplate(event: any) {
-    const input = event.target;
-    const isError = input.classList.contains('error');
-    
-    console.log('Template focus:', input, 'isError:', isError);
-    
-    if (isError) {
-      input.style.setProperty('border', '2px solid #ef4444', 'important');
-      input.style.setProperty('box-shadow', '0 0 0 4px rgba(239, 68, 68, 0.2)', 'important');
-    } else {
-      input.style.setProperty('border', '2px solid #3b82f6', 'important');
-      input.style.setProperty('box-shadow', '0 0 0 4px rgba(59, 130, 246, 0.2)', 'important');
+  // Métodos para manejar el logo
+  onLogoChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.validateLogoFile(file);
     }
-    input.style.setProperty('outline', 'none', 'important');
   }
 
-  onInputBlurTemplate(event: any) {
-    const input = event.target;
-    const isError = input.classList.contains('error');
-    
-    console.log('Template blur:', input, 'isError:', isError);
-    
-    if (isError) {
-      input.style.setProperty('border', '2px solid #ef4444', 'important');
-      input.style.setProperty('box-shadow', '0 0 0 3px rgba(239, 68, 68, 0.1)', 'important');
-    } else {
-      input.style.setProperty('border', '2px solid #d1d5db', 'important');
-      input.style.setProperty('box-shadow', 'none', 'important');
+  validateLogoFile(file: File) {
+    try {
+      // Validar extensión
+      if (!file.name.match(/\.(png|jpg|jpeg|svg)$/i)) {
+        console.warn('El logo debe tener extensión .png, .jpg, .jpeg o .svg');
+        this.clearLogoFile();
+        return;
+      }
+
+      // Validar tamaño (máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        console.warn('El logo es muy grande. Máximo 2MB.');
+        this.clearLogoFile();
+        return;
+      }
+
+      // Validar que no esté vacío
+      if (file.size === 0) {
+        console.warn('El archivo está vacío.');
+        this.clearLogoFile();
+        return;
+      }
+
+      // Si pasa todas las validaciones
+      this.logoFile = file;
+      this.logoOption = 'custom';
+      console.log('Logo válido seleccionado:', file.name);
+      
+      // Actualizar el radio button
+      const customRadio = document.getElementById('logo-custom') as HTMLInputElement;
+      if (customRadio) {
+        customRadio.checked = true;
+      }
+      
+    } catch (error) {
+      console.error('Error validando logo:', error);
+      this.clearLogoFile();
     }
-    input.style.setProperty('outline', 'none', 'important');
+  }
+
+  clearLogoFile() {
+    this.logoFile = null;
+    this.logoOption = 'temporary';
+    
+    // Limpiar el input
+    const fileInput = document.getElementById('logo') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+    // Actualizar el radio button
+    const tempRadio = document.getElementById('logo-temp') as HTMLInputElement;
+    if (tempRadio) {
+      tempRadio.checked = true;
+    }
+  }
+
+  onLogoOptionChange(option: 'temporary' | 'custom') {
+    this.logoOption = option;
+    if (option === 'temporary') {
+      this.clearLogoFile();
+    }
+  }
+
+  getLogoPreview(): string {
+    if (this.logoFile && this.logoOption === 'custom') {
+      return URL.createObjectURL(this.logoFile);
+    }
+    return '';
   }
 
   async finishSetup() {
@@ -589,7 +558,11 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         obligadoContabilidad: companyData.obligadoContabilidad,
         contribuyenteEspecial: 'NO',
         guiaRemision: 'NO',
-        establecimientos: this.establishments
+        establecimientos: this.establishments,
+        logoConfig: {
+          useCustomLogo: this.logoOption === 'custom',
+          logoFile: this.logoFile
+        }
       };
 
       console.log('Completando setup con:', companyPayload);
@@ -601,6 +574,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!this.signaturePassword) {
         throw new Error('Contraseña del certificado requerida');
       }
+      
       const setupResponse = await this.companyService.completeSetup(companyPayload, this.signatureFile, this.signaturePassword).toPromise();
       console.log('Setup completado:', setupResponse);
       
@@ -623,8 +597,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
-
   validateAllSteps(): boolean {
     // Guardar el establecimiento actual antes de validar
     this.saveCurrentEstablishmentData();
@@ -635,16 +607,19 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
              est.estab && est.ptoEmi && est.secuencial && est.dirEstablecimiento
            );
     const signatureValid = this.signatureFile !== null && this.signatureError === '' && this.signaturePassword.trim() !== '';
+    const logoValid = this.logoOption === 'temporary' || (this.logoOption === 'custom' && this.logoFile !== null);
     
     console.log('Validación final:', {
       company: companyValid,
       establishments: establishmentsValid,
       signature: signatureValid,
+      logo: logoValid,
+      logoOption: this.logoOption,
       signatureError: this.signatureError,
       signaturePassword: this.signaturePassword
     });
     
-    return companyValid && establishmentsValid && signatureValid;
+    return companyValid && establishmentsValid && signatureValid && logoValid;
   }
 
   getStepTitle(): string {
@@ -654,7 +629,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       case 2:
         return 'Establecimientos';
       case 3:
-        return 'Firma Electrónica';
+        return 'Firma Electrónica y Logo';
       default:
         return 'Configuración';
     }
@@ -667,7 +642,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       case 2:
         return 'Configura tus puntos de emisión de facturas';
       case 3:
-        return 'Certificado para firmar electrónicamente';
+        return 'Certificado de firma electrónica y logo empresarial';
       default:
         return '';
     }
@@ -708,7 +683,85 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.validateAllSteps() && !this.isLoading;
   }
 
-  // Método para debug - puedes llamarlo desde la consola del navegador
+  // Método para debug
+  // Método para mejorar las interacciones del formulario
+  enhanceFormInteractions() {
+    this.addInputFocusAnimations();
+    this.addFormValidationFeedback();
+  }
+
+  private addInputFocusAnimations() {
+    const inputs = document.querySelectorAll('.setup-input');
+    inputs.forEach((input: any) => {
+      input.addEventListener('focus', () => {
+        this.playFocusSound();
+        input.parentElement?.classList.add('focused');
+      });
+      
+      input.addEventListener('blur', () => {
+        input.parentElement?.classList.remove('focused');
+      });
+    });
+  }
+
+  private addFormValidationFeedback() {
+    const inputs = document.querySelectorAll('.setup-input');
+    inputs.forEach((input: any) => {
+      input.addEventListener('input', () => {
+        this.debounceValidation(input);
+      });
+    });
+  }
+
+  private debounceValidation = this.debounce((input: any) => {
+    const isValid = input.checkValidity() && input.value.length > 0;
+    const parentGroup = input.closest('.form-group');
+    
+    if (parentGroup) {
+      parentGroup.classList.toggle('field-valid', isValid);
+      parentGroup.classList.toggle('field-invalid', !isValid && input.value.length > 0);
+    }
+  }, 300);
+
+  private debounce(func: Function, wait: number) {
+    let timeout: any;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  private playFocusSound() {
+    // Simular feedback auditivo suave (solo en producción con configuración del usuario)
+    if ('AudioContext' in window || 'webkitAudioContext' in window) {
+      try {
+        // Crear un sonido muy suave y corto para el focus
+        // Este es opcional y se puede quitar si no se desea
+      } catch (e) {
+        // Silenciar errores de audio
+      }
+    }
+  }
+
+  // Mejorar la animación de cambio de paso
+  private animateStepTransition() {
+    const stepContent = document.querySelector('.step-content');
+    if (stepContent) {
+      stepContent.classList.add('step-transition-out');
+      setTimeout(() => {
+        stepContent.classList.remove('step-transition-out');
+        stepContent.classList.add('step-transition-in');
+        setTimeout(() => {
+          stepContent.classList.remove('step-transition-in');
+        }, 600);
+      }, 200);
+    }
+  }
+
   debugCurrentStep() {
     console.log('=== DEBUG CURRENT STEP ===');
     console.log('Current Step:', this.currentStep);

@@ -1,0 +1,195 @@
+/* ===== VARIABLES GLOBALES DE BRANDING ===== */
+:root {
+  /* COLORES PRINCIPALES - SINCRONIZADO CON BrandService */
+  --logo-primary-color: #1e3a8a;
+  --logo-secondary-color: #3b82f6;
+  --logo-accent-color: #374151;
+  --logo-text-color: white;
+
+  /* INFORMACIÓN DE MARCA */
+  --brand-name: 'MocaBits';
+  --brand-subtitle: 'Sistema de Facturación Inteligente';
+  --brand-tagline: 'Facturación Inteligente • Gestión Simplificada';
+  --brand-description: 'Sistema de Facturación Electrónica Empresarial';
+  --brand-version: 'v1.0.0';
+
+  /* TAMAÑOS DEL LOGO */
+  --logo-size-main: 50px;
+  --logo-size-signature: 24px;
+  --logo-border-radius: 22%;
+
+  /* TIPOGRAFÍA */
+  --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  
+  /* COLORES DEL SISTEMA */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+  
+  /* COLORES DE TEXTO */
+  --text-primary: #1f2937;
+  --text-secondary: #64748b;
+  --text-muted: #9ca3af;
+  
+  /* COLORES DE FONDO */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-muted: #f1f5f9;
+  
+  /* BORDES */
+  --border-color: #e5e7eb;
+  --border-color-focus: var(--logo-primary-color);
+  
+  /* SOMBRAS */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.25);
+  
+  /* TRANSICIONES */
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s ease;
+  
+  /* BORDER RADIUS */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 50%;
+}
+
+/* ===== CLASES UTILITARIAS GLOBALES ===== */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.button-hover-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.button-hover-effect:hover::before {
+  left: 100%;
+}
+
+/* ===== ESTILOS GLOBALES PARA FORMULARIOS ===== */
+.form-input-consistent {
+  width: 100% !important;
+  height: clamp(2.25rem, 5vh, 3rem) !important;
+  padding: 0 1rem !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: clamp(0.875rem, 2.5vh, 1rem) !important;
+  transition: var(--transition-base) !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  box-shadow: var(--shadow-sm) !important;
+  font-family: var(--font-family-primary);
+}
+
+.form-input-consistent::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.form-input-consistent:focus {
+  border-color: var(--border-color-focus) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12), var(--shadow-md) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.form-input-consistent.error {
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.form-input-consistent.success {
+  border-color: var(--color-success) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* ===== ESTILOS GLOBALES PARA BOTONES ===== */
+.btn-consistent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 16px 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-decoration: none;
+  min-width: 120px;
+  font-family: var(--font-family-primary);
+}
+
+.btn-primary-consistent {
+  background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25) !important;
+}
+
+.btn-primary-consistent:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5) !important;
+}
+
+.btn-success-consistent {
+  background: linear-gradient(135deg, var(--color-success), #059669) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.btn-success-consistent:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* ===== RESPONSIVE GLOBAL ===== */
+@media (max-width: 768px) {
+  :root {
+    --logo-size-main: 40px;
+    --logo-size-signature: 20px;
+  }
+  
+  .form-input-consistent {
+    font-size: 16px !important; /* Evita zoom en iOS */
+  }
+  
+  .btn-consistent {
+    min-height: 48px !important; /* Tamaño mínimo táctil */
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --logo-size-main: 36px;
+    --logo-size-signature: 18px;
+  }
+}

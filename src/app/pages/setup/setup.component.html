@@ -1,498 +1,468 @@
 <div class="setup-container">
   <!-- Header -->
   <div class="setup-header">
-    <div class="header-content">
-      <div class="welcome-badge">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        ¡Bienvenido!
+    <div class="logo-section">
+      <div class="logo-placeholder">
+        <i class="icon-building"></i>
       </div>
-      <h1>Configuremos tu sistema de facturación</h1>
-      <p>Solo necesitamos algunos datos para personalizar tu experiencia. Este proceso tomará solo unos minutos.</p>
-    </div>
-    <div class="progress-section">
-      <div class="progress-indicator">
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
-        </div>
-        <div class="progress-steps">
-          <div class="progress-step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
-            <span>1</span>
-          </div>
-          <div class="progress-step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
-            <span>2</span>
-          </div>
-          <div class="progress-step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
-            <span>3</span>
-          </div>
-          <div class="progress-step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4">
-            <span>4</span>
-          </div>
-        </div>
+      <div class="header-text">
+        <h1>Configuración Inicial</h1>
+        <p>Configure su empresa para comenzar a facturar</p>
       </div>
-      <span class="progress-text">Paso {{ currentStep }} de {{ totalSteps }}</span>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="setup-content">
-    <div class="setup-card">
-      <!-- Step Header -->
-      <div class="step-header">
-        <div class="step-icon">
-          <svg *ngIf="currentStep === 1" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-          </svg>
-          <svg *ngIf="currentStep === 2" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          <svg *ngIf="currentStep === 3" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <svg *ngIf="currentStep === 4" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div class="step-info">
-          <h2>{{ getStepTitle() }}</h2>
-          <p>{{ getStepDescription() }}</p>
-          <div class="step-tips">
-            <span class="tip-icon">💡</span>
-            <span *ngIf="currentStep === 1">Necesitarás tu RUC y datos de tu empresa a mano</span>
-            <span *ngIf="currentStep === 2">Puedes configurar múltiples establecimientos si los necesitas</span>
-            <span *ngIf="currentStep === 3">La firma electrónica es requerida para facturación válida</span>
-            <span *ngIf="currentStep === 4">La firma electrónica es requerida para facturación válida</span>
-          </div>
-        </div>
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+    </div>
+    <div class="step-indicators">
+      <div class="step-indicator" 
+           [class.active]="currentStep >= 1" 
+           [class.completed]="currentStep > 1">
+        <span class="step-number">1</span>
+        <span class="step-label">Contribuyente</span>
       </div>
-
-      <!-- Step Content Container -->
-      <div class="step-content-wrapper">
-
-      <!-- Step 1: Datos del Contribuyente -->
-      <div *ngIf="currentStep === 1" class="step-content">
-        <div class="content-intro">
-          <p>Información básica de tu empresa para facturación electrónica.</p>
-        </div>
-        <form [formGroup]="companyForm" class="form-grid">
-          <div class="form-group">
-            <label for="ruc">RUC *</label>
-            <input 
-              type="text" 
-              id="ruc" 
-              formControlName="ruc" 
-              placeholder="0928914464001"
-              maxlength="13"
-              class="setup-input"
-              [ngStyle]="{
-                'border': isFieldInvalid(companyForm, 'ruc') ? '2px solid #ef4444 !important' : '2px solid #d1d5db !important',
-                'border-width': '2px !important',
-                'border-style': 'solid !important',
-                'outline': 'none !important',
-                'background-color': isFieldInvalid(companyForm, 'ruc') ? '#fef2f2 !important' : '#ffffff !important'
-              }"
-              style="border: 2px solid #d1d5db !important; outline: none !important;"
-              [class.error]="isFieldInvalid(companyForm, 'ruc')"
-              [style.border]="isFieldInvalid(companyForm, 'ruc') ? '2px solid #ef4444 !important' : '2px solid #d1d5db !important'"
-              (focus)="onInputFocusTemplate($event)"
-              (blur)="onInputBlurTemplate($event)">
-            <small *ngIf="!isFieldInvalid(companyForm, 'ruc')">13 dígitos</small>
-            <div *ngIf="isFieldInvalid(companyForm, 'ruc')" class="error-message">
-              {{ getFieldError(companyForm, 'ruc') }}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="codDoc">Código de Documento *</label>
-            <select id="codDoc" formControlName="codDoc" class="setup-input">
-              <option value="04">04 - RUC</option>
-              <option value="05">05 - Cédula</option>
-            </select>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="razonSocial">Razón Social *</label>
-            <input 
-              type="text" 
-              id="razonSocial" 
-              formControlName="razonSocial" 
-              placeholder="Distribuidora de Suministros Nacional S.A."
-              class="setup-input"
-              [class.error]="isFieldInvalid(companyForm, 'razonSocial')">
-            <div *ngIf="isFieldInvalid(companyForm, 'razonSocial')" class="error-message">
-              {{ getFieldError(companyForm, 'razonSocial') }}
-            </div>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="nombreComercial">Nombre Comercial *</label>
-            <input 
-              type="text" 
-              id="nombreComercial" 
-              formControlName="nombreComercial" 
-              placeholder="Empresa Importadora y Exportadora de Piezas"
-              class="setup-input"
-              [class.error]="isFieldInvalid(companyForm, 'nombreComercial')">
-            <div *ngIf="isFieldInvalid(companyForm, 'nombreComercial')" class="error-message">
-              {{ getFieldError(companyForm, 'nombreComercial') }}
-            </div>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="dirMatriz">Dirección Matriz *</label>
-            <textarea 
-              id="dirMatriz" 
-              formControlName="dirMatriz" 
-              placeholder="Enrique Guerrero Portilla OE1-34 AV. Galo Plaza Lasso"
-              rows="2"
-              class="setup-input"
-              [class.error]="isFieldInvalid(companyForm, 'dirMatriz')"></textarea>
-            <div *ngIf="isFieldInvalid(companyForm, 'dirMatriz')" class="error-message">
-              {{ getFieldError(companyForm, 'dirMatriz') }}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="obligadoContabilidad">Obligado a llevar contabilidad *</label>
-            <select id="obligadoContabilidad" formControlName="obligadoContabilidad" class="setup-input">
-              <option value="SI">SI</option>
-              <option value="NO">NO</option>
-            </select>
-          </div>
-        </form>
+      <div class="step-indicator" 
+           [class.active]="currentStep >= 2" 
+           [class.completed]="currentStep > 2">
+        <span class="step-number">2</span>
+        <span class="step-label">Establecimientos</span>
       </div>
+      <div class="step-indicator" 
+           [class.active]="currentStep >= 3" 
+           [class.completed]="currentStep > 3">
+        <span class="step-number">3</span>
+        <span class="step-label">Firma & Logo</span>
+      </div>
+    </div>
+  </div>
 
-      <!-- Step 2: Establecimientos -->
-      <div *ngIf="currentStep === 2" class="step-content">
-        <div class="content-intro">
-          <p>Configura tus puntos de emisión de facturas. Puedes tener múltiples establecimientos.</p>
-        </div>
+  <!-- Step Content -->
+  <div class="step-content">
+    <div class="step-header">
+      <h2>{{ getStepTitle() }}</h2>
+      <p class="step-description">{{ getStepDescription() }}</p>
+    </div>
+
+    <!-- Step 1: Datos del Contribuyente -->
+    <div *ngIf="currentStep === 1" class="step-form">
+      <form [formGroup]="companyForm" class="company-form">
         
-        <!-- Tabs de establecimientos -->
-        <div class="establishments-tabs" *ngIf="establishments.length > 1">
-          <div class="tabs-header">
-            <button 
-              *ngFor="let establishment of establishments; let i = index"
-              type="button"
-              class="tab-button"
-              [class.active]="currentEstablishmentIndex === i"
-              (click)="selectEstablishment(i)">
-              Establecimiento {{ establishment.estab }}
-              <span 
-                *ngIf="establishments.length > 1" 
-                class="remove-tab"
-                (click)="$event.stopPropagation(); removeEstablishment(i)"
-                title="Eliminar establecimiento">
-                ×
-              </span>
-            </button>
-            <button 
-              type="button" 
-              class="add-tab-button"
-              (click)="addNewEstablishment()"
-              title="Agregar establecimiento">
-              +
-            </button>
-          </div>
-        </div>
-
-        <!-- Establecimiento actual -->
-        <div class="establishment-info" *ngIf="establishments.length === 1">
-          <div class="establishment-header">
-            <h3>Establecimiento Principal</h3>
-            <button 
-              type="button" 
-              class="btn btn-outline btn-sm"
-              (click)="addNewEstablishment()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 5v14m7-7H5"/>
-              </svg>
-              Agregar Otro Establecimiento
-            </button>
-          </div>
-        </div>
-
-        <form [formGroup]="establishmentForm" class="form-grid">
-          <div class="form-group">
-            <label for="estab">Código del Establecimiento *</label>
-            <input 
-              type="text" 
-              id="estab" 
-              formControlName="estab" 
-              placeholder="001"
-              maxlength="3"
-              class="setup-input"
-              [class.error]="isFieldInvalid(establishmentForm, 'estab')">
-            <small>3 dígitos</small>
-            <div *ngIf="isFieldInvalid(establishmentForm, 'estab')" class="error-message">
-              {{ getFieldError(establishmentForm, 'estab') }}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="ptoEmi">Punto de Emisión *</label>
-            <input 
-              type="text" 
-              id="ptoEmi" 
-              formControlName="ptoEmi" 
-              placeholder="001"
-              maxlength="3"
-              class="setup-input"
-              [class.error]="isFieldInvalid(establishmentForm, 'ptoEmi')">
-            <small>3 dígitos</small>
-            <div *ngIf="isFieldInvalid(establishmentForm, 'ptoEmi')" class="error-message">
-              {{ getFieldError(establishmentForm, 'ptoEmi') }}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="secuencial">Secuencial Inicial *</label>
-            <input 
-              type="text" 
-              id="secuencial" 
-              formControlName="secuencial" 
-              placeholder="000000001"
-              maxlength="9"
-              class="setup-input"
-              [class.error]="isFieldInvalid(establishmentForm, 'secuencial')">
-            <small>9 dígitos</small>
-            <div *ngIf="isFieldInvalid(establishmentForm, 'secuencial')" class="error-message">
-              {{ getFieldError(establishmentForm, 'secuencial') }}
-            </div>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="dirEstablecimiento">Dirección del Establecimiento *</label>
-            <textarea 
-              id="dirEstablecimiento" 
-              formControlName="dirEstablecimiento" 
-              placeholder="Sebastián Moreno S/N Francisco García"
-              rows="2"
-              class="setup-input"
-              [class.error]="isFieldInvalid(establishmentForm, 'dirEstablecimiento')"></textarea>
-            <div *ngIf="isFieldInvalid(establishmentForm, 'dirEstablecimiento')" class="error-message">
-              {{ getFieldError(establishmentForm, 'dirEstablecimiento') }}
-            </div>
-          </div>
-        </form>
-
-        <!-- Resumen de establecimientos configurados -->
-        <div class="establishments-summary" *ngIf="establishments.length > 1">
-          <h4>Resumen de Establecimientos ({{ establishments.length }})</h4>
-          <div class="summary-grid">
-            <div 
-              *ngFor="let est of establishments; let i = index" 
-              class="summary-item"
-              [class.current]="currentEstablishmentIndex === i">
-              <div class="summary-header">
-                <strong>{{ est.estab }}-{{ est.ptoEmi }}</strong>
-                <button 
-                  type="button" 
-                  class="btn-icon"
-                  (click)="selectEstablishment(i)"
-                  title="Editar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                </button>
+        <div class="form-section">
+          <h3><i class="icon-document"></i> Información Tributaria</h3>
+          
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="razonSocial">Razón Social *</label>
+              <input 
+                type="text" 
+                id="razonSocial"
+                formControlName="razonSocial"
+                class="setup-input"
+                [class.error]="isFieldInvalid(companyForm, 'razonSocial')"
+                placeholder="Nombre legal de la empresa">
+              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'razonSocial')">
+                {{ getFieldError(companyForm, 'razonSocial') }}
               </div>
-              <p class="summary-address">{{ est.dirEstablecimiento || 'Sin dirección' }}</p>
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="nombreComercial">Nombre Comercial *</label>
+              <input 
+                type="text" 
+                id="nombreComercial"
+                formControlName="nombreComercial"
+                class="setup-input"
+                [class.error]="isFieldInvalid(companyForm, 'nombreComercial')"
+                placeholder="Nombre comercial o marca">
+              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'nombreComercial')">
+                {{ getFieldError(companyForm, 'nombreComercial') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half-width">
+              <label for="ruc">RUC *</label>
+              <input 
+                type="text" 
+                id="ruc"
+                formControlName="ruc"
+                class="setup-input"
+                [class.error]="isFieldInvalid(companyForm, 'ruc')"
+                placeholder="1234567890001"
+                maxlength="13">
+              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'ruc')">
+                {{ getFieldError(companyForm, 'ruc') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="codDoc">Tipo Documento *</label>
+              <select 
+                id="codDoc"
+                formControlName="codDoc"
+                class="setup-input"
+                [class.error]="isFieldInvalid(companyForm, 'codDoc')">
+                <option value="04">RUC</option>
+                <option value="05">Cédula</option>
+                <option value="06">Pasaporte</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="dirMatriz">Dirección Matriz *</label>
+              <textarea 
+                id="dirMatriz"
+                formControlName="dirMatriz"
+                class="setup-input"
+                [class.error]="isFieldInvalid(companyForm, 'dirMatriz')"
+                placeholder="Dirección completa de la matriz"
+                rows="3"></textarea>
+              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'dirMatriz')">
+                {{ getFieldError(companyForm, 'dirMatriz') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="obligadoContabilidad">Obligado a llevar contabilidad *</label>
+              <select 
+                id="obligadoContabilidad"
+                formControlName="obligadoContabilidad"
+                class="setup-input">
+                <option value="SI">Sí</option>
+                <option value="NO">No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 2: Establecimientos -->
+    <div *ngIf="currentStep === 2" class="step-form">
+      <div class="establishments-header">
+        <h3><i class="icon-store"></i> Puntos de Emisión</h3>
+        <button type="button" class="btn-add-establishment" (click)="addNewEstablishment()">
+          <i class="icon-plus"></i> Agregar Establecimiento
+        </button>
+      </div>
+
+      <!-- Pestañas de Establecimientos -->
+      <div class="establishments-tabs" *ngIf="establishments.length > 1">
+        <div class="tab" 
+             *ngFor="let est of establishments; let i = index"
+             [class.active]="i === currentEstablishmentIndex"
+             (click)="selectEstablishment(i)">
+          <span>Establecimiento {{ est.estab }}</span>
+          <button type="button" 
+                  class="tab-close" 
+                  (click)="removeEstablishment(i)"
+                  *ngIf="establishments.length > 1">×</button>
         </div>
       </div>
 
-      <!-- Step 3: Firma Electrónica -->
-      <div *ngIf="currentStep === 3" class="step-content">
-        <div class="upload-section">
-          <div class="upload-area" [class.has-file]="signatureFile" [class.has-error]="getSignatureError()">
+      <form [formGroup]="establishmentForm" class="establishment-form">
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="estab">Código Establecimiento *</label>
+              <input 
+                type="text" 
+                id="estab"
+                formControlName="estab"
+                class="setup-input"
+                [class.error]="isFieldInvalid(establishmentForm, 'estab')"
+                placeholder="001"
+                maxlength="3">
+              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'estab')">
+                {{ getFieldError(establishmentForm, 'estab') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ptoEmi">Punto Emisión *</label>
+              <input 
+                type="text" 
+                id="ptoEmi"
+                formControlName="ptoEmi"
+                class="setup-input"
+                [class.error]="isFieldInvalid(establishmentForm, 'ptoEmi')"
+                placeholder="001"
+                maxlength="3">
+              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'ptoEmi')">
+                {{ getFieldError(establishmentForm, 'ptoEmi') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="secuencial">Secuencial Inicial *</label>
+              <input 
+                type="text" 
+                id="secuencial"
+                formControlName="secuencial"
+                class="setup-input"
+                [class.error]="isFieldInvalid(establishmentForm, 'secuencial')"
+                placeholder="000000001"
+                maxlength="9">
+              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'secuencial')">
+                {{ getFieldError(establishmentForm, 'secuencial') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="dirEstablecimiento">Dirección del Establecimiento *</label>
+              <textarea 
+                id="dirEstablecimiento"
+                formControlName="dirEstablecimiento"
+                class="setup-input"
+                [class.error]="isFieldInvalid(establishmentForm, 'dirEstablecimiento')"
+                placeholder="Dirección completa del punto de emisión"
+                rows="3"></textarea>
+              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'dirEstablecimiento')">
+                {{ getFieldError(establishmentForm, 'dirEstablecimiento') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Resumen de Establecimientos -->
+      <div class="establishments-summary" *ngIf="establishments.length > 0">
+        <h4>Resumen de Establecimientos</h4>
+        <div class="summary-cards">
+          <div class="summary-card" 
+               *ngFor="let est of establishments; let i = index"
+               [class.current]="i === currentEstablishmentIndex">
+            <div class="card-header">
+              <strong>{{ est.estab }}-{{ est.ptoEmi }}</strong>
+              <span class="sequence">Sec: {{ est.secuencial }}</span>
+            </div>
+            <div class="card-address">{{ est.dirEstablecimiento || 'Sin dirección' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Firma Electrónica y Logo -->
+    <div *ngIf="currentStep === 3" class="step-form">
+      
+      <!-- Sección Firma Electrónica -->
+      <div class="form-section">
+        <h3><i class="icon-certificate"></i> Certificado de Firma Electrónica</h3>
+        
+        <div class="signature-upload">
+          <div class="upload-area" [class.has-file]="signatureFile" [class.error]="getSignatureError()">
             <input 
               type="file" 
-              id="signature" 
-              (change)="onSignatureChange($event)" 
-              accept="" 
-              class="file-input">
+              id="signature"
+              accept=".p12,.pfx"
+              (change)="onSignatureChange($event)"
+              class="file-input"
+              hidden>
+            
             <label for="signature" class="upload-label">
-              <div class="upload-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6z"/>
-                  <path d="M14 2v6h6"/>
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                  <path d="M6 18v-1a2 2 0 012-2h4a2 2 0 012 2v1"/>
-                </svg>
+              <div class="upload-icon" *ngIf="!signatureFile">
+                <i class="icon-upload"></i>
               </div>
+              <div class="upload-icon success" *ngIf="signatureFile && !getSignatureError()">
+                <i class="icon-check"></i>
+              </div>
+              
               <div class="upload-text">
-                <h3>{{ signatureFile ? signatureFile.name : 'Subir Certificado' }}</h3>
-                <p *ngIf="!signatureFile && !getSignatureError()">Arrastra tu certificado .p12 aquí o haz clic para seleccionar</p>
-                <p *ngIf="signatureFile && !getSignatureError()" class="success-text">✓ Certificado válido seleccionado</p>
-                <p *ngIf="getSignatureError()" class="error-text">{{ getSignatureError() }}</p>
-                <small>Archivo .p12 (máximo 5MB)</small>
+                <span class="upload-title" *ngIf="!signatureFile">
+                  Seleccionar Certificado (.p12 o .pfx)
+                </span>
+                <span class="upload-title success" *ngIf="signatureFile && !getSignatureError()">
+                  {{ signatureFile.name }}
+                </span>
+                <span class="upload-subtitle" *ngIf="!signatureFile">
+                  Máximo 5MB • Formatos: .p12, .pfx
+                </span>
+                <span class="upload-subtitle" *ngIf="signatureFile && !getSignatureError()">
+                  {{ formatFileSize(signatureFile.size) }} • ✓ Válido
+                </span>
               </div>
             </label>
           </div>
           
-          <!-- Mensaje de error detallado -->
-          <div *ngIf="getSignatureError()" class="validation-error">
-            <div class="error-content">
-              <p>{{ getSignatureError() }}</p>
-              <ul class="error-suggestions">
-                <li>Verifica que el archivo sea un certificado digital válido (.p12)</li>
-                <li>Asegúrate de que el archivo no esté corrupto</li>
-                <li>El certificado debe estar vigente y emitido por una autoridad certificadora</li>
-                <li>El tamaño del archivo no debe exceder 5MB</li>
-              </ul>
-            </div>
+          <div class="error-message" *ngIf="getSignatureError()">
+            {{ getSignatureError() }}
           </div>
+        </div>
 
-          <!-- Estado de validación exitosa -->
-          <div *ngIf="signatureFile && !getSignatureError()" class="validation-success">
-            <div class="success-content">
-              <p>El archivo {{ signatureFile.name }} ha sido validado correctamente.</p>
-              <div class="file-details">
-                <span class="detail-item">Tamaño: {{ formatFileSize(signatureFile.size) }}</span>
-                <span class="detail-item">Tipo: Certificado PKCS#12</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="upload-requirements">
-            <h4>Sobre el certificado de firma electrónica:</h4>
-            <ul>
-              <li>Debe ser un archivo .p12 válido</li>
-              <li>Emitido por una autoridad certificadora autorizada (UANATACA, ECLIPSOFT, etc.)</li>
-              <li>Debe estar vigente y no expirado</li>
-              <li>Necesario para firmar facturas electrónicas según la normativa del SRI</li>
-              <li>El archivo será validado automáticamente al seleccionarlo</li>
-            </ul>
-          </div>
-          
-          <!-- Contraseña del certificado -->
-          <div *ngIf="signatureFile" class="password-section">
-            <label for="signaturePassword">Contraseña del certificado *</label>
-            <input 
-              type="password" 
-              id="signaturePassword" 
-              [(ngModel)]="signaturePassword" 
-              placeholder="Ingresa la contraseña de tu certificado"
-              class="setup-input">
-            <small>La contraseña es requerida para usar el certificado</small>
+        <div class="form-group" *ngIf="signatureFile">
+          <label for="signaturePassword">Contraseña del Certificado *</label>
+          <input 
+            type="password" 
+            id="signaturePassword"
+            [(ngModel)]="signaturePassword"
+            class="setup-input"
+            placeholder="Ingrese la contraseña del certificado"
+            required>
+          <div class="input-help">
+            La contraseña que utilizó al generar el certificado de firma electrónica
           </div>
         </div>
       </div>
 
-      <!-- Step 4: Firma Electrónica -->
-      <div *ngIf="currentStep === 4" class="step-content">
-        <div class="upload-section">
-          <div class="upload-area" [class.has-file]="signatureFile" [class.has-error]="getSignatureError()">
+      <!-- Sección Logo Empresarial -->
+      <div class="form-section">
+        <h3><i class="icon-image"></i> Logo Empresarial</h3>
+        
+        <div class="logo-configuration">
+          <div class="logo-preview">
+            <div class="preview-container">
+              <div class="logo-placeholder-large" *ngIf="!logoFile || logoOption === 'temporary'">
+                <i class="icon-image"></i>
+                <span>Vista Previa del Logo</span>
+              </div>
+              <img *ngIf="logoFile && logoOption === 'custom'" 
+                   [src]="getLogoPreview()" 
+                   alt="Logo preview"
+                   class="logo-preview-image">
+            </div>
+          </div>
+          
+          <div class="logo-upload">
             <input 
               type="file" 
-              id="signature" 
-              (change)="onSignatureChange($event)" 
-              accept="" 
-              class="file-input">
-            <label for="signature" class="upload-label">
-              <div class="upload-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6z"/>
-                  <path d="M14 2v6h6"/>
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                  <path d="M6 18v-1a2 2 0 012-2h4a2 2 0 012 2v1"/>
-                </svg>
+              id="logo"
+              accept=".png,.jpg,.jpeg,.svg"
+              (change)="onLogoChange($event)"
+              class="file-input"
+              hidden>
+            
+            <label for="logo" class="btn-upload-logo">
+              <i class="icon-upload"></i>
+              Subir Logo
+            </label>
+            
+            <div class="logo-requirements">
+              <h4>Requerimientos del Logo:</h4>
+              <ul>
+                <li>Formatos: PNG, JPG, SVG</li>
+                <li>Tamaño mínimo: 100x100px</li>
+                <li>Fondo transparente (recomendado)</li>
+                <li>Tamaño máximo: 2MB</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="logo-options">
+          <div class="option-card">
+            <input type="radio" 
+                   id="logo-temp" 
+                   name="logoOption" 
+                   value="temporary" 
+                   [checked]="logoOption === 'temporary'"
+                   (change)="onLogoOptionChange('temporary')">
+            <label for="logo-temp" class="option-label">
+              <div class="option-icon">
+                <i class="icon-settings"></i>
               </div>
-              <div class="upload-text">
-                <h3>{{ signatureFile ? signatureFile.name : 'Subir Certificado' }}</h3>
-                <p *ngIf="!signatureFile && !getSignatureError()">Arrastra tu certificado .p12 aquí o haz clic para seleccionar</p>
-                <p *ngIf="signatureFile && !getSignatureError()" class="success-text">✓ Certificado válido seleccionado</p>
-                <p *ngIf="getSignatureError()" class="error-text">{{ getSignatureError() }}</p>
-                <small>Archivo .p12 (máximo 5MB)</small>
+              <div class="option-content">
+                <h4>Usar Logo Temporal</h4>
+                <p>Comenzar con el logo por defecto del sistema</p>
               </div>
             </label>
           </div>
-          
-          <!-- Mensaje de error detallado -->
-          <div *ngIf="getSignatureError()" class="validation-error">
-            <div class="error-content">
-              <p>{{ getSignatureError() }}</p>
-              <ul class="error-suggestions">
-                <li>Verifica que el archivo sea un certificado digital válido (.p12 o .pfx)</li>
-                <li>Asegúrate de que el archivo no esté corrupto</li>
-                <li>El certificado debe estar vigente y emitido por una autoridad certificadora</li>
-                <li>El tamaño del archivo no debe exceder 5MB</li>
-              </ul>
-            </div>
-          </div>
 
-          <!-- Estado de validación exitosa -->
-          <div *ngIf="signatureFile && !getSignatureError()" class="validation-success">
-            <div class="success-content">
-              <p>El archivo {{ signatureFile.name }} ha sido validado correctamente.</p>
-              <div class="file-details">
-                <span class="detail-item">Tamaño: {{ formatFileSize(signatureFile.size) }}</span>
-                <span class="detail-item">Tipo: Certificado PKCS#12</span>
+          <div class="option-card">
+            <input type="radio" 
+                   id="logo-custom" 
+                   name="logoOption" 
+                   value="custom"
+                   [checked]="logoOption === 'custom'"
+                   (change)="onLogoOptionChange('custom')">
+            <label for="logo-custom" class="option-label">
+              <div class="option-icon">
+                <i class="icon-image"></i>
               </div>
-            </div>
-          </div>
-          
-          <div class="upload-requirements">
-            <h4>Sobre el certificado de firma electrónica:</h4>
-            <ul>
-              <li>Debe ser un archivo .p12 válido</li>
-              <li>Emitido por una autoridad certificadora autorizada (UANATACA, ECLIPSOFT, etc.)</li>
-              <li>Debe estar vigente y no expirado</li>
-              <li>Necesario para firmar facturas electrónicas según la normativa del SRI</li>
-              <li>El archivo será validado automáticamente al seleccionarlo</li>
-            </ul>
+              <div class="option-content">
+                <h4>Subir Logo Personalizado</h4>
+                <p>Usar el logo de su empresa (recomendado)</p>
+              </div>
+            </label>
           </div>
         </div>
       </div>
 
+      <!-- Información Adicional -->
+      <div class="info-section">
+        <div class="info-card">
+          <div class="info-icon">
+            <i class="icon-info"></i>
+          </div>
+          <div class="info-content">
+            <h4>Información Importante</h4>
+            <ul>
+              <li>El certificado de firma electrónica es requerido para la facturación electrónica</li>
+              <li>Debe ser emitido por una entidad certificadora autorizada (BCE, ANF, etc.)</li>
+              <li>El logo puede cambiarse posteriormente en la configuración</li>
+              <li>Todos los datos pueden ser modificados después del setup inicial</li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <!-- End Step Content Wrapper -->
+    </div>
+  </div>
 
-      <!-- Navigation Buttons -->
-      <div class="step-navigation">
-        <button 
-          *ngIf="currentStep > 1" 
-          type="button" 
-          class="btn btn-secondary" 
-          (click)="prevStep()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-          Anterior
-        </button>
+  <!-- Navigation Buttons -->
+  <div class="navigation-buttons">
+    <button 
+      type="button" 
+      class="btn-secondary" 
+      (click)="prevStep()"
+      *ngIf="currentStep > 1"
+      [disabled]="isLoading">
+      <i class="icon-arrow-left"></i>
+      Anterior
+    </button>
 
-        <div class="nav-spacer"></div>
+    <button 
+      type="button" 
+      class="btn-primary" 
+      (click)="nextStep()"
+      *ngIf="currentStep < totalSteps"
+      [disabled]="!canContinue()">
+      Continuar
+      <i class="icon-arrow-right"></i>
+    </button>
 
-        <button 
-          *ngIf="currentStep < totalSteps" 
-          type="button" 
-          class="btn btn-primary" 
-          [disabled]="!canContinue()"
-          (click)="nextStep()">
-          <span *ngIf="!isLoading">Siguiente</span>
-          <span *ngIf="isLoading">Procesando...</span>
-          <svg *ngIf="!isLoading" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </button>
+    <button 
+      type="button" 
+      class="btn-success" 
+      (click)="finishSetup()"
+      *ngIf="currentStep === totalSteps"
+      [disabled]="!canFinish() || isLoading">
+      <span *ngIf="!isLoading">
+        <i class="icon-check"></i>
+        Completar Configuración
+      </span>
+      <span *ngIf="isLoading">
+        <i class="icon-loading"></i>
+        Guardando...
+      </span>
+    </button>
+  </div>
 
-        <button 
-          *ngIf="currentStep === totalSteps" 
-          type="button" 
-          class="btn btn-success" 
-          [disabled]="!canFinish()"
-          (click)="finishSetup()">
-          <span *ngIf="!isLoading">Finalizar Configuración</span>
-          <span *ngIf="isLoading">Guardando...</span>
-          <svg *ngIf="!isLoading" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-          <div *ngIf="isLoading" class="loading-spinner"></div>
-        </button>
-      </div>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Guardando configuración...</p>
     </div>
   </div>
 </div>
