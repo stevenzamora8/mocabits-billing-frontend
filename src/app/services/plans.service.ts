@@ -110,7 +110,8 @@ export class PlansService {
   }
 
   /**
-   * Asigna un plan al usuario autenticado
+   * Asigna un plan a la compañía del usuario autenticado
+   * Endpoint: POST /billing/v1/plans/company-plans
    */
   assignPlanToUser(planId: number): Observable<any> {
     console.log('=== PlansService - assignPlanToUser START ===');
@@ -142,7 +143,7 @@ export class PlansService {
     console.log('PlansService - Authorization header:', headers.get('Authorization'));
     console.log('PlansService - Content-Type header:', headers.get('Content-Type'));
 
-    const fullUrl = `${this.apiUrl}/plans/user-plans`;
+    const fullUrl = `${this.apiUrl}/plans/company-plans`;
     console.log('PlansService - full URL:', fullUrl);
     console.log('PlansService - apiUrl:', this.apiUrl);
 
@@ -187,7 +188,7 @@ export class PlansService {
     const body = { "planId": 1 };
 
     // URL EXACTA del curl que funciona
-    const url = 'http://localhost:8080/billing/v1/plans/user-plans';
+    const url = 'http://localhost:8080/billing/v1/plans/company-plans';
 
     console.log('TEST - URL:', url);
     console.log('TEST - Headers:', headers);

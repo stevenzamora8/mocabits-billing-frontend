@@ -22,7 +22,7 @@ const MESSAGES = {
   RESETTING: 'Restableciendo...',
   RESET_PASSWORD: 'Restablecer Contraseña',
   GO_TO_LOGIN: 'Ir al Login',
-  SUCCESS_MESSAGE: 'Contraseña restablecida exitosamente. Redirigiendo al login...',
+  SUCCESS_MESSAGE: '¡Tu contraseña ha sido actualizada exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.',
   ERROR_MESSAGE: 'Error al restablecer la contraseña. Inténtalo de nuevo.'
 } as const;
 
@@ -59,6 +59,9 @@ export class ResetPasswordFormComponent implements OnInit {
   alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
   showAlertComponent: boolean = false;
 
+  // Redirect countdown
+  redirectCountdown: number = 0;
+
   ngOnInit(): void {
     this.initializeComponent();
   }
@@ -83,7 +86,6 @@ export class ResetPasswordFormComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         console.error('Token validation error:', error);
-        this.showAlert('El enlace de restablecimiento es inválido o ha expirado.', 'danger');
         this.handleInvalidLink();
       }
     });
@@ -124,10 +126,20 @@ export class ResetPasswordFormComponent implements OnInit {
     this.errorMessage = '';
     this.password = '';
     this.confirmPassword = '';
-    // Redirigir automáticamente al login después de 2 segundos
-    setTimeout(() => {
-      this.navigateToLogin();
-    }, 2000);
+
+    // Iniciar contador de redirección automática
+    this.startRedirectCountdown();
+  }
+
+  private startRedirectCountdown(): void {
+    this.redirectCountdown = 5;
+    const countdownInterval = setInterval(() => {
+      this.redirectCountdown--;
+      if (this.redirectCountdown <= 0) {
+        clearInterval(countdownInterval);
+        this.navigateToLogin();
+      }
+    }, 1000);
   }
 
   navigateToLogin(): void {

@@ -1,11 +1,12 @@
 <!-- Alert Component -->
-<app-alert
-  *ngIf="showAlertComponent"
-  [message]="alertMessage"
-  [type]="alertType"
-  [dismissible]="true"
-  (closed)="onAlertClosed()">
-</app-alert>
+<div class="alert-container" *ngIf="showAlertComponent">
+  <app-alert
+    [message]="alertMessage"
+    [type]="alertType"
+    [dismissible]="true"
+    (closed)="onAlertClosed()">
+  </app-alert>
+</div>
 
 <!-- Formulario de Login -->
 <div *ngIf="!showSuccessMessage" class="auth-section">

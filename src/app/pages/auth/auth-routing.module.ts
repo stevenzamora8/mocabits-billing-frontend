@@ -7,6 +7,7 @@ const routes: Routes = [
     path: '',
     component: AuthLayoutComponent,
     children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
       {
         path: 'login',
         loadComponent: () => import('./login-form/login-form.component').then(m => m.LoginFormComponent)

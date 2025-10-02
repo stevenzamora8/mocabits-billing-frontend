@@ -16,22 +16,22 @@ export class SetupGuard implements CanActivate {
         next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
           console.log('SetupGuard - User setup status:', status);
 
-          if (!status.hasActivePlan) {
-            // No tiene plan activo, redirigir a selección de planes
+          if (!status.hasCompanyInfo) {
+            // No tiene info de compañía, permitir acceso a setup (PRIMERO)
+            resolve(true);
+          } else if (!status.hasActivePlan) {
+            // Tiene compañía pero no plan activo, redirigir a selección de planes (SEGUNDO)
             this.router.navigate(['/plan-selection']);
             resolve(false);
-          } else if (!status.hasCompanyInfo) {
-            // Tiene plan pero no info de compañía, permitir acceso a setup
-            resolve(true);
           } else {
-            // Tiene plan y compañía completa, redirigir al dashboard
+            // Tiene ambos completos, redirigir al dashboard (FINAL)
             this.router.navigate(['/dashboard']);
             resolve(false);
           }
         },
         error: (error: any) => {
           console.error('SetupGuard - Error getting user setup status:', error);
-          // En caso de error, permitir acceso por defecto (para evitar bloqueos)
+          // En caso de error, permitir acceso al setup por defecto (para permitir configuración inicial)
           resolve(true);
         }
       });

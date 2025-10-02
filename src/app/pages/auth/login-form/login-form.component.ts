@@ -86,17 +86,17 @@ export class LoginFormComponent implements OnInit, OnDestroy {
             
             this.showSuccessMessage = true;
             
-            // Redirigir basado en el estado de setup
+            // Redirigir basado en el estado de setup - FLUJO: Setup primero, luego Plan
             setTimeout(() => {
-              if (hasActivePlan && hasCompanyInfo) {
-                // Usuario completamente configurado - ir al dashboard
-                this.router.navigate(['/dashboard']);
-              } else if (!hasActivePlan && !hasCompanyInfo) {
-                // Usuario sin plan ni compañía - ir a selección de plan
-                this.router.navigate(['/plan-selection']);
-              } else if (hasActivePlan && !hasCompanyInfo) {
-                // Usuario con plan pero sin info de compañía - ir al setup
+              if (!hasCompanyInfo) {
+                // Si no tiene información de compañía, ir al setup primero
                 this.router.navigate(['/setup']);
+              } else if (!hasActivePlan) {
+                // Si tiene compañía pero no plan, ir a selección de plan
+                this.router.navigate(['/plan-selection']);
+              } else {
+                // Usuario completamente configurado (tiene compañía Y plan) - ir al dashboard
+                this.router.navigate(['/dashboard']);
               }
             }, 2000);
           },
@@ -113,6 +113,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         console.error('Login error', error);
         this.showAlert(error.error?.message || error.message || 'Error al iniciar sesión', 'danger');
+        this.isLoading = false; // Reset loading state on error
       },
       complete: () => {
         this.isLoading = false;
@@ -142,11 +143,16 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     this.alertType = type;
     this.showAlertComponent = true;
 
-    // Auto-dismiss success messages after 4 seconds
+    // Auto-dismiss messages after specified time
     if (type === 'success') {
       this.alertTimeout = setTimeout(() => {
         this.onAlertClosed();
       }, 4000);
+    } else if (type === 'danger') {
+      // Auto-dismiss error messages after 6 seconds
+      this.alertTimeout = setTimeout(() => {
+        this.onAlertClosed();
+      }, 6000);
     }
   }
 

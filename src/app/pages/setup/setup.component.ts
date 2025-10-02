@@ -612,8 +612,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       }));
       localStorage.setItem('setupCompleted', 'true');
 
-      // Redirigir al dashboard
-      this.router.navigate(['/dashboard']);
+      // Redirigir a selección de plan después del setup
+      this.router.navigate(['/plan-selection']);
       
     } catch (error) {
       console.error('Error al guardar la configuración:', error);

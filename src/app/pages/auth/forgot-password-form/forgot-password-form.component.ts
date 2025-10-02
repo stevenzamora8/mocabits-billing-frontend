@@ -16,6 +16,7 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
   recoveryEmail: string = '';
   currentStep: 'form' | 'success' = 'form';
   isLoading: boolean = false;
+  showSuccessLoadingBar: boolean = false;
 
   // Alert properties
   alertMessage: string = '';
@@ -23,6 +24,7 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
   showAlertComponent: boolean = false;
 
   private alertTimeout: any;
+  private successLoadingTimeout: any;
 
   constructor(
     private authService: AuthService,
@@ -34,6 +36,9 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.alertTimeout) {
       clearTimeout(this.alertTimeout);
+    }
+    if (this.successLoadingTimeout) {
+      clearTimeout(this.successLoadingTimeout);
     }
   }
 
@@ -54,6 +59,16 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         console.log('Forgot password request successful:', response);
         this.currentStep = 'success';
+        this.showSuccessLoadingBar = true;
+
+        // Ocultar la barra de carga después de 3 segundos y redirigir al login
+        this.successLoadingTimeout = setTimeout(() => {
+          this.showSuccessLoadingBar = false;
+          // Redirigir al login después de 1 segundo adicional
+          setTimeout(() => {
+            this.goToLogin();
+          }, 1000);
+        }, 3000);
       },
       error: (error: any) => {
         console.error('Forgot password error:', error);

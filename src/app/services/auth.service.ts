@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, catchError } from 'rxjs/operators';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthErrorHandlerService } from './auth-error-handler.service';
 
 /**
  * AuthService
@@ -18,7 +19,10 @@ export class AuthService {
   // If set, may contain the "Basic " prefix or just the base64 part.
   private readonly envBasic = environment.basicAuth || '';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authErrorHandler: AuthErrorHandlerService
+  ) {}
 
   // Expose current access token as an observable so other services can react to changes
   private _accessToken$ = new BehaviorSubject<string | null>(localStorage.getItem('accessToken'));
@@ -112,6 +116,24 @@ export class AuthService {
           // localStorage might be unavailable in some environments
           console.warn('Could not persist auth tokens', e);
         }
+      }),
+      catchError((error: any) => {
+        // Usar el manejador de errores personalizado para login
+        const customMessage = this.authErrorHandler.handleLoginError(error);
+        console.error('AuthService - Login error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
       })
     );
   }
@@ -158,8 +180,22 @@ export class AuthService {
         return response;
       }),
       catchError((error: any) => {
-        console.error('Forgot password error:', error);
-        return throwError(() => error);
+        // Usar el manejador de errores personalizado para recuperación de contraseña
+        const customMessage = this.authErrorHandler.handleAuthError(error);
+        console.error('AuthService - Forgot password error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
       })
     );
   }
@@ -174,8 +210,22 @@ export class AuthService {
         return response;
       }),
       catchError((error: any) => {
-        console.error('Password reset error:', error);
-        return throwError(() => error);
+        // Usar el manejador de errores personalizado para reseteo de contraseña
+        const customMessage = this.authErrorHandler.handleAuthError(error);
+        console.error('AuthService - Password reset error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
       })
     );
   }
@@ -189,8 +239,22 @@ export class AuthService {
         return response;
       }),
       catchError((error: any) => {
-        console.error('Reset token validation error:', error);
-        return throwError(() => error);
+        // Usar el manejador de errores personalizado para validación de token
+        const customMessage = this.authErrorHandler.handleAuthError(error);
+        console.error('AuthService - Reset token validation error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
       })
     );
   }

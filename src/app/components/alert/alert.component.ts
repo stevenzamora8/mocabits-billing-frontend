@@ -56,7 +56,7 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info';
     .alert {
       position: relative;
       padding: 0.875rem 1.125rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       border: 1px solid transparent;
       border-radius: 0.75rem;
       font-size: 0.875rem;
@@ -65,6 +65,8 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info';
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
       backdrop-filter: blur(10px);
       overflow: hidden;
+      max-width: 100%;
+      width: 100%;
     }
     
     .alert-content {
