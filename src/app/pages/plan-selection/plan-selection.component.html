@@ -1,32 +1,14 @@
 <div class="plan-selection-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="header-content">
-      <div class="brand-logo">
-        <svg width="50" height="50" viewBox="0 0 100 100" fill="none">
-          <rect width="100" height="100" rx="20" fill="url(#brandGradient)"/>
-          <path d="M30 35h40v30H30z" fill="white" opacity="0.9"/>
-          <path d="M35 45h30v2H35zm0 6h25v2H35zm0 6h20v2H35z" fill="url(#textGradient)"/>
-          <defs>
-            <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#667eea"/>
-              <stop offset="50%" style="stop-color:#764ba2"/>
-              <stop offset="100%" style="stop-color:#f093fb"/>
-            </linearGradient>
-            <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#667eea"/>
-              <stop offset="100%" style="stop-color:#764ba2"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-      <h1 class="main-title">Selecciona tu Plan</h1>
-      <p class="main-subtitle">Elige el plan que mejor se adapte a las necesidades de tu negocio</p>
+  <!-- Header -->
+  <div class="plan-header">
+    <div class="welcome-header">
+      <h1>Selecciona tu Plan</h1>
+      <p class="welcome-subtitle">Elige el plan que mejor se adapte a las necesidades de tu negocio</p>
     </div>
   </div>
 
-  <!-- Plans Grid -->
-  <div class="plans-container">
+  <!-- Plan Content -->
+  <div class="plan-content">
     <!-- Loading State -->
     <div *ngIf="isLoadingPlans" class="loading-container">
       <div class="loading-spinner"></div>
@@ -98,33 +80,25 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Action Buttons -->
-  <div class="actions-section">
-    <div class="actions-container">
-      <!-- Botón de prueba para comparar con Postman -->
-      <button 
-        class="test-button"
-        (click)="testPostmanRequest()"
-        [disabled]="isLoading">
-        🧪 Probar solicitud idéntica a Postman
-      </button>
-      
-      <button 
-        class="skip-button"
-        (click)="onSkip()"
-        [disabled]="isLoading">
-        Continuar con plan gratuito
-      </button>
-      
-      <button 
-        class="continue-button"
-        [disabled]="!selectedPlan || isLoading"
-        (click)="onContinue()">
-        <span *ngIf="!isLoading">Continuar con {{ selectedPlanName }}</span>
-        <div *ngIf="isLoading" class="button-spinner"></div>
-      </button>
+    <!-- Action Buttons -->
+    <div class="actions-section">
+      <div class="actions-container">
+        <button 
+          class="skip-button"
+          (click)="onSkip()"
+          [disabled]="isLoading">
+          Continuar con plan gratuito
+        </button>
+        
+        <button 
+          class="continue-button"
+          [disabled]="!selectedPlan || isLoading"
+          (click)="onContinue()">
+          <span *ngIf="!isLoading">Continuar con {{ selectedPlanName }}</span>
+          <div *ngIf="isLoading" class="button-spinner"></div>
+        </button>
+      </div>
     </div>
   </div>
 

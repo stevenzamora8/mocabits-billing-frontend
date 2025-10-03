@@ -156,25 +156,6 @@ export class PlanSelectionComponent implements OnInit {
   /**
    * Función de prueba: enviar EXACTAMENTE la misma solicitud que funciona en Postman
    */
-  testPostmanRequest() {
-    console.log('🧪 TEST: Ejecutando solicitud idéntica a Postman...');
-    this.isLoading = true;
-    this.error = null;
-
-    this.plansService.testExactPostmanRequest().subscribe({
-      next: (response) => {
-        console.log('✅ TEST SUCCESS: La solicitud idéntica a Postman funcionó!', response);
-        this.error = '✅ ÉXITO: La solicitud idéntica a Postman funcionó correctamente!';
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('❌ TEST FAILED: La solicitud idéntica a Postman falló:', error);
-        this.error = `❌ ERROR: La solicitud idéntica a Postman falló: ${error.message}`;
-        this.isLoading = false;
-      }
-    });
-  }
-
   retryLoadPlans() {
     this.loadPlans();
   }

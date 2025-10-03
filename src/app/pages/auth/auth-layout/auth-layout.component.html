@@ -311,12 +311,9 @@
     <div class="form-container">
       <!-- Contenido específico de cada página de autenticación -->
       <router-outlet></router-outlet>
-    </div>
-
-    <!-- Firma de la empresa -->
-    <div class="company-signature">
-      <div class="signature-line"></div>
-      <div class="signature-content">
+      
+      <!-- Información de la empresa debajo del formulario -->
+      <div class="signature-text">
         <div class="signature-logo">
           <!-- Logo personalizado para la firma -->
           <img *ngIf="useCustomLogo && customLogoPath"
@@ -325,24 +322,25 @@
                class="signature-logo-image">
 
           <!-- Logo SVG para la firma -->
-          <svg *ngIf="!useCustomLogo" width="24" height="24" viewBox="0 0 100 100" fill="none">
-            <rect width="100" height="100" rx="22" fill="url(#signatureGradient)"/>
+          <svg *ngIf="!useCustomLogo" width="32" height="32" viewBox="0 0 100 100" fill="none">
+            <rect width="100" height="100" rx="22" fill="url(#formSignatureGradient)"/>
             <path d="M20 30 L20 70 L25 70 L25 40 L35 55 L40 55 L50 40 L50 70 L55 70 L55 30 L48 30 L37.5 48 L27 30 Z" fill="white"/>
             <path d="M62 30 L62 70 L75 70 Q82 70 82 62.5 Q82 55 75 55 Q82 55 82 42.5 Q82 30 75 30 Z M67 35 L75 35 Q77 35 77 42.5 Q77 50 75 50 L67 50 Z M67 55 L75 55 Q77 55 77 62.5 Q77 70 75 70 L67 70 Z" fill="white"/>
             <defs>
-              <linearGradient id="signatureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#6b7280"/>
-                <stop offset="100%" style="stop-color:#9ca3af"/>
+              <linearGradient id="formSignatureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#667eea"/>
+                <stop offset="50%" style="stop-color:#764ba2"/>
+                <stop offset="100%" style="stop-color:#f093fb"/>
               </linearGradient>
             </defs>
           </svg>
         </div>
-        <div class="signature-text">
-          <span class="company-name">{{ brandName }}</span>
-          <span class="company-tagline">{{ brandTagline }}</span>
+        <div class="signature-info">
+          <span class="company-name">{{ brandName || 'MocaBits' }}</span>
+          <span class="company-tagline">{{ brandTagline || 'Facturación Inteligente • Gestión Simplificada' }}</span>
+          <span class="company-version">{{ brandVersion || 'v1.0.0' }}</span>
         </div>
       </div>
-      <div class="signature-version">{{ brandVersion }}</div>
     </div>
 
   </div>

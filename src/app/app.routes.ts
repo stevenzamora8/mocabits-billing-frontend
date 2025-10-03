@@ -1,16 +1,18 @@
 import { Routes } from '@angular/router';
 import { SetupGuard } from './guards/setup.guard';
 import { AuthGuard } from './guards/auth.guard';
+import { PlanSelectionGuard } from './guards/plan-selection.guard';
+import { DashboardGuard } from './guards/dashboard.guard';
 
 export const routes: Routes = [
   {
     path: 'test-simple',
-    loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+    loadComponent: () => import('./pages/auth/reset-password-form/reset-password-form.component').then(m => m.ResetPasswordFormComponent),
     title: 'Test Simple'
   },
   {
     path: 'reset-password/:uid',
-    loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+    loadComponent: () => import('./pages/auth/reset-password-form/reset-password-form.component').then(m => m.ResetPasswordFormComponent),
     title: 'MocaBits - Restablecer Contraseña'
   },
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -21,13 +23,13 @@ export const routes: Routes = [
   {
     path: 'plan-selection',
     loadComponent: () => import('./pages/plan-selection/plan-selection.component').then(m => m.PlanSelectionComponent),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, PlanSelectionGuard],
     title: 'MocaBits - Seleccionar Plan'
   },
   {
     path: 'setup',
     loadComponent: () => import('./pages/setup/setup.component').then(m => m.SetupComponent),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, SetupGuard],
     title: 'MocaBits - Configuración Inicial'
   },
   {
@@ -38,7 +40,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardModule),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, DashboardGuard],
     title: 'MocaBits - Dashboard'
   },
   { path: '**', redirectTo: '/auth/login' }

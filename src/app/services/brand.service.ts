@@ -10,6 +10,7 @@ export class BrandService {
   constructor() {
     // Aplicar variables CSS dinámicamente
     this.applyCSSVariables();
+    console.log('BrandService initialized with config:', this.config);
   }
 
   /**

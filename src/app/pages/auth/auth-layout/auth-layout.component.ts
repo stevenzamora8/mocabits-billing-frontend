@@ -13,12 +13,12 @@ import { BrandService } from '../../../services/brand.service';
   styleUrls: ['./auth-layout.component.css']
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy {
-  // Propiedades de branding
-  brandName: string = '';
-  brandSubtitle: string = '';
-  brandDescription: string = '';
-  brandTagline: string = '';
-  brandVersion: string = '';
+  // Propiedades de branding con valores por defecto
+  brandName: string = 'MocaBits';
+  brandSubtitle: string = 'Sistema de Facturación Inteligente';
+  brandDescription: string = 'Sistema de Facturación Electrónica Empresarial';
+  brandTagline: string = 'Facturación Inteligente • Gestión Simplificada';
+  brandVersion: string = 'v1.0.0';
   currentYear: number = new Date().getFullYear();
   useCustomLogo: boolean = false;
   customLogoPath: string = '';
@@ -29,17 +29,14 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private brandService: BrandService
-  ) {}
+  ) {
+    // Inicializar inmediatamente en el constructor
+    this.loadBrandingConfig();
+  }
 
   ngOnInit(): void {
-    // Cargar configuración de branding
-    this.brandName = this.brandService.getBrandName();
-    this.brandSubtitle = this.brandService.getBrandSubtitle();
-    this.brandDescription = this.brandService.getBrandDescription();
-    this.brandTagline = this.brandService.getBrandTagline();
-    this.brandVersion = this.brandService.getBrandVersion();
-    this.useCustomLogo = this.brandService.useCustomLogo();
-    this.customLogoPath = this.brandService.getCustomLogoPath() || '';
+    // Cargar configuración de branding nuevamente para asegurar
+    this.loadBrandingConfig();
 
     // Detectar la ruta actual para mostrar la ilustración correspondiente
     this.router.events
@@ -76,5 +73,40 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Carga la configuración de branding desde el servicio
+   */
+  private loadBrandingConfig(): void {
+    try {
+      // Obtener valores del servicio
+      const name = this.brandService.getBrandName();
+      const subtitle = this.brandService.getBrandSubtitle();
+      const description = this.brandService.getBrandDescription();
+      const tagline = this.brandService.getBrandTagline();
+      const version = this.brandService.getBrandVersion();
+      const useCustom = this.brandService.useCustomLogo();
+      const customPath = this.brandService.getCustomLogoPath() || '';
+
+      // Asignar solo si los valores no están vacíos
+      if (name) this.brandName = name;
+      if (subtitle) this.brandSubtitle = subtitle;
+      if (description) this.brandDescription = description;
+      if (tagline) this.brandTagline = tagline;
+      if (version) this.brandVersion = version;
+      
+      this.useCustomLogo = useCustom;
+      this.customLogoPath = customPath;
+
+      console.log('Branding loaded:', {
+        brandName: this.brandName,
+        brandTagline: this.brandTagline,
+        brandVersion: this.brandVersion
+      });
+    } catch (error) {
+      console.error('Error loading branding config:', error);
+      // Los valores por defecto ya están asignados en las propiedades
+    }
   }
 }
