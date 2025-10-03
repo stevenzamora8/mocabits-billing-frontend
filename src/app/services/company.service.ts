@@ -75,10 +75,15 @@ export class CompanyService {
     );
   }
 
-  completeSetup(companyData: any, signatureFile: File, signaturePassword?: string): Observable<any> {
+  completeSetup(companyData: any, signatureFile: File, logoFile?: File, signaturePassword?: string): Observable<any> {
     const formData = new FormData();
     formData.append('companyData', JSON.stringify(companyData));
     formData.append('signatureFile', signatureFile);
+    
+    if (logoFile) {
+      formData.append('logoFile', logoFile);
+    }
+    
     if (signaturePassword) {
       formData.append('signaturePassword', signaturePassword);
     }

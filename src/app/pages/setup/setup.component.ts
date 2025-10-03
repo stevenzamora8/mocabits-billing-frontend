@@ -575,7 +575,12 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         throw new Error('Contraseña del certificado requerida');
       }
       
-      const setupResponse = await this.companyService.completeSetup(companyPayload, this.signatureFile, this.signaturePassword).toPromise();
+      const setupResponse = await this.companyService.completeSetup(
+        companyPayload, 
+        this.signatureFile, 
+        this.logoFile || undefined, 
+        this.signaturePassword
+      ).toPromise();
       console.log('Setup completado:', setupResponse);
       
       // Guardar datos en localStorage
