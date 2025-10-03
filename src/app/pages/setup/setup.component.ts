@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 import { CompanyService, Company, CompanyResponse } from '../../services/company.service';
+import { AuthService } from '../../services/auth.service';
+import { AlertComponent } from '../../components/alert/alert.component';
 
 interface CompanyData {
   razonSocial: string;
@@ -26,7 +28,7 @@ interface EstablishmentData {
 @Component({
   selector: 'app-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, AlertComponent],
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -60,10 +62,16 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   // Signature error tracking
   private signatureError: string = '';
 
+  // Alert component properties
+  alertMessage = '';
+  alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
+  pendingAction: (() => void) | null = null;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private companyService: CompanyService
+    private companyService: CompanyService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -783,5 +791,70 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     } else if (this.currentStep === 2) {
       this.logFormErrors(this.establishmentForm);
     }
+  }
+
+  /**
+   * Mostrar confirmación con AlertComponent
+   */
+  showConfirmation(message: string, action: () => void): void {
+    this.alertMessage = message;
+    this.alertType = 'confirm';
+    this.pendingAction = action;
+  }
+
+  /**
+   * Manejar confirmación del AlertComponent
+   */
+  onAlertConfirmed(): void {
+    if (this.pendingAction) {
+      this.pendingAction();
+    }
+    this.clearAlert();
+  }
+
+  /**
+   * Manejar cancelación del AlertComponent
+   */
+  onAlertCancelled(): void {
+    this.clearAlert();
+  }
+
+  /**
+   * Limpiar alert
+   */
+  clearAlert(): void {
+    this.alertMessage = '';
+    this.alertType = 'info';
+    this.pendingAction = null;
+  }
+
+  /**
+   * Cerrar sesión y redirigir al login
+   */
+  logout(): void {
+    // Usar modal de confirmación personalizado
+    this.showConfirmation(
+      '¿Está seguro que desea cerrar sesión? Se perderá el progreso no guardado.',
+      () => {
+        try {
+          // Limpiar tokens y datos de sesión
+          this.authService.logout();
+          
+          // Limpiar datos de setup del localStorage si existen
+          localStorage.removeItem('companySetup');
+          localStorage.removeItem('setupCompleted');
+          
+          console.log('Setup - Sesión cerrada exitosamente');
+          
+          // Redirigir al login
+          this.router.navigate(['/auth/login']);
+          
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error);
+          // Aun si hay error, redirigir al login por seguridad
+          this.router.navigate(['/auth/login']);
+        }
+      }
+    );
   }
 }

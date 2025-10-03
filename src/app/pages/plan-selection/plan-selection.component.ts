@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PlansService, PlanDisplay } from '../../services/plans.service';
+import { AuthService } from '../../services/auth.service';
+import { AlertComponent } from '../../components/alert/alert.component';
 
 @Component({
   selector: 'app-plan-selection',
-  imports: [CommonModule],
+  imports: [CommonModule, AlertComponent],
   templateUrl: './plan-selection.component.html',
   styleUrl: './plan-selection.component.css'
 })
@@ -17,9 +19,15 @@ export class PlanSelectionComponent implements OnInit {
 
   plans: PlanDisplay[] = [];
 
+  // Alert component properties
+  alertMessage = '';
+  alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
+  pendingAction: (() => void) | null = null;
+
   constructor(
     private router: Router,
-    private plansService: PlansService
+    private plansService: PlansService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -158,5 +166,70 @@ export class PlanSelectionComponent implements OnInit {
    */
   retryLoadPlans() {
     this.loadPlans();
+  }
+
+  /**
+   * Mostrar confirmación con AlertComponent
+   */
+  showConfirmation(message: string, action: () => void): void {
+    this.alertMessage = message;
+    this.alertType = 'confirm';
+    this.pendingAction = action;
+  }
+
+  /**
+   * Manejar confirmación del AlertComponent
+   */
+  onAlertConfirmed(): void {
+    if (this.pendingAction) {
+      this.pendingAction();
+    }
+    this.clearAlert();
+  }
+
+  /**
+   * Manejar cancelación del AlertComponent
+   */
+  onAlertCancelled(): void {
+    this.clearAlert();
+  }
+
+  /**
+   * Limpiar alert
+   */
+  clearAlert(): void {
+    this.alertMessage = '';
+    this.alertType = 'info';
+    this.pendingAction = null;
+  }
+
+  /**
+   * Cerrar sesión y redirigir al login
+   */
+  logout(): void {
+    this.showConfirmation(
+      '¿Está seguro que desea cerrar sesión?',
+      () => {
+        try {
+          // Limpiar tokens y datos de sesión
+          this.authService.logout();
+          
+          // Limpiar datos específicos del plan selection
+          localStorage.removeItem('selectedPlan');
+          localStorage.removeItem('companySetup');
+          localStorage.removeItem('setupCompleted');
+          
+          console.log('Plan Selection - Sesión cerrada exitosamente');
+          
+          // Redirigir al login
+          this.router.navigate(['/auth/login']);
+          
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error);
+          // Aun si hay error, redirigir al login por seguridad
+          this.router.navigate(['/auth/login']);
+        }
+      }
+    );
   }
 }

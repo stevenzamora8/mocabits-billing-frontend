@@ -1,15 +1,16 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type AlertType = 'success' | 'danger' | 'warning' | 'info';
+export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
 
 @Component({
   selector: 'app-alert',
   standalone: true,
   imports: [CommonModule],
   template: `
+    <!-- Alert Normal -->
     <div 
-      *ngIf="message"
+      *ngIf="message && type !== 'confirm'"
       class="alert"
       [class]="'alert-' + type"
       [class.alert-dismissible]="dismissible"
@@ -49,6 +50,46 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info';
         *ngIf="autoDismiss" 
         class="alert-progress"
         [style.animation-duration.ms]="autoDismissTime">
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div *ngIf="type === 'confirm' && message" class="modal-backdrop" (click)="cancel()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{ confirmTitle || 'Confirmar Acción' }}</h4>
+            <button 
+              type="button" 
+              class="btn-close" 
+              (click)="cancel()"
+              aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="alert alert-warning" role="alert">
+              <i class="alert-icon">⚠️</i>
+              {{ message }}
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="cancel()">
+              {{ cancelText || 'Cancelar' }}
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              (click)="confirm()">
+              {{ confirmText || 'Confirmar' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -185,6 +226,245 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info';
     .alert:not([style*="display: none"]) {
       animation: alert-fade-out 0.3s ease-in forwards;
     }
+
+    /* Estilos del Modal de Confirmación */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1050;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    .modal-dialog {
+      position: relative;
+      width: auto;
+      max-width: 500px;
+      margin: 1.75rem;
+      pointer-events: auto;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      background-color: white;
+      background-clip: padding-box;
+      border: 1px solid rgba(0, 0, 0, 0.175);
+      border-radius: 0.375rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+      border-top-left-radius: calc(0.375rem - 1px);
+      border-top-right-radius: calc(0.375rem - 1px);
+    }
+
+    .modal-title {
+      margin-bottom: 0;
+      line-height: 1.5;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #212529;
+    }
+
+    .btn-close {
+      box-sizing: content-box;
+      width: 1em;
+      height: 1em;
+      padding: 0.25em 0.25em;
+      color: #000;
+      background: transparent;
+      border: 0;
+      border-radius: 0.375rem;
+      opacity: 0.5;
+      cursor: pointer;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .btn-close:hover {
+      opacity: 0.75;
+    }
+
+    .modal-body {
+      position: relative;
+      flex: 1 1 auto;
+      padding: 1rem;
+    }
+
+    .modal-body .alert {
+      margin-bottom: 0;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, #fff3cd 0%, #fefcf3 100%);
+      border: 1px solid #ffeaa7;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .modal-body .alert-icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .modal-footer {
+      display: flex;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 1rem;
+      border-top: 1px solid #dee2e6;
+      border-bottom-right-radius: calc(0.375rem - 1px);
+      border-bottom-left-radius: calc(0.375rem - 1px);
+      gap: 0.75rem;
+      background-color: #f8f9fa;
+      min-height: 60px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #212529;
+      text-align: center;
+      text-decoration: none;
+      vertical-align: middle;
+      cursor: pointer;
+      user-select: none;
+      background-color: transparent;
+      border: 1px solid transparent;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      border-radius: 0.375rem;
+      min-width: 80px;
+      height: 38px;
+      transition: all 0.15s ease-in-out;
+      box-sizing: border-box;
+    }
+
+    .btn-secondary {
+      color: #fff !important;
+      background-color: #6c757d !important;
+      border-color: #6c757d !important;
+      font-weight: 500 !important;
+    }
+
+    .btn-secondary:hover {
+      color: #fff !important;
+      background-color: #5c636a !important;
+      border-color: #565e64 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary:focus {
+      color: #fff !important;
+      background-color: #5c636a !important;
+      border-color: #565e64 !important;
+      box-shadow: 0 0 0 0.2rem rgba(130, 138, 145, 0.5) !important;
+      outline: 0;
+    }
+
+    .btn-secondary:active {
+      color: #fff !important;
+      background-color: #565e64 !important;
+      border-color: #51585e !important;
+      transform: translateY(0);
+    }
+
+    .btn-danger {
+      color: #fff !important;
+      background-color: #dc3545 !important;
+      border-color: #dc3545 !important;
+      font-weight: 500 !important;
+    }
+
+    .btn-danger:hover {
+      color: #fff !important;
+      background-color: #c82333 !important;
+      border-color: #bd2130 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-danger:focus {
+      color: #fff !important;
+      background-color: #c82333 !important;
+      border-color: #bd2130 !important;
+      box-shadow: 0 0 0 0.2rem rgba(225, 83, 97, 0.5) !important;
+      outline: 0;
+    }
+
+    .btn-danger:active {
+      color: #fff !important;
+      background-color: #bd2130 !important;
+      border-color: #b21f2d !important;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Responsive para botones */
+    @media (max-width: 576px) {
+      .modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+      
+      .modal-footer .btn {
+        width: 100% !important;
+        min-width: auto !important;
+        justify-content: center;
+        margin: 0;
+      }
+    }
+
+    @media (min-width: 577px) {
+      .modal-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+      
+      .modal-footer .btn {
+        width: auto !important;
+        min-width: 80px !important;
+      }
+    }
   `]
 })
 export class AlertComponent implements OnInit, OnDestroy, OnChanges {
@@ -193,19 +473,27 @@ export class AlertComponent implements OnInit, OnDestroy, OnChanges {
   @Input() dismissible: boolean = true;
   @Input() autoDismiss: boolean = false;
   @Input() autoDismissTime: number = 5000; // 5 segundos por defecto
+  
+  // Propiedades para confirmación
+  @Input() confirmTitle: string = '';
+  @Input() confirmText: string = '';
+  @Input() cancelText: string = '';
+  
   @Output() closed = new EventEmitter<void>();
+  @Output() confirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
   private autoDismissTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void {
-    if (this.autoDismiss && this.message) {
+    if (this.autoDismiss && this.message && this.type !== 'confirm') {
       this.startAutoDismissTimer();
     }
   }
 
   ngOnChanges(): void {
-    // Reiniciar el timer cuando cambie el mensaje
-    if (this.autoDismiss && this.message) {
+    // Reiniciar el timer cuando cambie el mensaje (pero no para confirmaciones)
+    if (this.autoDismiss && this.message && this.type !== 'confirm') {
       this.startAutoDismissTimer();
     } else if (!this.message) {
       this.clearAutoDismissTimer();
@@ -234,6 +522,16 @@ export class AlertComponent implements OnInit, OnDestroy, OnChanges {
     this.clearAutoDismissTimer();
     this.message = '';
     this.closed.emit();
+  }
+
+  confirm(): void {
+    this.confirmed.emit();
+    this.close();
+  }
+
+  cancel(): void {
+    this.cancelled.emit();
+    this.close();
   }
 
 

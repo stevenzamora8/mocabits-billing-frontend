@@ -10,6 +10,16 @@
         <p>Configure su empresa para comenzar a facturar</p>
       </div>
     </div>
+    <div class="header-actions">
+      <button 
+        type="button" 
+        class="btn-logout" 
+        (click)="logout()"
+        title="Cerrar Sesión">
+        <i class="icon-logout"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
   </div>
 
   <!-- Progress Bar -->
@@ -449,20 +459,24 @@
       [disabled]="!canFinish() || isLoading">
       <span *ngIf="!isLoading">
         <i class="icon-check"></i>
-        Completar Configuración
+        Cargar
       </span>
       <span *ngIf="isLoading">
         <i class="icon-loading"></i>
-        Guardando...
+        Cargando...
       </span>
     </button>
   </div>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="loading-content">
-      <div class="spinner"></div>
-      <p>Guardando configuración...</p>
-    </div>
-  </div>
+  <!-- Alert Component -->
+  <app-alert
+    [message]="alertMessage"
+    [type]="alertType"
+    confirmTitle="Confirmar Acción"
+    confirmText="Confirmar"
+    cancelText="Cancelar"
+    (confirmed)="onAlertConfirmed()"
+    (cancelled)="onAlertCancelled()"
+    (closed)="clearAlert()">
+  </app-alert>
 </div>

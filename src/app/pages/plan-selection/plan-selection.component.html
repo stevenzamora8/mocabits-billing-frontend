@@ -5,6 +5,14 @@
       <h1>Selecciona tu Plan</h1>
       <p class="welcome-subtitle">Elige el plan que mejor se adapte a las necesidades de tu negocio</p>
     </div>
+    <button 
+      type="button" 
+      class="btn-logout" 
+      (click)="logout()"
+      title="Cerrar sesión">
+      <i class="icon-logout"></i>
+      <span>Cerrar sesión</span>
+    </button>
   </div>
 
   <!-- Plan Content -->
@@ -109,4 +117,16 @@
     <div class="floating-element floating-3"></div>
     <div class="floating-element floating-4"></div>
   </div>
+
+  <!-- Alert Component -->
+  <app-alert
+    [message]="alertMessage"
+    [type]="alertType"
+    confirmTitle="Confirmar Acción"
+    confirmText="Confirmar"
+    cancelText="Cancelar"
+    (confirmed)="onAlertConfirmed()"
+    (cancelled)="onAlertCancelled()"
+    (closed)="clearAlert()">
+  </app-alert>
 </div>
