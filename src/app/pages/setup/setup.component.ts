@@ -836,24 +836,29 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showConfirmation(
       '¿Está seguro que desea cerrar sesión? Se perderá el progreso no guardado.',
       () => {
-        try {
-          // Limpiar tokens y datos de sesión
-          this.authService.logout();
-          
-          // Limpiar datos de setup del localStorage si existen
-          localStorage.removeItem('companySetup');
-          localStorage.removeItem('setupCompleted');
-          
-          console.log('Setup - Sesión cerrada exitosamente');
-          
-          // Redirigir al login
-          this.router.navigate(['/auth/login']);
-          
-        } catch (error) {
-          console.error('Error al cerrar sesión:', error);
-          // Aun si hay error, redirigir al login por seguridad
-          this.router.navigate(['/auth/login']);
-        }
+        // Llamar al logout con el nuevo endpoint REST
+        this.authService.logout().subscribe({
+          next: (response) => {
+            console.log('Setup - Logout successful:', response);
+            
+            // Limpiar datos de setup del localStorage si existen
+            localStorage.removeItem('companySetup');
+            localStorage.removeItem('setupCompleted');
+            
+            // Redirigir al login
+            this.router.navigate(['/auth/login']);
+          },
+          error: (error) => {
+            console.error('Setup - Logout error:', error);
+            
+            // Limpiar datos locales incluso si falla el logout en el servidor
+            localStorage.removeItem('companySetup');
+            localStorage.removeItem('setupCompleted');
+            
+            // Redirigir al login por seguridad
+            this.router.navigate(['/auth/login']);
+          }
+        });
       }
     );
   }

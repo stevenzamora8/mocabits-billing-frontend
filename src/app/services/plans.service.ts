@@ -41,10 +41,10 @@ export class PlansService {
 
   /**
    * Obtiene la lista de planes disponibles desde el backend
+   * Nueva URL REST: GET /billing/v1/plans
    */
   getPlans(): Observable<Plan[]> {
-    // El endpoint de planes es público, no requiere autenticación
-    return this.http.get<Plan[]>(`${this.apiUrl}/plans`);
+    return this.http.get<Plan[]>(`${this.apiUrl}/plans`, { headers: this.getAuthHeaders() });
   }
 
   /**
@@ -52,21 +52,14 @@ export class PlansService {
    */
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getAccessToken();
-    console.log('PlansService - getAuthHeaders token present:', !!token);
-    console.log('PlansService - token value (first 50 chars):', token ? token.substring(0, 50) + '...' : 'null');
-
+    
     let headers = new HttpHeaders();
-
-    // Forzar el case correcto del header Authorization
     headers = headers.set('Content-Type', 'application/json');
+    
     if (token) {
-      // Enviar el header con case correcto y verificar que se guarde
       headers = headers.set('Authorization', `Bearer ${token}`);
-      console.log('PlansService - Authorization header set with EXACT case "Authorization"');
-      console.log('PlansService - Verification - header present:', !!headers.get('Authorization'));
-      console.log('PlansService - Verification - header value starts with:', headers.get('Authorization')?.substring(0, 10));
     } else {
-      console.error('PlansService - No token found in AuthService!');
+      console.error('PlansService - No authentication token found');
     }
 
     return headers;
@@ -111,143 +104,64 @@ export class PlansService {
 
   /**
    * Asigna un plan a la compañía del usuario autenticado
-   * Endpoint: POST /billing/v1/plans/company-plans
+   * Nueva URL REST: POST /billing/v1/plans/assign
    */
   assignPlanToUser(planId: number): Observable<any> {
-    console.log('=== PlansService - assignPlanToUser START ===');
-    console.log('PlansService - planId:', planId);
-
-    // Verificar si el usuario está autenticado
-    const token = localStorage.getItem('accessToken');
-    console.log('PlansService - token exists:', !!token);
-    console.log('PlansService - token length:', token ? token.length : 0);
-    console.log('PlansService - token preview:', token ? `${token.substring(0, 20)}...${token.substring(token.length - 20)}` : 'null');
-
-    if (!token) {
-      console.error('PlansService - CRITICAL: No authentication token found! User must login first.');
-      return throwError(() => new Error('Usuario no autenticado. Debe iniciar sesión primero.'));
-    }
-
-    // Verificar que el token tenga el formato correcto
-    if (!token.startsWith('eyJ')) {
-      console.error('PlansService - CRITICAL: Token does not look like a JWT token!');
-      console.error('PlansService - Token starts with:', token.substring(0, 10));
-      return throwError(() => new Error('Token de autenticación inválido.'));
-    }
-
     const headers = this.getAuthHeaders();
     const body = { planId: planId };
+    const fullUrl = `${this.apiUrl}/plans/assign`;
 
-    console.log('PlansService - request body:', body);
-    console.log('PlansService - headers keys:', Array.from(headers.keys()));
-    console.log('PlansService - Authorization header:', headers.get('Authorization'));
-    console.log('PlansService - Content-Type header:', headers.get('Content-Type'));
-
-    const fullUrl = `${this.apiUrl}/plans/company-plans`;
-    console.log('PlansService - full URL:', fullUrl);
-    console.log('PlansService - apiUrl:', this.apiUrl);
-
-    console.log('PlansService - About to make HTTP request...');
-
-    return this.http.post(fullUrl, body, { headers, withCredentials: true }).pipe(
+    return this.http.post(fullUrl, body, { headers }).pipe(
       map(response => {
-        console.log('PlansService - SUCCESS: assignPlanToUser response:', response);
+        console.log('PlansService - Plan assigned successfully:', response);
         return response;
       }),
       catchError(error => {
-        console.error('PlansService - ERROR: assignPlanToUser failed:', error);
-        console.error('PlansService - error status:', error.status);
-        console.error('PlansService - error statusText:', error.statusText);
-        console.error('PlansService - error message:', error.message);
-        console.error('PlansService - error url:', error.url);
-
-        // Verificar si es un error de CORS
-        if (error.status === 0) {
-          console.error('PlansService - This looks like a CORS error or network error!');
-          console.error('PlansService - Check if backend is running and CORS is configured correctly');
-        }
-
+        console.error('PlansService - Failed to assign plan:', error);
         return throwError(() => error);
       })
     );
   }
 
-  /**
-   * Función de prueba para enviar EXACTAMENTE la misma solicitud que funciona en Postman
-   */
-  testExactPostmanRequest(): Observable<any> {
-    console.log('=== TEST: Enviando EXACTAMENTE la misma solicitud que funciona en Postman ===');
 
-    // Headers EXACTOS del curl que funciona
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjZmNkZThiMi01NzFkLTQ5MGMtYTJkOC0yOTRmMzVlMDhkNDciLCJzdWIiOiIxIiwiaWF0IjoxNzU4MTIxMDY4LCJleHAiOjE3NTgxMjQ2NjgsInR5cGUiOiJhY2Nlc3MiLCJlbWFpbCI6InN0ZXZlbnphbW9yYThAb3V0bG9vay5jb20ifQ.fkq-XJIGhn6JStft4F-9IIc4tugcYOn0LjFGx_XovYnJssYI4crBhIe3wT9KSq8CbXqQZyRRPKRyyMTaHiyHpQ',
-      'Content-Type': 'application/json'
-    });
-
-    // Body EXACTO del curl que funciona
-    const body = { "planId": 1 };
-
-    // URL EXACTA del curl que funciona
-    const url = 'http://localhost:8080/billing/v1/plans/company-plans';
-
-    console.log('TEST - URL:', url);
-    console.log('TEST - Headers:', headers);
-    console.log('TEST - Body:', body);
-    console.log('TEST - Method: POST');
-
-    return this.http.post(url, body, { headers }).pipe(
-      map(response => {
-        console.log('TEST - SUCCESS: Response received:', response);
-        return response;
-      }),
-      catchError(error => {
-        console.error('TEST - ERROR: Request failed:', error);
-        console.error('TEST - Status:', error.status);
-        console.error('TEST - StatusText:', error.statusText);
-        console.error('TEST - Message:', error.message);
-        console.error('TEST - URL:', error.url);
-        return throwError(() => error);
-      })
-    );
-  }
 
   /**
    * Obtiene los planes asignados al usuario autenticado
    */
   getUserPlans(): Observable<any> {
-    console.log('PlansService - getUserPlans: Fetching user plans');
     const headers = this.getAuthHeaders();
     const url = `${this.apiUrl}/plans/user-plans`;
 
     return this.http.get(url, { headers }).pipe(
-      map(response => {
-        console.log('PlansService - getUserPlans success:', response);
-        return response;
-      }),
       catchError(error => {
-        console.error('PlansService - getUserPlans error:', error);
+        console.error('PlansService - Failed to get user plans:', error);
         return throwError(() => error);
       })
     );
   }
 
   /**
-   * Obtiene el estado de setup del usuario (si tiene plan activo y info de compañía)
+   * Obtiene el estado de configuración del usuario según la nueva API REST
+   * Nueva URL REST: GET /billing/v1/plans/setup-status
    */
-  getUserSetupStatus(): Observable<{ hasActivePlan: boolean; hasCompanyInfo: boolean }> {
-    console.log('PlansService - getUserSetupStatus: Fetching user setup status');
+  getSetupStatus(): Observable<{ hasActivePlan: boolean; hasCompanyInfo: boolean }> {
     const headers = this.getAuthHeaders();
-    const url = `${this.apiUrl}/plans/user-setup-status`;
+    const url = `${this.apiUrl}/plans/setup-status`;
 
     return this.http.get<{ hasActivePlan: boolean; hasCompanyInfo: boolean }>(url, { headers }).pipe(
-      map(response => {
-        console.log('PlansService - getUserSetupStatus success:', response);
-        return response;
-      }),
       catchError(error => {
-        console.error('PlansService - getUserSetupStatus error:', error);
+        console.error('PlansService - Failed to get setup status:', error);
         return throwError(() => error);
       })
     );
+  }
+
+  /**
+   * @deprecated Use getSetupStatus() instead. Will be removed in future version.
+   * Obtiene el estado de setup del usuario (si tiene plan activo y info de compañía)
+   */
+  getUserSetupStatus(): Observable<{ hasActivePlan: boolean; hasCompanyInfo: boolean }> {
+    console.warn('PlansService - getUserSetupStatus() is deprecated. Use getSetupStatus() instead.');
+    return this.getSetupStatus();
   }
 }

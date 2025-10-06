@@ -75,23 +75,21 @@ export class CompanyService {
     );
   }
 
-  completeSetup(companyData: any, signatureFile: File, logoFile?: File, signaturePassword?: string): Observable<any> {
+  completeSetup(companyData: any, digitalCertificate: File, logo?: File, certificatePassword?: string): Observable<any> {
     const formData = new FormData();
     formData.append('companyData', JSON.stringify(companyData));
-    formData.append('signatureFile', signatureFile);
+    formData.append('digitalCertificate', digitalCertificate);
+    formData.append('certificatePassword', certificatePassword || '');
     
-    if (logoFile) {
-      formData.append('logoFile', logoFile);
-    }
-    
-    if (signaturePassword) {
-      formData.append('signaturePassword', signaturePassword);
+    if (logo) {
+      formData.append('logo', logo);
     }
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.authService.getAccessToken()}`
     });
 
-    return this.http.post(`${this.apiUrl}/complete-setup`, formData, { headers });
+    // Nueva URL REST: POST /billing/v1/companies
+    return this.http.post(`${this.apiUrl}`, formData, { headers });
   }
 }

@@ -34,10 +34,61 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Check if user is already logged in
-    if (this.authService.getAccessToken()) {
-      this.router.navigate(['/dashboard']);
+    // Cerrar sesión automáticamente al acceder al login
+    // Esto asegura que no haya sesiones activas residuales
+    this.clearUserSession();
+  }
+
+  /**
+   * Limpia la sesión del usuario al acceder al login
+   */
+  private clearUserSession(): void {
+    const hasToken = this.authService.getAccessToken();
+    const refreshToken = localStorage.getItem('refreshToken');
+    
+    console.log('Login - clearUserSession ejecutado');
+    console.log('Login - hasToken:', !!hasToken);
+    console.log('Login - hasRefreshToken:', !!refreshToken);
+    console.log('Login - accessToken preview:', hasToken ? hasToken.substring(0, 20) + '...' : 'null');
+    
+    if (hasToken) {
+      console.log('Login - Cerrando sesión automáticamente al acceder al login');
+      console.log('Login - Invocando authService.logout()...');
+      
+      // Cerrar sesión con el servidor
+      this.authService.logout().subscribe({
+        next: (response) => {
+          console.log('Login - Sesión cerrada exitosamente en el servidor:', response);
+        },
+        error: (error) => {
+          console.error('Login - Error al cerrar sesión en el servidor:', error);
+          console.error('Login - Error status:', error.status);
+          console.error('Login - Error message:', error.message);
+          // Continuar con limpieza local aunque falle el servidor
+        },
+        complete: () => {
+          console.log('Login - Logout completado, limpiando datos locales...');
+          // Limpiar datos adicionales que puedan quedar
+          this.clearLocalData();
+        }
+      });
+    } else {
+      console.log('Login - No hay token activo, solo limpiando datos locales');
+      // Aun sin token, limpiar cualquier dato residual
+      this.clearLocalData();
     }
+  }
+
+  /**
+   * Limpia datos locales adicionales
+   */
+  private clearLocalData(): void {
+    localStorage.removeItem('selectedPlan');
+    localStorage.removeItem('selectedPlanId');
+    localStorage.removeItem('selectedPlanPrice');
+    localStorage.removeItem('companySetup');
+    localStorage.removeItem('setupCompleted');
+    console.log('Login - Datos locales limpiados');
   }
 
   ngOnDestroy(): void {
@@ -78,7 +129,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
         console.log('Login successful', result);
         
         // Verificar el estado de setup del usuario para determinar a dónde redirigir
-        this.plansService.getUserSetupStatus().subscribe({
+        this.plansService.getSetupStatus().subscribe({
           next: (setupStatus) => {
             console.log('User setup status:', setupStatus);
             

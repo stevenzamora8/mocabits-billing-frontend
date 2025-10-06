@@ -87,7 +87,7 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanPrice', selectedPlanData.price.toString());
 
         // Verificar el estado del usuario después de asignar el plan
-        this.plansService.getUserSetupStatus().subscribe({
+        this.plansService.getSetupStatus().subscribe({
           next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
             console.log('User setup status after plan assignment:', status);
             this.isLoading = false;
@@ -137,7 +137,7 @@ export class PlanSelectionComponent implements OnInit {
         localStorage.setItem('selectedPlanPrice', freePlan.price.toString());
 
         // Verificar el estado del usuario después de asignar el plan
-        this.plansService.getUserSetupStatus().subscribe({
+        this.plansService.getSetupStatus().subscribe({
           next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
             console.log('User setup status after free plan assignment:', status);
             this.isLoading = false;
@@ -210,25 +210,31 @@ export class PlanSelectionComponent implements OnInit {
     this.showConfirmation(
       '¿Está seguro que desea cerrar sesión?',
       () => {
-        try {
-          // Limpiar tokens y datos de sesión
-          this.authService.logout();
-          
-          // Limpiar datos específicos del plan selection
-          localStorage.removeItem('selectedPlan');
-          localStorage.removeItem('companySetup');
-          localStorage.removeItem('setupCompleted');
-          
-          console.log('Plan Selection - Sesión cerrada exitosamente');
-          
-          // Redirigir al login
-          this.router.navigate(['/auth/login']);
-          
-        } catch (error) {
-          console.error('Error al cerrar sesión:', error);
-          // Aun si hay error, redirigir al login por seguridad
-          this.router.navigate(['/auth/login']);
-        }
+        // Llamar al logout con el nuevo endpoint REST
+        this.authService.logout().subscribe({
+          next: (response) => {
+            console.log('Plan Selection - Logout successful:', response);
+            
+            // Limpiar datos específicos del plan selection
+            localStorage.removeItem('selectedPlan');
+            localStorage.removeItem('companySetup');
+            localStorage.removeItem('setupCompleted');
+            
+            // Redirigir al login
+            this.router.navigate(['/auth/login']);
+          },
+          error: (error) => {
+            console.error('Plan Selection - Logout error:', error);
+            
+            // Limpiar datos locales incluso si falla el logout en el servidor
+            localStorage.removeItem('selectedPlan');
+            localStorage.removeItem('companySetup');
+            localStorage.removeItem('setupCompleted');
+            
+            // Redirigir al login por seguridad
+            this.router.navigate(['/auth/login']);
+          }
+        });
       }
     );
   }

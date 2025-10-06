@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 export interface NavigationItem {
@@ -125,8 +126,8 @@ export class DashboardService {
   }
 
   logout(): void {
-    // Limpiar tokens de autenticación usando AuthService
-    this.authService.logout();
+    // Limpiar tokens de autenticación usando AuthService (método local)
+    this.authService.logoutLocal();
     
     // Limpiar datos del dashboard
     localStorage.removeItem('selectedPlan');
@@ -142,5 +143,30 @@ export class DashboardService {
       memberSince: '',
       lastActivity: ''
     });
+  }
+
+  /**
+   * Logout with server notification
+   * Returns Observable for components that need to handle the async operation
+   */
+  logoutWithServer(): Observable<any> {
+    return this.authService.logout().pipe(
+      tap(() => {
+        // Limpiar datos del dashboard
+        localStorage.removeItem('selectedPlan');
+        
+        // Reset user data
+        this.currentUserSubject.next({
+          name: 'Usuario',
+          email: '',
+          plan: 'Gratis',
+          totalInvoices: 0,
+          totalClients: 0,
+          totalRevenue: 0,
+          memberSince: '',
+          lastActivity: ''
+        });
+      })
+    );
   }
 }

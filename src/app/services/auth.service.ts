@@ -260,12 +260,61 @@ export class AuthService {
   }
 
   /**
-   * Logout method to clear authentication data
+   * Logout method using the new REST API endpoint
+   * Nueva URL REST: POST /security/v1/auth/logout
    */
-  logout(): void {
+  logout(): Observable<any> {
+    console.log('=== AuthService.logout() INICIADO ===');
+    
+    const refreshToken = localStorage.getItem('refreshToken');
+    const logoutUrl = `${environment.apiBaseUrl}/security/v1/auth/logout`;
+    
+    console.log('AuthService - refreshToken presente:', !!refreshToken);
+    console.log('AuthService - logoutUrl:', logoutUrl);
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const body = {
+      refreshToken: refreshToken || ''
+    };
+
+    console.log('AuthService - request body:', body);
+    console.log('AuthService - Enviando petición POST al servidor...');
+
+    return this.http.post(logoutUrl, body, { headers }).pipe(
+      tap((response: any) => {
+        console.log('AuthService - Logout successful - response:', response);
+        this.clearAuthData();
+      }),
+      catchError((error: any) => {
+        console.error('AuthService - Logout error - status:', error.status);
+        console.error('AuthService - Logout error - message:', error.message);
+        console.error('AuthService - Logout error - url:', error.url);
+        console.error('AuthService - Logout error - full error:', error);
+        // Incluso si falla el logout en el servidor, limpiamos los datos locales
+        this.clearAuthData();
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Método para limpiar datos de autenticación localmente
+   */
+  private clearAuthData(): void {
     this.setAccessToken(null);
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    console.log('AuthService - User logged out, tokens cleared');
+    console.log('AuthService - Authentication data cleared');
+  }
+
+  /**
+   * Método de logout local (sin llamada al servidor)
+   * Útil para casos donde no se requiere notificar al servidor
+   */
+  logoutLocal(): void {
+    this.clearAuthData();
   }
 }
