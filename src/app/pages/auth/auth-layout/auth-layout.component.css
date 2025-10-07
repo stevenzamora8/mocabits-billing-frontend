@@ -20,22 +20,19 @@
   --brand-version: 'v1.0.0';
 
   /* COLORES DEL LOGO - CONFIGURADOS GLOBALMENTE POR BrandService */
-  /* --logo-primary-color: #1e3a8a; */
-  /* --logo-secondary-color: #3b82f6; */
-  /* --logo-accent-color: #374151; */
-  /* --logo-text-color: white; */
+  --logo-primary-color: #1e3a8a;
+  --logo-secondary-color: #3b82f6;
+  --logo-accent-color: #764ba2;
+  --logo-text-color: white;
 
   /* TAMAÑOS DEL LOGO */
   --logo-size-main: 50px;
   --logo-size-signature: 24px;
   --logo-border-radius: 22%;
-
-  /* NUEVAS VARIABLES PARA MEJORAS */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
+  
+  /* SOMBRAS Y EFECTOS */
   --text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-  --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
 }
 
 /*
@@ -134,11 +131,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 60% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 40%);
   pointer-events: none;
   animation: backgroundShift 20s ease-in-out infinite;
 }
@@ -204,19 +196,12 @@
   font-weight: 900;
   margin-bottom: clamp(0.4rem, 1vh, 0.8rem);
   letter-spacing: -0.04em;
+  color: white;
   text-shadow: 
     var(--text-shadow),
     0 0 50px rgba(255, 255, 255, 0.4),
     0 4px 20px rgba(0, 0, 0, 0.3);
   line-height: 1.05;
-  background: linear-gradient(135deg, 
-    white 0%, 
-    rgba(255, 255, 255, 0.95) 30%,
-    rgba(255, 255, 255, 0.85) 70%,
-    rgba(255, 255, 255, 0.9) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   position: relative;
   animation: titleGlow 3s ease-in-out infinite alternate;
 }
@@ -1457,18 +1442,20 @@
 
 .form-container .signature-text .company-version {
   font-size: clamp(0.5rem, 0.8vw, 0.625rem) !important;
-  font-weight: 300 !important;
-  color: rgba(156, 163, 175, 0.4) !important;
+  font-weight: 500 !important;
+  color: rgba(107, 114, 128, 0.8) !important;
   margin-top: 0.125rem !important;
   align-self: center !important;
   display: inline-block !important;
   letter-spacing: 0.5px !important;
   text-transform: uppercase !important;
-  padding: 0 !important;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+  padding: 0.2rem 0.4rem !important;
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.1) 0%, 
+    rgba(139, 92, 246, 0.1) 100%) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* FALLBACK: CSS para la información debajo del formulario si Angular no funciona */
@@ -1555,6 +1542,8 @@
   
   .form-container .signature-text .company-version {
     font-size: clamp(0.55rem, 1vw, 0.7rem) !important;
+    color: rgba(107, 114, 128, 0.9) !important;
+    padding: 0.15rem 0.3rem !important;
   }
 
   /* Prevenir desfases en tablets */
@@ -1633,6 +1622,8 @@
   .form-container .signature-text .company-version {
     font-size: clamp(0.5rem, 1.8vw, 0.6rem) !important;
     margin-top: 0.1rem !important;
+    color: rgba(107, 114, 128, 0.9) !important;
+    padding: 0.1rem 0.25rem !important;
   }
 }
 
