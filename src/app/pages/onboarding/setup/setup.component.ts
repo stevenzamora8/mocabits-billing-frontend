@@ -5,9 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
-import { CompanyService, Company, CompanyResponse } from '../../services/company.service';
-import { AuthService } from '../../services/auth.service';
-import { AlertComponent } from '../../components/alert/alert.component';
+import { CompanyService, Company, CompanyResponse } from '../../../services/company.service';
+import { AuthService } from '../../../services/auth.service';
+import { AlertComponent } from '../../../components/alert/alert.component';
 
 interface CompanyData {
   razonSocial: string;
@@ -600,7 +600,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       localStorage.setItem('setupCompleted', 'true');
 
       // Redirigir a selección de plan después del setup
-      this.router.navigate(['/plan-selection']);
+      this.router.navigate(['/onboarding/plan-selection']);
       
     } catch (error) {
       console.error('Error al guardar la configuración:', error);

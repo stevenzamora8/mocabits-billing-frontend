@@ -14,7 +14,7 @@ export class DashboardGuard implements CanActivate {
       console.log('DashboardGuard - Checking user access to dashboard...');
       
       // Verificar el estado real del usuario desde el backend
-      this.plansService.getUserSetupStatus().subscribe({
+      this.plansService.getSetupStatus().subscribe({
         next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
           console.log('DashboardGuard - User setup status:', status);
 
@@ -24,15 +24,15 @@ export class DashboardGuard implements CanActivate {
             resolve(true);
           } else if (!status.hasCompanyInfo) {
             console.log('DashboardGuard - ❌ User missing company info - REDIRECT to setup');
-            this.router.navigate(['/setup']);
+            this.router.navigate(['/onboarding/setup']);
             resolve(false);
           } else if (!status.hasActivePlan) {
             console.log('DashboardGuard - ❌ User missing active plan - REDIRECT to plan selection');
-            this.router.navigate(['/plan-selection']);
+            this.router.navigate(['/onboarding/plan-selection']);
             resolve(false);
           } else {
             console.log('DashboardGuard - ❌ Unknown state - REDIRECT to setup for safety');
-            this.router.navigate(['/setup']);
+            this.router.navigate(['/onboarding/setup']);
             resolve(false);
           }
         },
@@ -41,7 +41,7 @@ export class DashboardGuard implements CanActivate {
           console.log('DashboardGuard - ❌ API Error - REDIRECT to setup for safety');
           
           // En caso de error, redirigir al setup para que el usuario pueda completar la configuración
-          this.router.navigate(['/setup']);
+          this.router.navigate(['/onboarding/setup']);
           resolve(false);
         }
       });

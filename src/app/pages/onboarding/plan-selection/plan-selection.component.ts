@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { PlansService, PlanDisplay } from '../../services/plans.service';
-import { AuthService } from '../../services/auth.service';
-import { AlertComponent } from '../../components/alert/alert.component';
+import { PlansService, PlanDisplay } from '../../../services/plans.service';
+import { AuthService } from '../../../services/auth.service';
+import { AlertComponent } from '../../../components/alert/alert.component';
 
 @Component({
   selector: 'app-plan-selection',

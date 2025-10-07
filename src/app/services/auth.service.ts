@@ -317,4 +317,91 @@ export class AuthService {
   logoutLocal(): void {
     this.clearAuthData();
   }
+
+  /**
+   * Verificar si un email ya existe en el sistema
+   * POST /security/v1/users/email-exists
+   */
+  checkEmailExists(email: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/security/v1/users/email-exists`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const body = { email };
+
+    console.log('AuthService - Checking if email exists:', email);
+
+    return this.http.post(url, body, { headers }).pipe(
+      tap((response: any) => {
+        console.log('AuthService - Email exists check response:', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        // Usar el manejador de errores personalizado
+        const customMessage = this.authErrorHandler.handleAuthError(error);
+        console.error('AuthService - Email exists check error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
+      })
+    );
+  }
+
+  /**
+   * Crear un nuevo usuario
+   * POST /security/v1/users
+   */
+  createUser(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+  }): Observable<any> {
+    const url = `${environment.apiBaseUrl}/security/v1/users`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    console.log('AuthService - Creating new user:', { 
+      email: userData.email, 
+      firstName: userData.firstName, 
+      lastName: userData.lastName 
+    });
+
+    return this.http.post(url, userData, { headers }).pipe(
+      tap((response: any) => {
+        console.log('AuthService - User creation successful:', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        // Usar el manejador de errores personalizado para creación de usuario
+        const customMessage = this.authErrorHandler.handleAuthError(error);
+        console.error('AuthService - User creation error:', customMessage);
+
+        // Crear un nuevo error con el mensaje personalizado
+        const customError = {
+          ...error,
+          error: {
+            ...error.error,
+            message: customMessage,
+            originalMessage: error.error?.message,
+            originalCode: error.error?.code
+          }
+        };
+
+        return throwError(() => customError);
+      })
+    );
+  }
 }

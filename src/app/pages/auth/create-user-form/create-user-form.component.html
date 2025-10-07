@@ -66,12 +66,13 @@
           id="email"
           name="email"
           [(ngModel)]="email"
+          (blur)="onEmailBlur()"
           required
           email
           [disabled]="isLoading"
           class="form-input"
-          [class.success]="isEmailValid() && email.length > 0"
-          [class.error]="!isEmailValid() && email.length > 0"
+          [class.success]="isEmailValid() && email.length > 0 && !emailExists"
+          [class.error]="(!isEmailValid() && email.length > 0) || emailExists"
           placeholder="usuario@empresa.com"
           #emailField="ngModel">
         <span class="input-icon">
@@ -80,9 +81,18 @@
           </svg>
         </span>
         <div class="input-feedback" *ngIf="email && email.length > 0">
-          <span class="success-check" *ngIf="isEmailValid()">
+          <!-- Spinner mientras verifica email -->
+          <div *ngIf="emailChecking" class="button-spinner small" aria-hidden="true"></div>
+          <!-- Check verde si email es válido y no existe -->
+          <span class="success-check" *ngIf="!emailChecking && isEmailValid() && !emailExists">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </span>
+          <!-- X roja si email existe -->
+          <span class="error-check" *ngIf="!emailChecking && emailExists">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>
           </span>
         </div>
@@ -90,6 +100,9 @@
       <div class="field-error" *ngIf="emailField.invalid && emailField.touched">
         <span *ngIf="emailField.errors?.['required']">El correo es requerido</span>
         <span *ngIf="emailField.errors?.['email']">Ingresa un correo válido</span>
+      </div>
+      <div class="field-error" *ngIf="emailExists">
+        <span>Este email ya está registrado.</span>
       </div>
     </div>
 

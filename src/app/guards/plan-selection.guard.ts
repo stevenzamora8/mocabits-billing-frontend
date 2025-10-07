@@ -14,14 +14,14 @@ export class PlanSelectionGuard implements CanActivate {
       console.log('PlanSelectionGuard - Checking user access to plan selection...');
       
       // Verificar el estado real del usuario desde el backend
-      this.plansService.getUserSetupStatus().subscribe({
+      this.plansService.getSetupStatus().subscribe({
         next: (status: { hasActivePlan: boolean; hasCompanyInfo: boolean }) => {
           console.log('PlanSelectionGuard - User setup status:', status);
 
           if (!status.hasCompanyInfo) {
             // No tiene info de compañía, redirigir a setup (PRIMERO)
             console.log('PlanSelectionGuard - ❌ User missing company info - REDIRECT to setup');
-            this.router.navigate(['/setup']);
+            this.router.navigate(['/onboarding/setup']);
             resolve(false);
           } else if (!status.hasActivePlan) {
             // Tiene compañía pero no plan activo, permitir acceso a selección de planes (SEGUNDO)
@@ -39,7 +39,7 @@ export class PlanSelectionGuard implements CanActivate {
           console.log('PlanSelectionGuard - ❌ API Error - REDIRECT to setup for safety');
           
           // En caso de error, redirigir al setup para que el usuario pueda completar la configuración
-          this.router.navigate(['/setup']);
+          this.router.navigate(['/onboarding/setup']);
           resolve(false);
         }
       });

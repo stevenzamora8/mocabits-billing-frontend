@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { SetupGuard } from '../guards/setup.guard';
-import { AuthGuard } from '../guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
@@ -9,21 +7,8 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
   },
   { 
-    path: 'plan-selection', 
-    loadComponent: () => import('./plan-selection/plan-selection.component').then(m => m.PlanSelectionComponent),
-    canActivate: [AuthGuard],
-    title: 'MocaBits - Seleccionar Plan'
-  },
-  { 
-    path: 'setup', 
-    loadComponent: () => import('./setup/setup.component').then(m => m.SetupComponent),
-    canActivate: [AuthGuard, SetupGuard],
-    title: 'MocaBits - Configuración Inicial'
-  },
-  { 
-    path: 'setup-direct', 
-    loadComponent: () => import('./setup/setup.component').then(m => m.SetupComponent),
-    title: 'MocaBits - Configuración Inicial (Directo)'
+    path: 'onboarding', 
+    loadChildren: () => import('./onboarding/onboarding.module').then(m => m.OnboardingModule)
   },
   { 
     path: 'dashboard', 

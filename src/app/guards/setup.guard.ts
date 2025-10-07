@@ -25,7 +25,7 @@ export class SetupGuard implements CanActivate {
           } else if (!status.hasActivePlan) {
             // Tiene compañía pero no plan activo, redirigir a selección de planes (SEGUNDO)
             console.log('SetupGuard - ❌ User has company but missing plan - REDIRECT to plan selection');
-            this.router.navigate(['/plan-selection']);
+            this.router.navigate(['/onboarding/plan-selection']);
             resolve(false);
           } else {
             // Tiene ambos completos, redirigir al dashboard (FINAL)

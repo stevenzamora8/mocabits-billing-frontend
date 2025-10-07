@@ -181,7 +181,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   managePlan() {
     this.isUserModalOpen = false;
-    this.router.navigate(['/plan-selection']);
+    this.router.navigate(['/onboarding/plan-selection']);
   }
 
   toggleUserModal() {

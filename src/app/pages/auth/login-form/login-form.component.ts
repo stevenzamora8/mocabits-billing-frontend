@@ -141,10 +141,10 @@ export class LoginFormComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               if (!hasCompanyInfo) {
                 // Si no tiene información de compañía, ir al setup primero
-                this.router.navigate(['/setup']);
+                this.router.navigate(['/onboarding/setup']);
               } else if (!hasActivePlan) {
                 // Si tiene compañía pero no plan, ir a selección de plan
-                this.router.navigate(['/plan-selection']);
+                this.router.navigate(['/onboarding/plan-selection']);
               } else {
                 // Usuario completamente configurado (tiene compañía Y plan) - ir al dashboard
                 this.router.navigate(['/dashboard']);

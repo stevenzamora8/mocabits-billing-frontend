@@ -21,20 +21,23 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthModule)
   },
   {
+    path: 'onboarding',
+    loadChildren: () => import('./pages/onboarding/onboarding.module').then(m => m.OnboardingModule)
+  },
+  // Rutas de compatibilidad hacia atrás - redirigen al nuevo módulo onboarding
+  {
     path: 'plan-selection',
-    loadComponent: () => import('./pages/plan-selection/plan-selection.component').then(m => m.PlanSelectionComponent),
-    canActivate: [AuthGuard, PlanSelectionGuard],
-    title: 'MocaBits - Seleccionar Plan'
+    redirectTo: 'onboarding/plan-selection',
+    pathMatch: 'full'
   },
   {
     path: 'setup',
-    loadComponent: () => import('./pages/setup/setup.component').then(m => m.SetupComponent),
-    canActivate: [AuthGuard, SetupGuard],
-    title: 'MocaBits - Configuración Inicial'
+    redirectTo: 'onboarding/setup',
+    pathMatch: 'full'
   },
   {
     path: 'setup-direct',
-    loadComponent: () => import('./pages/setup/setup.component').then(m => m.SetupComponent),
+    loadComponent: () => import('./pages/onboarding/setup/setup.component').then(m => m.SetupComponent),
     title: 'MocaBits - Configuración Inicial (Directo)'
   },
   {
