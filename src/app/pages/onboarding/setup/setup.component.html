@@ -98,16 +98,28 @@
           <div class="form-row">
             <div class="form-group half-width">
               <label for="ruc">RUC *</label>
-              <input 
-                type="text" 
-                id="ruc"
-                formControlName="ruc"
-                class="setup-input"
-                [class.error]="isFieldInvalid(companyForm, 'ruc')"
-                placeholder="1234567890001"
-                maxlength="13">
+              <div class="input-wrapper">
+                <input 
+                  type="text" 
+                  id="ruc"
+                  formControlName="ruc"
+                  class="setup-input"
+                  [class.error]="isFieldInvalid(companyForm, 'ruc')"
+                  [class.validating]="rucValidationState === 'validating'"
+                  [class.valid]="rucValidationState === 'valid'"
+                  placeholder="1234567890001"
+                  maxlength="13">
+                <div class="validation-indicator">
+                  <div *ngIf="rucValidationState === 'validating'" class="spinner-icon"></div>
+                  <div *ngIf="rucValidationState === 'valid'" class="success-icon"></div>
+                  <div *ngIf="rucValidationState === 'invalid'" class="error-icon"></div>
+                </div>
+              </div>
               <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'ruc')">
                 {{ getFieldError(companyForm, 'ruc') }}
+              </div>
+              <div class="info-message" *ngIf="rucValidationState === 'validating'">
+                Verificando disponibilidad del RUC...
               </div>
             </div>
 

@@ -452,6 +452,82 @@ select.setup-input {
   margin-top: 4px;
 }
 
+/* ===== RUC VALIDATION STYLES ===== */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.validation-indicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+/* Spinner usando CSS puro */
+.spinner-icon::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Check icon usando CSS puro */
+.success-icon::before {
+  content: '✓';
+  color: #10b981;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* X icon usando CSS puro */
+.error-icon::before {
+  content: '✕';
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.setup-input.validating {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.setup-input.valid {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.info-message {
+  color: #3b82f6;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: slideDown 0.3s ease;
+  margin-top: 0.25rem;
+}
+
 /* ===== ESTABLISHMENTS ===== */
 .establishments-header {
   display: flex;

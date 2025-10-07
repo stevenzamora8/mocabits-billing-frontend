@@ -92,4 +92,18 @@ export class CompanyService {
     // Nueva URL REST: POST /billing/v1/companies
     return this.http.post(`${this.apiUrl}`, formData, { headers });
   }
+
+  /**
+   * Verificar si un RUC ya existe en el sistema
+   * @param ruc RUC a verificar
+   * @returns Observable con la respuesta de validación
+   */
+  checkRucExists(ruc: string): Observable<{ exists: boolean; message?: string }> {
+    const payload = { ruc };
+    return this.http.post<{ exists: boolean; message?: string }>(
+      `${this.apiUrl}/ruc-exists`, 
+      payload, 
+      { headers: this.getHeaders() }
+    );
+  }
 }

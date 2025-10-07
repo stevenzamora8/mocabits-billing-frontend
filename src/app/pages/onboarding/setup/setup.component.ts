@@ -62,6 +62,9 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   // Signature error tracking
   private signatureError: string = '';
 
+  // RUC validation state
+  rucValidationState: 'idle' | 'validating' | 'valid' | 'invalid' = 'idle';
+
   // Alert component properties
   alertMessage = '';
   alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
@@ -138,11 +141,15 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         Validators.minLength(2),
         Validators.maxLength(200)
       ]],
-      ruc: ['', [
-        Validators.required, 
-        Validators.pattern(/^\d{13}$/),
-        this.rucValidator
-      ]],
+      ruc: ['', {
+        validators: [
+          Validators.required, 
+          Validators.pattern(/^\d{13}$/),
+          this.rucValidator
+        ],
+        asyncValidators: [this.rucExistsValidator],
+        updateOn: 'blur' // Solo validar cuando el usuario termine de escribir
+      }],
       codDoc: ['04', [Validators.required]],
       dirMatriz: ['', [
         Validators.required, 
@@ -190,6 +197,41 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     if (provincia < 1 || provincia > 24) return { invalidProvince: true };
     
     return null;
+  }
+
+  // Validador asíncrono para verificar si el RUC ya existe
+  rucExistsValidator = (control: any) => {
+    if (!control.value || control.value.length !== 13) {
+      this.rucValidationState = 'idle';
+      return Promise.resolve(null);
+    }
+
+    // Indicar que se está validando
+    this.rucValidationState = 'validating';
+
+    return new Promise((resolve) => {
+      // Debounce la validación para evitar múltiples requests
+      setTimeout(() => {
+        this.companyService.checkRucExists(control.value).subscribe({
+          next: (response) => {
+            if (response.exists) {
+              this.rucValidationState = 'invalid';
+              resolve({ rucExists: { message: response.message || 'Este RUC ya está registrado en el sistema' } });
+            } else {
+              this.rucValidationState = 'valid';
+              resolve(null);
+            }
+          },
+          error: (error) => {
+            console.error('Error al validar RUC:', error);
+            this.rucValidationState = 'idle';
+            // En caso de error, no bloquear el formulario pero mostrar advertencia
+            console.warn('No se pudo verificar la disponibilidad del RUC. Verifique su conexión a internet.');
+            resolve(null);
+          }
+        });
+      }, 800); // Debounce de 800ms para dar tiempo al usuario
+    });
   }
 
   // Métodos para manejar múltiples establecimientos
@@ -683,6 +725,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     if (errors['pattern']) return 'Formato inválido';
     if (errors['invalidLength']) return 'Debe tener exactamente 13 dígitos';
     if (errors['invalidProvince']) return 'Código de provincia inválido';
+    if (errors['rucExists']) return errors['rucExists'].message || 'Este RUC ya está registrado en el sistema';
 
     return 'Campo inválido';
   }
