@@ -63,9 +63,9 @@
         [fullWidth]="true"
         [icon]="loginIcon"
         iconPosition="left"
-        [showIconWhenLoading]="true">
-        <span *ngIf="!isLoading" class="login-text">Iniciar Sesión</span>
-        <span *ngIf="isLoading" class="login-text">Validando credenciales...</span>
+        [showIconWhenLoading]="false">
+        <span *ngIf="!isLoading">Iniciar Sesión</span>
+        <span *ngIf="isLoading">Validando credenciales...</span>
       </app-button>
     </div>
 
