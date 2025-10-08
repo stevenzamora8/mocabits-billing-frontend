@@ -19,7 +19,8 @@ export class ButtonComponent {
   @Input() disabled: boolean = false;
   @Input() loading: boolean = false;
   @Input() fullWidth: boolean = false;
-  @Input() icon: string = '';
+  // Accept string OR SafeHtml so callers can pass sanitized SVGs
+  @Input() icon: any = '';
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() ariaLabel: string = '';
   @Input() class: string = '';

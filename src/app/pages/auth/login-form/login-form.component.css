@@ -274,10 +274,22 @@
   flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  align-items: center;
+}
+
+::ng-deep .form-actions .app-button {
+  justify-content: center !important;
+}
+
+.login-text {
+  display: block;
+  text-align: center;
 }
 
 .primary-button {
-  width: 100% !important;
+  width: auto !important;
+  max-width: 300px !important;
+  margin: 0 auto !important;
   height: clamp(2.25rem, 5vh, 3rem) !important;
   background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 100%) !important;
   color: white !important;
@@ -295,6 +307,7 @@
   outline: none !important;
   position: relative !important;
   overflow: hidden !important;
+  text-align: center !important;
 }
 
 .primary-button::before {
@@ -700,4 +713,10 @@
     min-height: 44px;
     padding: 0.75rem 1rem;
   }
+}
+
+.login-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
@@ -18,6 +19,8 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   isLoading: boolean = false;
   showSuccessMessage: boolean = false;
+  // Sanitized SVG icon for the login button
+  loginIcon: SafeHtml | string = '';
 
   // Alert properties
   alertMessage: string = '';
@@ -30,13 +33,20 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private plansService: PlansService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private sanitizer: DomSanitizer
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    // Prepare sanitized SVG icon early so it's available for the template
+    const svg = "<svg width='20' height='20' viewBox='0 0 24 24' fill='currentColor'><path d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/></svg>";
+    this.loginIcon = this.sanitizer.bypassSecurityTrustHtml(svg);
   }
+
+  // ngAfterViewInit removed: icon is prepared in constructor
 
   ngOnInit(): void {
     // Cerrar sesión automáticamente al acceder al login
