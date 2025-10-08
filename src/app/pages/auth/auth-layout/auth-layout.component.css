@@ -340,8 +340,8 @@
 .form-container {
   width: 100%;
   max-width: 440px;
-  padding: clamp(1rem, 2vh, 1.5rem);
-  padding-bottom: clamp(2rem, 4vh, 3rem); /* Espacio reducido para la firma */
+  padding: clamp(0.75rem, 1.5vh, 1rem);
+  padding-bottom: clamp(1.5rem, 3vh, 2rem); /* Espacio reducido para la firma */
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -611,11 +611,19 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: clamp(1.2rem, 3.5vh, 2.5rem);
-  margin-top: clamp(2.5rem, 6vh, 3.5rem);
+  margin-bottom: 0.75rem;
+  margin-top: clamp(1rem, 3vh, 1.5rem);
   z-index: 2;
   position: relative;
   animation: slideInDown 1s ease-out 0.2s both;
+}
+
+/* Welcome header spacing */
+.welcome-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-bottom: 0.25rem;
 }
 
 .brand-header::before {
@@ -1644,5 +1652,331 @@
   
   .form-container .signature-text .company-version {
     font-size: 0.45rem !important;
+  }
+}
+
+/* ================================= */
+/* ESTILOS PARA LOS NUEVOS COMPONENTES */
+/* Hacemos que se vean exactamente como el diseño original */
+/* ================================= */
+
+/* Contenedor del formulario */
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Header del formulario */
+.form-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.form-header h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.form-header p {
+  color: #6b7280;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Estilos para hacer que app-input se vea como input original */
+::ng-deep app-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+::ng-deep app-input .input-container {
+  position: relative;
+  width: 100%;
+}
+
+::ng-deep app-input .input-field {
+  width: 100% !important;
+  padding: 0.875rem 1rem !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+::ng-deep app-input .input-field:focus {
+  border-color: var(--logo-primary-color, #3b82f6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
+}
+
+::ng-deep app-input .input-field::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+::ng-deep app-input .input-field:disabled {
+  background-color: #f9fafb !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+  opacity: 0.75 !important;
+}
+
+::ng-deep app-input .input-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.25;
+}
+
+::ng-deep app-input .input-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #ef4444;
+  line-height: 1.25;
+}
+
+::ng-deep app-input.error .input-field {
+  border-color: #ef4444 !important;
+  box-shadow: 
+    0 0 0 3px rgba(239, 68, 68, 0.1),
+    0 1px 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Estilos para hacer que app-button se vea como button original */
+::ng-deep app-button {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep app-button .btn {
+  width: 100% !important;
+  padding: 0.875rem 1rem !important;
+  background: linear-gradient(135deg, 
+    var(--logo-primary-color, #3b82f6) 0%, 
+    var(--logo-secondary-color, #1e40af) 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.025em !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+::ng-deep app-button .btn:hover {
+  background: linear-gradient(135deg, 
+    var(--logo-secondary-color, #1e40af) 0%, 
+    var(--logo-primary-color, #1d4ed8) 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.25),
+    0 6px 10px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+::ng-deep app-button .btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+::ng-deep app-button .btn:focus {
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.2),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+::ng-deep app-button .btn:disabled {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+::ng-deep app-button .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+::ng-deep app-button .btn:hover::before {
+  left: 100%;
+}
+
+/* Estilos específicos para formularios */
+.form-group {
+  margin-bottom: 0.125rem;
+  width: 100%;
+}
+
+.form-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-footer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.signup-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.signup-prompt span {
+  white-space: nowrap;
+}
+
+/* Estilos específicos para botones ghost en el footer */
+.form-footer ::ng-deep app-button[variant="ghost"] {
+  width: auto !important;
+  display: inline-block !important;
+}
+
+.form-footer ::ng-deep app-button[variant="ghost"] .btn {
+  width: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--logo-primary-color, #3b82f6) !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+.form-footer ::ng-deep app-button[variant="ghost"] .btn:hover {
+  background: none !important;
+  color: var(--logo-secondary-color, #1e40af) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  text-decoration: underline !important;
+}
+
+.form-footer ::ng-deep app-button[variant="ghost"] .btn:active {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.form-footer ::ng-deep app-button[variant="ghost"] .btn:focus {
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+.form-footer ::ng-deep app-button[variant="ghost"] .btn::before {
+  display: none !important;
+}
+
+.form-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.form-link a {
+  color: var(--logo-primary-color, #3b82f6);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.form-link a:hover {
+  color: var(--logo-secondary-color, #1e40af);
+  text-decoration: underline;
+}
+
+/* Checkbox styling si es necesario */
+::ng-deep app-input[type="checkbox"] .input-field {
+  width: auto !important;
+  margin-right: 0.5rem !important;
+  position: relative !important;
+  top: 1px !important;
+}
+
+/* Responsive para los nuevos estilos */
+@media (max-width: 768px) {
+  ::ng-deep app-input .input-field {
+    padding: 0.75rem 0.875rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  ::ng-deep app-button .btn {
+    padding: 0.75rem 0.875rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .form-header h1 {
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  }
+
+  .form-header p {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  }
+}
+
+@media (max-width: 480px) {
+  ::ng-deep app-input .input-field {
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  ::ng-deep app-button .btn {
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .form-content {
+    gap: clamp(0.75rem, 2vh, 1rem);
+  }
+
+  .form-header {
+    margin-bottom: clamp(1rem, 2vh, 1.5rem);
   }
 }

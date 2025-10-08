@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { HttpErrorResponse } from '@angular/common/http';
 
 const MESSAGES = {
@@ -31,7 +33,7 @@ const PASSWORD_MIN_LENGTH = 8;
 @Component({
   selector: 'app-reset-password-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AlertComponent],
+  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
   templateUrl: './reset-password-form.component.html',
   styleUrls: ['./reset-password-form.component.css']
 })
@@ -39,13 +41,13 @@ export class ResetPasswordFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
 
   // Make MESSAGES available in template
   readonly MESSAGES = MESSAGES;
 
   // Form properties
-  password: string = '';
-  confirmPassword: string = '';
+  resetForm: FormGroup;
   uid: string = '';
   isLoading: boolean = true;
   isInvalidLink: boolean = false;
@@ -61,6 +63,31 @@ export class ResetPasswordFormComponent implements OnInit {
 
   // Redirect countdown
   redirectCountdown: number = 0;
+
+  constructor() {
+    this.resetForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(PASSWORD_MIN_LENGTH)]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  private passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+    
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    } else {
+      if (confirmPassword?.errors?.['passwordMismatch']) {
+        delete confirmPassword.errors['passwordMismatch'];
+        if (Object.keys(confirmPassword.errors).length === 0) {
+          confirmPassword.setErrors(null);
+        }
+      }
+    }
+    return null;
+  }
 
   ngOnInit(): void {
     this.initializeComponent();
@@ -107,7 +134,8 @@ export class ResetPasswordFormComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.authService.resetPassword(this.uid, this.password).subscribe({
+    const password = this.resetForm.get('password')?.value;
+    this.authService.resetPassword(this.uid, password).subscribe({
       next: () => {
         this.handleSuccess();
         this.isSubmitting = false;
@@ -124,8 +152,7 @@ export class ResetPasswordFormComponent implements OnInit {
   private handleSuccess(): void {
     this.successMessage = MESSAGES.SUCCESS_MESSAGE;
     this.errorMessage = '';
-    this.password = '';
-    this.confirmPassword = '';
+    this.resetForm.reset();
 
     // Iniciar contador de redirección automática
     this.startRedirectCountdown();
@@ -155,17 +182,20 @@ export class ResetPasswordFormComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return this.password.length >= PASSWORD_MIN_LENGTH && 
-           this.confirmPassword.length >= PASSWORD_MIN_LENGTH && 
-           this.password === this.confirmPassword;
+    const password = this.resetForm.get('password')?.value;
+    const confirmPassword = this.resetForm.get('confirmPassword')?.value;
+    return this.resetForm.valid && password === confirmPassword;
   }
 
   isPasswordValid(): boolean {
-    return this.password.length >= PASSWORD_MIN_LENGTH;
+    const password = this.resetForm.get('password')?.value;
+    return password ? password.length >= PASSWORD_MIN_LENGTH : false;
   }
 
   doPasswordsMatch(): boolean {
-    return this.password === this.confirmPassword && this.confirmPassword.length > 0;
+    const password = this.resetForm.get('password')?.value;
+    const confirmPassword = this.resetForm.get('confirmPassword')?.value;
+    return password === confirmPassword && confirmPassword && confirmPassword.length > 0;
   }
 
   // Alert methods

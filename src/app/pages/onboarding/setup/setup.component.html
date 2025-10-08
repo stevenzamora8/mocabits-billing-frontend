@@ -11,14 +11,14 @@
       </div>
     </div>
     <div class="header-actions">
-      <button 
-        type="button" 
-        class="btn-logout" 
+      <app-button
+        variant="ghost"
+        size="sm"
         (click)="logout()"
         title="Cerrar Sesión">
         <i class="icon-logout"></i>
         <span>Cerrar Sesión</span>
-      </button>
+      </app-button>
     </div>
   </div>
 
@@ -65,104 +65,76 @@
           
           <div class="form-row">
             <div class="form-group full-width">
-              <label for="razonSocial">Razón Social *</label>
-              <input 
-                type="text" 
-                id="razonSocial"
+              <app-input
                 formControlName="razonSocial"
-                class="setup-input"
-                [class.error]="isFieldInvalid(companyForm, 'razonSocial')"
-                placeholder="Nombre legal de la empresa">
-              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'razonSocial')">
-                {{ getFieldError(companyForm, 'razonSocial') }}
-              </div>
+                label="Razón Social"
+                placeholder="Nombre legal de la empresa"
+                [required]="true"
+                [errorMessage]="getFieldError(companyForm, 'razonSocial')">
+              </app-input>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group full-width">
-              <label for="nombreComercial">Nombre Comercial *</label>
-              <input 
-                type="text" 
-                id="nombreComercial"
+              <app-input
                 formControlName="nombreComercial"
-                class="setup-input"
-                [class.error]="isFieldInvalid(companyForm, 'nombreComercial')"
-                placeholder="Nombre comercial o marca">
-              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'nombreComercial')">
-                {{ getFieldError(companyForm, 'nombreComercial') }}
-              </div>
+                label="Nombre Comercial"
+                placeholder="Nombre comercial o marca"
+                [required]="true"
+                [errorMessage]="getFieldError(companyForm, 'nombreComercial')">
+              </app-input>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group half-width">
-              <label for="ruc">RUC *</label>
-              <div class="input-wrapper">
-                <input 
-                  type="text" 
-                  id="ruc"
-                  formControlName="ruc"
-                  class="setup-input"
-                  [class.error]="isFieldInvalid(companyForm, 'ruc')"
-                  [class.validating]="rucValidationState === 'validating'"
-                  [class.valid]="rucValidationState === 'valid'"
-                  placeholder="1234567890001"
-                  maxlength="13">
-                <div class="validation-indicator">
-                  <div *ngIf="rucValidationState === 'validating'" class="spinner-icon"></div>
-                  <div *ngIf="rucValidationState === 'valid'" class="success-icon"></div>
-                  <div *ngIf="rucValidationState === 'invalid'" class="error-icon"></div>
-                </div>
-              </div>
-              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'ruc')">
-                {{ getFieldError(companyForm, 'ruc') }}
-              </div>
-              <div class="info-message" *ngIf="rucValidationState === 'validating'">
-                Verificando disponibilidad del RUC...
-              </div>
+              <app-input
+                formControlName="ruc"
+                label="RUC"
+                placeholder="1234567890001"
+                [required]="true"
+                [maxLength]="13"
+                [loading]="rucValidationState === 'validating'"
+                [state]="rucValidationState === 'valid' ? 'success' : (rucValidationState === 'invalid' ? 'error' : 'default')"
+                [errorMessage]="getFieldError(companyForm, 'ruc')"
+                [hint]="rucValidationState === 'validating' ? 'Verificando disponibilidad del RUC...' : ''">
+              </app-input>
             </div>
 
             <div class="form-group">
-              <label for="codDoc">Tipo Documento *</label>
-              <select 
-                id="codDoc"
+              <app-select
                 formControlName="codDoc"
-                class="setup-input"
-                [class.error]="isFieldInvalid(companyForm, 'codDoc')">
-                <option value="04">RUC</option>
-                <option value="05">Cédula</option>
-                <option value="06">Pasaporte</option>
-              </select>
+                label="Tipo Documento"
+                [options]="documentTypeOptions"
+                [required]="true"
+                [errorMessage]="getFieldError(companyForm, 'codDoc')">
+              </app-select>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group full-width">
-              <label for="dirMatriz">Dirección Matriz *</label>
-              <textarea 
-                id="dirMatriz"
+              <app-input
                 formControlName="dirMatriz"
-                class="setup-input"
-                [class.error]="isFieldInvalid(companyForm, 'dirMatriz')"
+                label="Dirección Matriz"
+                type="textarea"
                 placeholder="Dirección completa de la matriz"
-                rows="3"></textarea>
-              <div class="error-message" *ngIf="isFieldInvalid(companyForm, 'dirMatriz')">
-                {{ getFieldError(companyForm, 'dirMatriz') }}
-              </div>
+                [required]="true"
+                [rows]="3"
+                [errorMessage]="getFieldError(companyForm, 'dirMatriz')">
+              </app-input>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="obligadoContabilidad">Obligado a llevar contabilidad *</label>
-              <select 
-                id="obligadoContabilidad"
+              <app-select
                 formControlName="obligadoContabilidad"
-                class="setup-input">
-                <option value="SI">Sí</option>
-                <option value="NO">No</option>
-              </select>
+                label="Obligado a llevar contabilidad"
+                [options]="accountingObligationOptions"
+                [required]="true">
+              </app-select>
             </div>
           </div>
         </div>
@@ -173,9 +145,12 @@
     <div *ngIf="currentStep === 2" class="step-form">
       <div class="establishments-header">
         <h3><i class="icon-store"></i> Puntos de Emisión</h3>
-        <button type="button" class="btn-add-establishment" (click)="addNewEstablishment()">
+        <app-button
+          variant="outline"
+          size="sm"
+          (click)="addNewEstablishment()">
           <i class="icon-plus"></i> Agregar Establecimiento
-        </button>
+        </app-button>
       </div>
 
       <!-- Pestañas de Establecimientos -->
@@ -196,64 +171,50 @@
         <div class="form-section">
           <div class="form-row">
             <div class="form-group">
-              <label for="estab">Código Establecimiento *</label>
-              <input 
-                type="text" 
-                id="estab"
+              <app-input
                 formControlName="estab"
-                class="setup-input"
-                [class.error]="isFieldInvalid(establishmentForm, 'estab')"
+                label="Código Establecimiento"
                 placeholder="001"
-                maxlength="3">
-              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'estab')">
-                {{ getFieldError(establishmentForm, 'estab') }}
-              </div>
+                [required]="true"
+                [maxLength]="3"
+                [errorMessage]="getFieldError(establishmentForm, 'estab')">
+              </app-input>
             </div>
 
             <div class="form-group">
-              <label for="ptoEmi">Punto Emisión *</label>
-              <input 
-                type="text" 
-                id="ptoEmi"
+              <app-input
                 formControlName="ptoEmi"
-                class="setup-input"
-                [class.error]="isFieldInvalid(establishmentForm, 'ptoEmi')"
+                label="Punto Emisión"
                 placeholder="001"
-                maxlength="3">
-              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'ptoEmi')">
-                {{ getFieldError(establishmentForm, 'ptoEmi') }}
-              </div>
+                [required]="true"
+                [maxLength]="3"
+                [errorMessage]="getFieldError(establishmentForm, 'ptoEmi')">
+              </app-input>
             </div>
 
             <div class="form-group">
-              <label for="secuencial">Secuencial Inicial *</label>
-              <input 
-                type="text" 
-                id="secuencial"
+              <app-input
                 formControlName="secuencial"
-                class="setup-input"
-                [class.error]="isFieldInvalid(establishmentForm, 'secuencial')"
+                label="Secuencial Inicial"
                 placeholder="000000001"
-                maxlength="9">
-              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'secuencial')">
-                {{ getFieldError(establishmentForm, 'secuencial') }}
-              </div>
+                [required]="true"
+                [maxLength]="9"
+                [errorMessage]="getFieldError(establishmentForm, 'secuencial')">
+              </app-input>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group full-width">
-              <label for="dirEstablecimiento">Dirección del Establecimiento *</label>
-              <textarea 
-                id="dirEstablecimiento"
+              <app-input
                 formControlName="dirEstablecimiento"
-                class="setup-input"
-                [class.error]="isFieldInvalid(establishmentForm, 'dirEstablecimiento')"
+                label="Dirección del Establecimiento"
+                type="textarea"
                 placeholder="Dirección completa del punto de emisión"
-                rows="3"></textarea>
-              <div class="error-message" *ngIf="isFieldInvalid(establishmentForm, 'dirEstablecimiento')">
-                {{ getFieldError(establishmentForm, 'dirEstablecimiento') }}
-              </div>
+                [required]="true"
+                [rows]="3"
+                [errorMessage]="getFieldError(establishmentForm, 'dirEstablecimiento')">
+              </app-input>
             </div>
           </div>
         </div>
@@ -443,41 +404,38 @@
 
   <!-- Navigation Buttons -->
   <div class="navigation-buttons">
-    <button 
-      type="button" 
-      class="btn-secondary" 
-      (click)="prevStep()"
+    <app-button
       *ngIf="currentStep > 1"
-      [disabled]="isLoading">
+      variant="secondary"
+      size="lg"
+      [disabled]="isLoading"
+      (click)="prevStep()">
       <i class="icon-arrow-left"></i>
       Anterior
-    </button>
+    </app-button>
 
-    <button 
-      type="button" 
-      class="btn-primary" 
-      (click)="nextStep()"
+    <app-button
       *ngIf="currentStep < totalSteps"
-      [disabled]="!canContinue()">
+      variant="primary"
+      size="lg"
+      [disabled]="!canContinue()"
+      (click)="nextStep()">
       Continuar
       <i class="icon-arrow-right"></i>
-    </button>
+    </app-button>
 
-    <button 
-      type="button" 
-      class="btn-success" 
-      (click)="finishSetup()"
+    <app-button
       *ngIf="currentStep === totalSteps"
-      [disabled]="!canFinish() || isLoading">
+      variant="primary"
+      size="lg"
+      [loading]="isLoading"
+      [disabled]="!canFinish()"
+      (click)="finishSetup()">
       <span *ngIf="!isLoading">
         <i class="icon-check"></i>
-        Cargar
+        Completar Setup
       </span>
-      <span *ngIf="isLoading">
-        <i class="icon-loading"></i>
-        Cargando...
-      </span>
-    </button>
+    </app-button>
   </div>
 
   <!-- Alert Component -->

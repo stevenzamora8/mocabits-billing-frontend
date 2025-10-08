@@ -8,6 +8,7 @@ import { takeUntil, debounceTime } from 'rxjs/operators';
 import { CompanyService, Company, CompanyResponse } from '../../../services/company.service';
 import { AuthService } from '../../../services/auth.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { ButtonComponent, InputComponent, SelectComponent, SelectOption } from '../../../shared/components/ui';
 
 interface CompanyData {
   razonSocial: string;
@@ -28,7 +29,7 @@ interface EstablishmentData {
 @Component({
   selector: 'app-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, AlertComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -69,6 +70,18 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   alertMessage = '';
   alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
   pendingAction: (() => void) | null = null;
+
+  // Select options for new UI components
+  documentTypeOptions: SelectOption[] = [
+    { value: '04', label: 'RUC' },
+    { value: '05', label: 'Cédula' },
+    { value: '06', label: 'Pasaporte' }
+  ];
+
+  accountingObligationOptions: SelectOption[] = [
+    { value: 'SI', label: 'Sí' },
+    { value: 'NO', label: 'No' }
+  ];
 
   constructor(
     private fb: FormBuilder,

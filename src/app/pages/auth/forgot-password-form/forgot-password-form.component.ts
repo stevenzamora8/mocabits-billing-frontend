@@ -1,19 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
 
 @Component({
   selector: 'app-forgot-password-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AlertComponent],
+  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
   templateUrl: './forgot-password-form.component.html',
   styleUrls: ['./forgot-password-form.component.css']
 })
 export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
-  recoveryEmail: string = '';
+  recoveryForm: FormGroup;
   currentStep: 'form' | 'success' = 'form';
   isLoading: boolean = false;
   showSuccessLoadingBar: boolean = false;
@@ -28,8 +30,13 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.recoveryForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
 
   ngOnInit(): void {}
 
@@ -47,7 +54,7 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
   }
 
   onSendRecoveryEmail(): void {
-    if (!this.recoveryEmail || !this.isEmailValid()) {
+    if (this.recoveryForm.invalid) {
       this.showAlert('Por favor ingresa un correo electrónico válido', 'warning');
       return;
     }
@@ -55,7 +62,8 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.clearAlert();
 
-    this.authService.forgotPassword(this.recoveryEmail).subscribe({
+    const email = this.recoveryForm.get('email')?.value;
+    this.authService.forgotPassword(email).subscribe({
       next: (response: any) => {
         console.log('Forgot password request successful:', response);
         this.currentStep = 'success';
@@ -85,8 +93,9 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
   }
 
   isEmailValid(): boolean {
+    const email = this.recoveryForm.get('email')?.value;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.recoveryEmail);
+    return email ? emailRegex.test(email) : false;
   }
 
   private showAlert(message: string, type: 'success' | 'danger' | 'warning' | 'info'): void {

@@ -1,0 +1,38 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  [class]="buttonClasses"
+  [attr.aria-label]="ariaLabel"
+  (click)="onClick($event)">
+  
+  <!-- Left icons container -->
+  <span *ngIf="(icon && iconPosition === 'left' && (!loading || showIconWhenLoading)) || loading" 
+        class="app-button__left-icons">
+    <!-- Left icon -->
+    <span *ngIf="icon && iconPosition === 'left' && (!loading || showIconWhenLoading)" 
+          class="app-button__icon app-button__icon--left"
+          [innerHTML]="icon">
+    </span>
+
+    <!-- Loading spinner -->
+    <span *ngIf="loading" class="app-button__spinner">
+      <svg class="app-button__spinner-icon" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+          <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </span>
+  </span>
+
+  <!-- Button content -->
+  <span class="app-button__content" [class.app-button__content--hidden]="loading && !showIconWhenLoading">
+    <ng-content></ng-content>
+  </span>
+
+  <!-- Right icon -->
+  <span *ngIf="icon && iconPosition === 'right' && (!loading || showIconWhenLoading)" 
+        class="app-button__icon app-button__icon--right"
+        [innerHTML]="icon">
+  </span>
+</button>

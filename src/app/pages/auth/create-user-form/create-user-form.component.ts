@@ -1,22 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertComponent } from '../../../components/alert/alert.component';
 import { AuthService } from '../../../services/auth.service';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
 
 @Component({
   selector: 'app-create-user-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AlertComponent],
+  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
   templateUrl: './create-user-form.component.html',
   styleUrl: './create-user-form.component.css'
 })
 export class CreateUserFormComponent implements OnInit {
-  firstName: string = '';
-  lastName: string = '';
-  email: string = '';
-  password: string = '';
+  userForm: FormGroup;
   isLoading: boolean = false;
   currentStep: string = 'form';
   showPassword: boolean = false;
@@ -30,11 +29,19 @@ export class CreateUserFormComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private fb: FormBuilder
   ) {
     console.log('CreateUserFormComponent constructor ejecutado');
     console.log('localStorage selectedPlan:', localStorage.getItem('selectedPlan'));
     console.log('localStorage setupCompleted:', localStorage.getItem('setupCompleted'));
+    
+    this.userForm = this.fb.group({
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
   ngOnInit(): void {
@@ -57,11 +64,12 @@ export class CreateUserFormComponent implements OnInit {
 
     this.isLoading = true;
     
+    const formValue = this.userForm.value;
     const userData = {
-      email: this.email.trim(),
-      firstName: this.firstName.trim(),
-      lastName: this.lastName.trim(),
-      password: btoa(this.password) // Codificar contraseña en base64
+      email: formValue.email.trim(),
+      firstName: formValue.firstName.trim(),
+      lastName: formValue.lastName.trim(),
+      password: btoa(formValue.password) // Codificar contraseña en base64
     };
 
     console.log('Creando usuario con datos:', {
@@ -105,7 +113,8 @@ export class CreateUserFormComponent implements OnInit {
    * Verificar si el email ya existe cuando el usuario termina de escribir
    */
   onEmailBlur() {
-    if (this.isEmailValid() && this.email.trim()) {
+    const email = this.userForm.get('email')?.value;
+    if (this.isEmailValid() && email?.trim()) {
       this.checkEmailAvailability();
     }
   }
@@ -114,7 +123,8 @@ export class CreateUserFormComponent implements OnInit {
     this.emailChecking = true;
     this.emailExists = false;
 
-    this.authService.checkEmailExists(this.email.trim()).subscribe({
+    const email = this.userForm.get('email')?.value?.trim();
+    this.authService.checkEmailExists(email).subscribe({
       next: (response) => {
         console.log('Email check response:', response);
         this.emailChecking = false;
@@ -139,8 +149,9 @@ export class CreateUserFormComponent implements OnInit {
   }
 
   isEmailValid(): boolean {
+    const email = this.userForm.get('email')?.value;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.email);
+    return email ? emailRegex.test(email) : false;
   }
 
   togglePasswordVisibility() {
@@ -148,10 +159,6 @@ export class CreateUserFormComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return this.firstName.trim() !== '' && 
-           this.lastName.trim() !== '' && 
-           this.isEmailValid() && 
-           this.password.length >= 6 &&
-           !this.emailExists;
+    return this.userForm.valid && !this.emailExists;
   }
 }

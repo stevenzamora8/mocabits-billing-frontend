@@ -1,22 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { ButtonComponent, InputComponent } from '../../../shared/components/ui';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AlertComponent],
+  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent implements OnInit, OnDestroy {
-  email: string = '';
-  password: string = '';
-  showPassword: boolean = false;
+  loginForm: FormGroup;
   isLoading: boolean = false;
   showSuccessMessage: boolean = false;
 
@@ -30,8 +29,14 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private plansService: PlansService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   ngOnInit(): void {
     // Cerrar sesión automáticamente al acceder al login
@@ -106,7 +111,8 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   }
 
   onEmailEnter(): void {
-    if (this.isEmailValid(this.email)) {
+    const email = this.loginForm.get('email')?.value;
+    if (this.isEmailValid(email)) {
       // Focus password field
       const passwordField = document.getElementById('password');
       if (passwordField) {
@@ -116,15 +122,16 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   }
 
   onLogin(): void {
-    if (!this.email || !this.password) {
-      this.showAlert('Por favor complete todos los campos', 'warning');
+    if (this.loginForm.invalid) {
+      this.showAlert('Por favor complete todos los campos correctamente', 'warning');
       return;
     }
 
     this.isLoading = true;
     this.clearAlert();
 
-    this.authService.login(this.email, this.password).subscribe({
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
       next: (result) => {
         console.log('Login successful', result);
         
@@ -180,8 +187,26 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/auth/create-user']);
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
+  // Helper methods for form validation
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.loginForm.get(fieldName);
+    return !!(field?.invalid && field?.touched);
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.loginForm.get(fieldName);
+    if (field?.errors && field?.touched) {
+      if (field.errors['required']) {
+        return `${fieldName === 'email' ? 'El correo electrónico' : 'La contraseña'} es requerido`;
+      }
+      if (field.errors['email']) {
+        return 'Por favor ingresa un correo válido';
+      }
+      if (field.errors['minlength']) {
+        return 'La contraseña debe tener al menos 6 caracteres';
+      }
+    }
+    return null;
   }
 
   isEmailValid(email: string): boolean {
