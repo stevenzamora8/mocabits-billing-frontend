@@ -42,7 +42,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     });
 
     // Prepare sanitized SVG icon early so it's available for the template
-    const svg = "<svg width='20' height='20' viewBox='0 0 24 24' fill='currentColor'><path d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/></svg>";
+    const svg = "<svg width='20' height='20' viewBox='0 0 24 24' fill='currentColor'><path d='M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/></svg>";
     this.loginIcon = this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
