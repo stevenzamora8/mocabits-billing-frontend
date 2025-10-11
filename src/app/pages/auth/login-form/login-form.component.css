@@ -271,14 +271,20 @@
 /* ACCIONES DEL FORMULARIO */
 .form-actions {
   display: flex;
+  width: 100% !important;
   flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  align-items: center;
+  align-items: stretch;
 }
 
 ::ng-deep .form-actions .app-button {
   justify-content: center !important;
+  width: 100% !important;
+}
+
+::ng-deep .form-actions .app-button button {
+  width: 100% !important;
 }
 
 .login-text {
@@ -287,8 +293,8 @@
 }
 
 .primary-button {
-  width: auto !important;
-  max-width: 300px !important;
+  width: 100% !important;
+  max-width: 100% !important;
   margin: 0 auto !important;
   height: clamp(2.25rem, 5vh, 3rem) !important;
   background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 100%) !important;

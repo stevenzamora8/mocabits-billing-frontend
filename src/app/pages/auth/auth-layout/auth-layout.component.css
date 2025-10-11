@@ -1760,12 +1760,6 @@
     0 1px 3px rgba(239, 68, 68, 0.1) !important;
 }
 
-/* Estilos para hacer que app-button se vea como button original */
-::ng-deep app-button {
-  display: block;
-  width: 100%;
-}
-
 ::ng-deep app-button .btn {
   width: 100% !important;
   padding: 0.875rem 1rem !important;
