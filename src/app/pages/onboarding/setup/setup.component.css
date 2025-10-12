@@ -3,29 +3,74 @@
 .setup-container {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--logo-primary-color) 0%, var(--logo-secondary-color) 50%, var(--logo-accent-color) 100%);
-  padding: 12px;
+  padding: 24px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
   
-  /* VARIABLES DE BRANDING - IGUAL QUE EL LOGIN */
+  /* VARIABLES DE BRANDING */
   --logo-primary-color: #1e3a8a;
   --logo-secondary-color: #3b82f6;
   --logo-accent-color: #374151;
   --logo-text-color: white;
+  --input-focus-color: rgba(59, 130, 246, 0.15);
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --transition-speed: 0.3s;
+}
+
+/* Fondo decorativo */
+.setup-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Fondo decorativo */
+.setup-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ===== HEADER ===== */
 .setup-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 0 auto 16px auto;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 0 auto 24px auto;
   max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transform: translateY(0);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  position: relative;
+  z-index: 1;
+}
+
+.setup-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.setup-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .logo-section {
@@ -151,31 +196,38 @@
 
 /* ===== PROGRESS BAR ===== */
 .progress-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 24px auto;
   max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  transform: translateY(0);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.progress-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .progress-bar {
-  width: 100%;
   height: 6px;
-  background: #e2e8f0;
-  border-radius: 6px;
+  background: rgba(203, 213, 225, 0.3);
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
-  border-radius: 8px;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .step-indicators {
@@ -188,28 +240,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  opacity: 0.5;
-  transition: all 0.3s ease;
+  gap: 12px;
+  flex: 1;
+  position: relative;
+  color: rgba(0, 0, 0, 0.6);
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
 }
 
-.step-indicator.active,
-.step-indicator.completed {
-  opacity: 1;
+.step-indicator:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
 }
 
 .step-number {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #e2e8f0;
-  color: #64748b;
+  border: 2px solid rgba(30, 58, 138, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 12px;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  font-size: 16px;
+  background: white;
+  transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: var(--logo-primary-color);
+}
+
+.step-indicator:hover .step-number {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  border-color: var(--logo-primary-color);
+  background: white;
 }
 
 .step-indicator.active .step-number {
@@ -238,15 +304,23 @@
 
 /* ===== STEP CONTENT ===== */
 .step-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin: 0 auto 16px auto;
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  margin: 0 auto 24px auto;
   max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   min-height: 400px;
+  position: relative;
+  z-index: 1;
+  transform: translateY(0);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.step-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .step-header {
@@ -255,16 +329,23 @@
 }
 
 .step-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 22px;
-  font-weight: 700;
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 800;
   color: #1a202c;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
 }
 
 .step-description {
-  margin: 0;
-  font-size: 14px;
+  margin: 0 auto;
+  font-size: 16px;
   color: #64748b;
+  max-width: 600px;
+  line-height: 1.6;
 }
 
 /* ===== FORM SECTIONS ===== */
@@ -318,10 +399,32 @@
 }
 
 /* ===== FORM INPUTS - MISMO ESTILO QUE CREATE USER ===== */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 1.1rem;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.input-group:focus-within .input-icon {
+  color: var(--logo-primary-color);
+}
+
 .setup-input {
   width: 100% !important;
   height: clamp(2.25rem, 5vh, 3rem) !important;
-  padding: 0 1rem !important;
+  padding: 0 1rem 0 2.75rem !important; /* Padding extra a la izquierda para el icono */
   border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: clamp(0.875rem, 2.5vh, 1rem) !important;
@@ -334,6 +437,33 @@
   position: relative !important;
   overflow: hidden !important;
   font-family: inherit;
+}
+
+/* Ocultar el botón de borrado (x) en los inputs */
+.setup-input::-webkit-search-cancel-button,
+.setup-input::-webkit-clear-button,
+.setup-input::-ms-clear {
+  display: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* Estilos específicos para iconos comunes */
+.icon-user::before { content: "👤"; }
+.icon-building::before { content: "🏢"; }
+.icon-document::before { content: "📄"; }
+.icon-email::before { content: "✉️"; }
+.icon-phone::before { content: "📱"; }
+.icon-location::before { content: "📍"; }
+.icon-tax::before { content: "💰"; }
+.icon-id::before { content: "🪪"; }
+
+/* Estado hover del grupo de input */
+.input-group:hover .setup-input:not(:focus):not(.error):not(.success) {
+  border-color: #cbd5e1;
+}
+
+.input-group:hover .input-icon {
+  color: #64748b;
 }
 
 .setup-input::placeholder {
