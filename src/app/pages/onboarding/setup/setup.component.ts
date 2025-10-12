@@ -691,9 +691,10 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   getFieldError(formGroup: FormGroup, fieldName: string): string {
     const field = formGroup.get(fieldName);
     if (!field || !field.errors) return '';
+    // Solo mostrar error si el campo fue tocado o modificado
+    if (!(field.touched || field.dirty)) return '';
 
     const errors = field.errors;
-    
     if (errors['required']) return 'Este campo es requerido';
     if (errors['minlength']) return `Mínimo ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo ${errors['maxlength'].requiredLength} caracteres`;

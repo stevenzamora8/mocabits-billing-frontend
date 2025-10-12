@@ -7,9 +7,9 @@
     {{ label }}
   </label>
 
+
   <!-- Select container -->
-  <div [class]="containerClasses"
-       #selectContainer>
+  <div [class]="containerClasses" #selectContainer>
     <!-- Select button -->
     <button type="button"
             class="app-select"
@@ -21,12 +21,10 @@
             (blur)="onTouched()">
       <!-- Selected value display -->
       <span class="app-select-text">{{ selectedOption?.label || placeholder }}</span>
-
       <!-- Arrow icon -->
       <svg class="app-select-arrow" width="20" height="20" viewBox="0 0 20 20">
         <path d="M7 7l3 3 3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
-
       <!-- Loading spinner -->
       <div *ngIf="loading" class="app-select-loading">
         <svg class="app-select-spinner" viewBox="0 0 24 24">
@@ -35,53 +33,53 @@
         </svg>
       </div>
     </button>
+  </div>
 
-    <!-- Dropdown -->
-    <div *ngIf="isOpen"
-         class="app-select-dropdown"
-         [class.app-select-dropdown--up]="dropdownDirection === 'up'"
-         #dropdown>
-      <!-- Search input -->
-      <div *ngIf="searchable" class="app-select-search">
-        <input type="text"
-               class="app-select-search-input"
-               [placeholder]="searchPlaceholder"
-               [(ngModel)]="searchTerm"
-               (input)="onSearch($event)"
-               (click)="$event.stopPropagation()"
-               #searchInput>
+  <!-- Dropdown SIEMPRE debajo del input -->
+  <div *ngIf="isOpen"
+       class="app-select-dropdown"
+       [class.app-select-dropdown--up]="dropdownDirection === 'up'"
+       #dropdown>
+    <!-- Search input -->
+    <div *ngIf="searchable" class="app-select-search">
+      <input type="text"
+             class="app-select-search-input"
+             [placeholder]="searchPlaceholder"
+             [(ngModel)]="searchTerm"
+             (input)="onSearch($event)"
+             (click)="$event.stopPropagation()"
+             #searchInput>
+    </div>
+
+    <!-- Options list -->
+    <div class="app-select-options"
+         [class.app-select-options--with-search]="searchable">
+      <!-- Empty state -->
+      <div *ngIf="filteredOptions.length === 0" class="app-select-empty">
+        {{ emptyMessage }}
       </div>
 
-      <!-- Options list -->
-      <div class="app-select-options"
-           [class.app-select-options--with-search]="searchable">
-        <!-- Empty state -->
-        <div *ngIf="filteredOptions.length === 0" class="app-select-empty">
-          {{ emptyMessage }}
+      <!-- Options -->
+      <ng-container *ngFor="let option of filteredOptions; trackBy: trackByValue">
+        <!-- Group header -->
+        <div *ngIf="option.group && !isGroupHeaderShown(option.group)"
+             class="app-select-group-header">
+          {{ option.group }}
         </div>
 
-        <!-- Options -->
-        <ng-container *ngFor="let option of filteredOptions; trackBy: trackByValue">
-          <!-- Group header -->
-          <div *ngIf="option.group && !isGroupHeaderShown(option.group)"
-               class="app-select-group-header">
-            {{ option.group }}
-          </div>
-
-          <!-- Option item -->
-          <button type="button"
-                  class="app-select-option"
-                  [class.selected]="isSelected(option)"
-                  [class.disabled]="option.disabled"
-                  [class.highlighted]="highlightedIndex === getOptionIndex(option)"
-                  [disabled]="option.disabled"
-                  (click)="selectOption(option)"
-                  (mouseenter)="highlightedIndex = getOptionIndex(option)">
-            <!-- Option label -->
-            {{ option.label }}
-          </button>
-        </ng-container>
-      </div>
+        <!-- Option item -->
+        <button type="button"
+                class="app-select-option"
+                [class.selected]="isSelected(option)"
+                [class.disabled]="option.disabled"
+                [class.highlighted]="highlightedIndex === getOptionIndex(option)"
+                [disabled]="option.disabled"
+                (click)="selectOption(option)"
+                (mouseenter)="highlightedIndex = getOptionIndex(option)">
+          <!-- Option label -->
+          {{ option.label }}
+        </button>
+      </ng-container>
     </div>
   </div>
 
