@@ -1,5 +1,7 @@
+
 <div class="setup-container">
-  <!-- Header -->
+
+  <!-- Intro Section -->
   <div class="setup-header">
     <div class="logo-section">
       <div class="logo-placeholder">
@@ -7,7 +9,7 @@
       </div>
       <div class="header-text">
         <h1>Configuración Inicial</h1>
-        <p>Configure su empresa para comenzar a facturar</p>
+        <p>Bienvenido al asistente de configuración. Complete los siguientes pasos para dejar lista su empresa y comenzar a facturar en minutos.</p>
       </div>
     </div>
     <div class="header-actions">
@@ -22,30 +24,24 @@
     </div>
   </div>
 
-  <!-- Progress Bar -->
+  <!-- Step Indicators (Barra de pasos) -->
   <div class="progress-container">
-    <div class="progress-bar">
-      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
-    </div>
     <div class="step-indicators">
-      <div class="step-indicator" 
-           [class.active]="currentStep >= 1" 
-           [class.completed]="currentStep > 1">
+      <div class="step-indicator" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
         <span class="step-number">1</span>
         <span class="step-label">Contribuyente</span>
       </div>
-      <div class="step-indicator" 
-           [class.active]="currentStep >= 2" 
-           [class.completed]="currentStep > 2">
+      <div class="step-indicator" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
         <span class="step-number">2</span>
         <span class="step-label">Establecimientos</span>
       </div>
-      <div class="step-indicator" 
-           [class.active]="currentStep >= 3" 
-           [class.completed]="currentStep > 3">
+      <div class="step-indicator" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
         <span class="step-number">3</span>
         <span class="step-label">Firma & Logo</span>
       </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
     </div>
   </div>
 
@@ -62,7 +58,6 @@
         
         <div class="form-section">
           <h3><i class="icon-document"></i> Información Tributaria</h3>
-          
           <div class="form-row">
             <div class="form-group full-width">
               <app-input
@@ -78,7 +73,6 @@
               </app-input>
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group full-width">
               <app-input
@@ -94,7 +88,6 @@
               </app-input>
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group half-width">
               <app-input
@@ -113,6 +106,17 @@
                 </svg>
               </app-input>
             </div>
+            <div class="form-group half-width">
+              <app-select
+                formControlName="obligadoContabilidad"
+                label="Obligado a llevar contabilidad"
+                [options]="accountingObligationOptions"
+                [required]="true">
+                <svg slot="right-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                </svg>
+              </app-select>
+            </div>
           </div>
 
           <div class="form-row">
@@ -130,20 +134,6 @@
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
               </app-input>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <app-select
-                formControlName="obligadoContabilidad"
-                label="Obligado a llevar contabilidad"
-                [options]="accountingObligationOptions"
-                [required]="true">
-                <svg slot="right-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-                </svg>
-              </app-select>
             </div>
           </div>
         </div>

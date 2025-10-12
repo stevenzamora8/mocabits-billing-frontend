@@ -370,19 +370,22 @@
 }
 
 /* ===== FORM LAYOUT ===== */
+
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .form-group.full-width {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
 }
 
 .form-group.half-width {
-  grid-column: span 2;
+  flex: 1 1 0;
+  min-width: 220px;
+  max-width: 50%;
 }
 
 .form-group {
