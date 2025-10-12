@@ -74,8 +74,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   // Select options for new UI components
   documentTypeOptions: SelectOption[] = [
     { value: '04', label: 'RUC' },
-    { value: '05', label: 'Cédula' },
-    { value: '06', label: 'Pasaporte' }
+    { value: '05', label: 'Cédula' }
   ];
 
   accountingObligationOptions: SelectOption[] = [
@@ -163,7 +162,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         asyncValidators: [this.rucExistsValidator],
         updateOn: 'blur' // Solo validar cuando el usuario termine de escribir
       }],
-      codDoc: ['04', [Validators.required]],
+      codDoc: ['05', [Validators.required]], // Inicializamos con Cédula por defecto
       dirMatriz: ['', [
         Validators.required, 
         Validators.minLength(5),

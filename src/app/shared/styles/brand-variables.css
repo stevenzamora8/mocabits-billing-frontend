@@ -37,6 +37,18 @@
   --bg-secondary: #f8fafc;
   --bg-muted: #f1f5f9;
   
+  /* CAMPOS DE TEXTO */
+  --text-field-border: #e5e7eb;
+  --text-field-hover-border: #9ca3af;
+  --text-field-background: #ffffff;
+  --text-field-text: #1f2937;
+  --text-field-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --text-field-focus-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  --text-field-error-focus-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  --text-field-disabled-background: #f9fafb;
+  --text-field-disabled-border: #e5e7eb;
+  --text-field-disabled-text: #9ca3af;
+  
   /* BORDES */
   --border-color: #e5e7eb;
   --border-color-focus: var(--logo-primary-color);
