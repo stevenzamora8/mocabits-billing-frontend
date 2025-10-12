@@ -14,7 +14,6 @@ interface CompanyData {
   razonSocial: string;
   nombreComercial: string;
   ruc: string;
-  codDoc: string;
   dirMatriz: string;
   obligadoContabilidad: string;
 }
@@ -71,11 +70,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
   pendingAction: (() => void) | null = null;
 
-  // Select options for new UI components
-  documentTypeOptions: SelectOption[] = [
-    { value: '04', label: 'RUC' },
-    { value: '05', label: 'Cédula' }
-  ];
+
 
   accountingObligationOptions: SelectOption[] = [
     { value: 'SI', label: 'Sí' },
@@ -95,11 +90,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Aplicar estilos después de que la vista se inicialice
-    setTimeout(() => {
-      this.applyInputStyles();
-      this.enhanceFormInteractions();
-    }, 100);
+    // Ya no se manipulan estilos ni eventos manualmente
   }
 
   ngOnDestroy() {
@@ -107,24 +98,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroy$.complete();
   }
 
-  private applyInputStyles() {
-    const inputs = document.querySelectorAll('.setup-container input, .setup-container select, .setup-container textarea');
-    inputs.forEach((input: any) => {
-      this.setInputBaseStyles(input);
-    });
-  }
 
-  private setInputBaseStyles(input: any) {
-    const isError = input.classList.contains('error');
-    
-    if (isError) {
-      input.style.setProperty('border-color', '#ef4444', 'important');
-      input.style.setProperty('background-color', '#fef2f2', 'important');
-    } else {
-      input.style.setProperty('border-color', '#94a3b8', 'important');
-      input.style.setProperty('background-color', '#f9fafb', 'important');
-    }
-  }
 
   setupFormSubscriptions() {
     // Detectar cuando el usuario empieza a escribir
@@ -162,7 +136,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         asyncValidators: [this.rucExistsValidator],
         updateOn: 'blur' // Solo validar cuando el usuario termine de escribir
       }],
-      codDoc: ['05', [Validators.required]], // Inicializamos con Cédula por defecto
       dirMatriz: ['', [
         Validators.required, 
         Validators.minLength(5),
@@ -314,12 +287,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         
         this.currentStep++;
         this.scrollToTop();
-        
-        // Aplicar estilos después de cambio de paso
-        setTimeout(() => {
-          this.applyInputStyles();
-          this.enhanceFormInteractions();
-        }, 300);
+        // Ya no se aplican estilos ni eventos manualmente
       } else {
         this.showValidationErrors();
       }
@@ -330,11 +298,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.currentStep > 1) {
       this.currentStep--;
       this.scrollToTop();
-      
-      // Aplicar estilos después de cambio de paso
-      setTimeout(() => {
-        this.applyInputStyles();
-      }, 100);
+      // Ya no se aplican estilos ni eventos manualmente
     }
   }
 
@@ -615,7 +579,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         razonSocial: companyData.razonSocial,
         nombreComercial: companyData.nombreComercial,
         ruc: companyData.ruc,
-        codDoc: companyData.codDoc,
         dirMatriz: companyData.dirMatriz,
         obligadoContabilidad: companyData.obligadoContabilidad,
         contribuyenteEspecial: 'NO',
@@ -751,69 +714,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.validateAllSteps() && !this.isLoading;
   }
 
-  // Método para debug
-  // Método para mejorar las interacciones del formulario
-  enhanceFormInteractions() {
-    this.addInputFocusAnimations();
-    this.addFormValidationFeedback();
-  }
 
-  private addInputFocusAnimations() {
-    const inputs = document.querySelectorAll('.setup-input');
-    inputs.forEach((input: any) => {
-      input.addEventListener('focus', () => {
-        this.playFocusSound();
-        input.parentElement?.classList.add('focused');
-      });
-      
-      input.addEventListener('blur', () => {
-        input.parentElement?.classList.remove('focused');
-      });
-    });
-  }
-
-  private addFormValidationFeedback() {
-    const inputs = document.querySelectorAll('.setup-input');
-    inputs.forEach((input: any) => {
-      input.addEventListener('input', () => {
-        this.debounceValidation(input);
-      });
-    });
-  }
-
-  private debounceValidation = this.debounce((input: any) => {
-    const isValid = input.checkValidity() && input.value.length > 0;
-    const parentGroup = input.closest('.form-group');
-    
-    if (parentGroup) {
-      parentGroup.classList.toggle('field-valid', isValid);
-      parentGroup.classList.toggle('field-invalid', !isValid && input.value.length > 0);
-    }
-  }, 300);
-
-  private debounce(func: Function, wait: number) {
-    let timeout: any;
-    return function executedFunction(...args: any[]) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
-  private playFocusSound() {
-    // Simular feedback auditivo suave (solo en producción con configuración del usuario)
-    if ('AudioContext' in window || 'webkitAudioContext' in window) {
-      try {
-        // Crear un sonido muy suave y corto para el focus
-        // Este es opcional y se puede quitar si no se desea
-      } catch (e) {
-        // Silenciar errores de audio
-      }
-    }
-  }
 
   // Mejorar la animación de cambio de paso
   private animateStepTransition() {
