@@ -160,7 +160,7 @@
 }
 
 .form-input.error + .input-icon {
-  color: #ef4444;
+  color: #ef4444 !important;
 }
 
 .form-input.success + .input-icon {
