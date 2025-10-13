@@ -198,14 +198,14 @@
 .progress-container {
   margin: 0 auto 24px auto;
   max-width: 800px;
-  background: rgba(255, 255, 255, 0.98);
+  background: #fff;
   padding: 24px;
   border-radius: 16px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px);
+  box-shadow: none;
+  border: none;
+  backdrop-filter: none;
   transform: translateY(0);
-  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  transition: transform var(--transition-speed) ease;
 }
 
 .progress-container:hover {
