@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { AlertType } from '../../../components/alert/alert.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
+import { AlertComponent } from '../../../components/alert/alert.component';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
@@ -41,6 +43,17 @@ export class ClientsComponent implements OnInit {
 
   // Make Math available in template
   readonly Math = Math;
+
+  // Alert state
+  alertMessage: string = '';
+  alertType: AlertType = 'info';
+  alertVisible: boolean = false;
+  alertAutoDismiss: boolean = false;
+  alertConfirmMode: boolean = false;
+  alertConfirmAction: (() => void) | null = null;
+  alertConfirmTitle: string = '';
+  alertConfirmText: string = '';
+  alertCancelText: string = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -317,23 +330,8 @@ export class ClientsComponent implements OnInit {
   }
 
   editClient(client: Client): void {
-    if (client.id) {
-      this.isLoading = true;
-      this.clientService.getClient(client.id).subscribe({
-        next: (freshClient) => {
-          this.openClientModal(freshClient);
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error fetching client for edit:', error);
-          // Fallback to using the provided client data
-          this.openClientModal(client);
-          this.isLoading = false;
-        }
-      });
-    } else {
-      this.openClientModal(client);
-    }
+    // Abrir el modal directamente con los datos actuales del cliente
+    this.openClientModal(client);
   }
 
   viewClient(client: Client): void {
@@ -343,22 +341,89 @@ export class ClientsComponent implements OnInit {
   }
 
   deleteClient(client: Client): void {
-    const confirmMessage = `¿Estás seguro de que deseas eliminar el cliente "${client.name}"?\n\nEsta acción no se puede deshacer.`;
-    if (confirm(confirmMessage) && client.id) {
-      this.isLoading = true;
-      this.clientService.deleteClient(client.id).subscribe({
-        next: () => {
-          // Reload current page to get updated data
-          this.loadClients(this.currentPage);
-          this.isLoading = false;
-          console.log('Cliente eliminado:', client.id);
-        },
-        error: (error) => {
-          console.error('Error deleting client:', error);
-          this.isLoading = false;
-        }
-      });
+    if (!client.id) return;
+    this.showConfirmAlert(
+      `¿Estás seguro de que deseas eliminar el cliente "${client.name}"? Esta acción no se puede deshacer.`,
+      'Eliminar Cliente',
+      'Eliminar',
+      'Cancelar',
+      () => {
+        this.isLoading = true;
+        this.clientService.deleteClient(client.id!).subscribe({
+          next: () => {
+            this.showAlert('Cliente eliminado correctamente', 'success', true);
+            this.loadClients(this.currentPage);
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.showAlert('Error al eliminar el cliente', 'danger');
+            this.isLoading = false;
+          }
+        });
+      }
+    );
+  }
+
+  toggleClientStatus(client: Client): void {
+    if (!client.id) return;
+    const newStatus = client.status === 'A' ? 'I' : 'A';
+    const actionText = newStatus === 'A' ? 'activar' : 'inactivar';
+    this.showConfirmAlert(
+      `¿Estás seguro de que deseas ${actionText} el cliente "${client.name}"?`,
+      `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Cliente`,
+      actionText.charAt(0).toUpperCase() + actionText.slice(1),
+      'Cancelar',
+      () => {
+        this.isLoading = true;
+        this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
+          next: (updatedClient) => {
+            this.showAlert(`Cliente ${actionText}do correctamente`, 'success', true);
+            this.loadClients(this.currentPage);
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.showAlert(`Error al ${actionText} el cliente`, 'danger');
+            this.isLoading = false;
+          }
+        });
+      }
+    );
+  }
+  // Alert helpers
+  showAlert(message: string, type: AlertType = 'info', autoDismiss: boolean = false) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.alertVisible = true;
+    this.alertAutoDismiss = autoDismiss;
+    this.alertConfirmMode = false;
+  }
+
+  showConfirmAlert(message: string, title: string, confirmText: string, cancelText: string, onConfirm: () => void) {
+    this.alertMessage = message;
+    this.alertType = 'confirm';
+    this.alertVisible = true;
+    this.alertConfirmMode = true;
+    this.alertConfirmAction = onConfirm;
+    this.alertConfirmTitle = title;
+    this.alertConfirmText = confirmText;
+    this.alertCancelText = cancelText;
+  }
+
+  handleAlertClosed() {
+    this.alertVisible = false;
+    this.alertConfirmMode = false;
+    this.alertMessage = '';
+  }
+
+  handleAlertConfirmed() {
+    if (this.alertConfirmAction) {
+      this.alertConfirmAction();
     }
+    this.handleAlertClosed();
+  }
+
+  handleAlertCancelled() {
+    this.handleAlertClosed();
   }
 
   // Utility functions
@@ -366,64 +431,6 @@ export class ClientsComponent implements OnInit {
     return client.id?.toString() || `client-${index}`;
   }
 
-  exportClients(): void {
-    try {
-      const dataToExport = this.clients.map((client: Client) => ({
-        ID: client.id,
-        Nombre: client.name,
-        'Tipo Identificación': client.typeIdentification,
-        Identificación: client.identification,
-        Email: client.email,
-        Teléfono: client.phone || ''
-      }));
-
-      const csvContent = this.convertToCSV(dataToExport);
-      this.downloadCSV(csvContent, 'clientes.csv');
-      console.log('Clientes exportados exitosamente');
-    } catch (error) {
-      console.error('Error al exportar clientes:', error);
-    }
-  }
-
-  private convertToCSV(data: any[]): string {
-    if (data.length === 0) return '';
-
-    const headers = Object.keys(data[0]);
-    const csvRows = [];
-
-    // Add headers
-    csvRows.push(headers.join(','));
-
-    // Add data rows
-    data.forEach(row => {
-      const values = headers.map(header => {
-        const value = row[header] || '';
-        // Escape quotes and wrap in quotes if contains comma or quote
-        if (value.toString().includes(',') || value.toString().includes('"')) {
-          return `"${value.toString().replace(/"/g, '""')}"`;
-        }
-        return value;
-      });
-      csvRows.push(values.join(','));
-    });
-
-    return csvRows.join('\n');
-  }
-
-  private downloadCSV(csvContent: string, filename: string): void {
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  }
 
   formatDate(date: Date): string {
     return date.toLocaleDateString('es-ES', {

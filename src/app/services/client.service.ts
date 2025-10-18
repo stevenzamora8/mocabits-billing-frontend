@@ -202,4 +202,8 @@ export class ClientService {
   deleteClient(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/billing/v1/clients/${id}`, { headers: this.getHeaders() });
   }
+
+  toggleClientStatus(id: number, status: string): Observable<Client> {
+    return this.http.put<Client>(`${this.apiUrl}/billing/v1/clients/${id}`, { status }, { headers: this.getHeaders() });
+  }
 }
