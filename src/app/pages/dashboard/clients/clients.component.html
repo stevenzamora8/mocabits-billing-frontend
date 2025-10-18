@@ -20,12 +20,14 @@
         <h1>Gestión de Clientes</h1>
         <p>Administra tu base de datos de clientes y contactos</p>
       </div>
-      <button class="btn-primary" (click)="openClientModal()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 4v16m8-8H4"/>
-        </svg>
+      <app-button
+        variant="primary"
+        size="lg"
+        (click)="openClientModal()"
+        [icon]="addIcon"
+        iconPosition="left">
         Nuevo Cliente
-      </button>
+      </app-button>
     </div>
   </div>
 
@@ -69,50 +71,55 @@
   </div>
 
   <!-- Filters and Search -->
+  <style>
+    /* Ensure select dropdowns appear above the table and other content */
+    .filters-section, .filter-selects, .filter-selects .app-select-panel, .filter-selects .cdk-overlay-pane {
+      z-index: 1002 !important;
+      position: relative;
+    }
+  </style>
   <div class="filters-section">
     <div class="search-box">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-      </svg>
-      <input
+      <app-input
         type="text"
         placeholder="Buscar por nombre..."
         [(ngModel)]="searchTerm"
         (input)="onSearchChange()"
-      >
+        leftIcon="search">
+        <svg slot="left-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </app-input>
     </div>
-
     <div class="filter-selects">
-      <select [(ngModel)]="selectedType" (change)="onFilterChange()" class="filter-select">
-        <option value="">Todos los tipos</option>
-        <option value="CEDULA">Cédula</option>
-        <option value="RUC">RUC</option>
-        <option value="PASAPORTE">Pasaporte</option>
-      </select>
-
-      <input
+      <app-select
+        placeholder="Todos los tipos"
+        [options]="typeOptions"
+        [(ngModel)]="selectedType"
+        (selectionChange)="onFilterChange()"
+      ></app-select>
+      <app-input
         type="text"
         placeholder="Identificación..."
         [(ngModel)]="selectedIdentification"
         (input)="onFilterChange()"
-        class="filter-input"
-      >
-
-      <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="filter-select">
-        <option value="">Todos los estados</option>
-        <option value="A">Activo</option>
-        <option value="I">Inactivo</option>
-      </select>
+      ></app-input>
+      <app-select
+        placeholder="Todos los estados"
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        (selectionChange)="onFilterChange()"
+      ></app-select>
     </div>
-
     <div class="filter-buttons">
-      <button class="btn-secondary" (click)="clearFilters()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 2a1 1 0 0 0-1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 0 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 1 14.001 13H11a1 1 0 0 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z"/>
-        </svg>
+      <app-button
+        variant="outline"
+        size="md"
+        (click)="clearFilters()"
+        [icon]="clearIcon"
+        iconPosition="left">
         Limpiar
-      </button>
-
+      </app-button>
     </div>
   </div>
 
@@ -209,60 +216,52 @@
     </div>
 
     <div class="pagination-controls">
-      <button
-        class="pagination-btn"
+      <app-button
+        variant="outline"
+        size="sm"
         [disabled]="currentPage === 0"
         (click)="goToPage(1)"
-        title="Primera página"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/>
-        </svg>
-      </button>
+        [icon]="firstPageIcon"
+        [ariaLabel]="'Primera página'">
+      </app-button>
 
-      <button
-        class="pagination-btn"
+      <app-button
+        variant="outline"
+        size="sm"
         [disabled]="currentPage === 0"
         (click)="previousPage()"
-        title="Página anterior"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/>
-        </svg>
-      </button>
+        [icon]="prevPageIcon"
+        [ariaLabel]="'Página anterior'">
+      </app-button>
 
       <div class="pagination-numbers">
-        <button
+        <app-button
           *ngFor="let page of getPageNumbers()"
-          class="pagination-number"
+          variant="outline"
+          size="sm"
           [class.active]="page === (currentPage + 1)"
-          (click)="goToPage(page)"
-        >
+          (click)="goToPage(page)">
           {{ page }}
-        </button>
+        </app-button>
       </div>
 
-      <button
-        class="pagination-btn"
+      <app-button
+        variant="outline"
+        size="sm"
         [disabled]="currentPage >= totalPages - 1"
         (click)="nextPage()"
-        title="Página siguiente"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
+        [icon]="nextPageIcon"
+        [ariaLabel]="'Página siguiente'">
+      </app-button>
 
-      <button
-        class="pagination-btn"
+      <app-button
+        variant="outline"
+        size="sm"
         [disabled]="currentPage >= totalPages - 1"
         (click)="goToPage(totalPages)"
-        title="Última página"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
-        </svg>
-      </button>
+        [icon]="lastPageIcon"
+        [ariaLabel]="'Última página'">
+      </app-button>
     </div>
   </div>
 </div>
@@ -272,93 +271,111 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ editingClient ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
-      <button class="close-btn" (click)="closeClientModal()">
-        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-        </svg>
-      </button>
+      <app-button
+        variant="ghost"
+        size="sm"
+        (click)="closeClientModal()"
+        class="close-btn"
+        [icon]="closeIcon"
+        [ariaLabel]="'Cerrar modal'">
+      </app-button>
     </div>
 
     <form [formGroup]="clientForm" (ngSubmit)="saveClient()" class="client-form">
+      <style>
+        .client-form .form-input.error {
+          border-color: #ef4444;
+          background: #fff1f1;
+        }
+        .client-form .error-message, .client-form .field-error {
+          color: #ef4444;
+          font-size: 0.85em;
+          margin-top: 2px;
+        }
+      </style>
       <div class="form-row">
         <div class="form-group">
-          <label for="name">Nombre *</label>
-          <input
-            id="name"
-            type="text"
-            formControlName="name"
+          <app-input
+            label="Nombre *"
             placeholder="Nombre completo"
-            class="form-input"
-            [class.error]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched">
-          <div class="error-message" *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched">
-            El nombre es requerido y debe tener al menos 2 caracteres
-          </div>
+            formControlName="name"
+            [errorMessage]="getFieldError('name')"
+            [attr.aria-invalid]="getFieldError('name')"
+            [ngClass]="{'error': getFieldError('name')}"
+          ></app-input>
         </div>
 
         <div class="form-group">
-          <label for="typeIdentification">Tipo de Identificación *</label>
-          <select id="typeIdentification" formControlName="typeIdentification" class="form-select">
-            <option value="CEDULA">Cédula</option>
-            <option value="RUC">RUC</option>
-            <option value="PASAPORTE">Pasaporte</option>
-          </select>
+          <app-select
+            label="Tipo de Identificación *"
+            placeholder="Seleccionar tipo"
+            [options]="typeIdentificationOptions"
+            formControlName="typeIdentification"
+            [errorMessage]="getFieldError('typeIdentification')"
+          ></app-select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="identification">Identificación *</label>
-          <input
-            id="identification"
-            type="text"
-            formControlName="identification"
+          <app-input
+            label="Identificación *"
             placeholder="Número de identificación"
-            class="form-input"
-            [class.error]="clientForm.get('identification')?.invalid && clientForm.get('identification')?.touched">
-          <div class="error-message" *ngIf="clientForm.get('identification')?.invalid && clientForm.get('identification')?.touched">
-            La identificación es requerida
-          </div>
+            formControlName="identification"
+            [errorMessage]="getFieldError('identification')"
+            [attr.aria-invalid]="getFieldError('identification')"
+            [ngClass]="{'error': getFieldError('identification')}"
+          ></app-input>
         </div>
 
         <div class="form-group">
-          <label for="email">Email *</label>
-          <input
-            id="email"
+          <app-input
+            label="Email *"
+            placeholder="correo@ejemplo.com"
             type="email"
             formControlName="email"
-            placeholder="correo@ejemplo.com"
-            class="form-input"
-            [class.error]="clientForm.get('email')?.invalid && clientForm.get('email')?.touched">
-          <div class="error-message" *ngIf="clientForm.get('email')?.invalid && clientForm.get('email')?.touched">
-            Ingrese un email válido
-          </div>
+            [errorMessage]="getFieldError('email')"
+            [attr.aria-invalid]="getFieldError('email')"
+            [ngClass]="{'error': getFieldError('email')}"
+          ></app-input>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="phone">Teléfono</label>
-        <input
-          id="phone"
+        <app-input
+          label="Teléfono"
+          placeholder="0987654321"
           type="tel"
           formControlName="phone"
-          placeholder="0987654321"
-          class="form-input">
+        ></app-input>
       </div>
 
       <div class="form-group">
-        <label for="status">Estado *</label>
-        <select id="status" formControlName="status" class="form-select">
-          <option value="A">Activo</option>
-          <option value="I">Inactivo</option>
-        </select>
+        <app-select
+          label="Estado *"
+          placeholder="Seleccionar estado"
+          [options]="clientStatusOptions"
+          formControlName="status"
+          [errorMessage]="getFieldError('status')"
+        ></app-select>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-secondary" (click)="closeClientModal()">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="clientForm.invalid || isSaving">
-          <span *ngIf="isSaving" class="loading-spinner"></span>
-          {{ isSaving ? 'Creando...' : (editingClient ? 'Actualizar' : 'Crear') }} Cliente
-        </button>
+        <app-button
+          type="button"
+          variant="outline"
+          size="md"
+          (click)="closeClientModal()">
+          Cancelar
+        </app-button>
+        <app-button
+          type="submit"
+          variant="primary"
+          size="md"
+          [disabled]="clientForm.invalid || isSaving"
+          [loading]="isSaving">
+          {{ isSaving ? 'Guardando...' : (editingClient ? 'Actualizar' : 'Crear') }} Cliente
+        </app-button>
       </div>
     </form>
   </div>

@@ -4,11 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
+import { SelectComponent, SelectOption } from '../../../shared/components/ui/select/select.component';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
@@ -19,6 +22,33 @@ export class ClientsComponent implements OnInit {
   selectedType: string = '';
   selectedIdentification: string = '';
   selectedStatus: string = '';
+
+  Math = Math; // Make Math available in template
+
+  // Select options
+  typeOptions: SelectOption[] = [
+    { value: '', label: 'Todos los tipos' },
+    { value: 'CEDULA', label: 'Cédula' },
+    { value: 'RUC', label: 'RUC' },
+    { value: 'PASAPORTE', label: 'Pasaporte' }
+  ];
+
+  statusOptions: SelectOption[] = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'A', label: 'Activo' },
+    { value: 'I', label: 'Inactivo' }
+  ];
+
+  typeIdentificationOptions: SelectOption[] = [
+    { value: 'CEDULA', label: 'Cédula' },
+    { value: 'RUC', label: 'RUC' },
+    { value: 'PASAPORTE', label: 'Pasaporte' }
+  ];
+
+  clientStatusOptions: SelectOption[] = [
+    { value: 'A', label: 'Activo' },
+    { value: 'I', label: 'Inactivo' }
+  ];
 
   // Modal
   isClientModalOpen: boolean = false;
@@ -41,8 +71,14 @@ export class ClientsComponent implements OnInit {
   isLoading: boolean = false;
   isSaving: boolean = false;
 
-  // Make Math available in template
-  readonly Math = Math;
+  // Icon strings for buttons
+  readonly firstPageIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/></svg>`;
+  readonly prevPageIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>`;
+  readonly nextPageIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>`;
+  readonly lastPageIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/></svg>`;
+  readonly closeIcon = `<svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>`;
+  readonly addIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4"/></svg>`;
+  readonly clearIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2a1 1 0 0 0-1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 0 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 1 14.001 13H11a1 1 0 0 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z"/></svg>`;
 
   // Alert state
   alertMessage: string = '';
@@ -429,6 +465,22 @@ export class ClientsComponent implements OnInit {
   // Utility functions
   trackByClientId(index: number, client: Client): string {
     return client.id?.toString() || `client-${index}`;
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const control = this.clientForm.get(fieldName);
+    if (control && control.invalid && control.touched) {
+      if (control.errors?.['required']) {
+        return 'Este campo es requerido';
+      }
+      if (control.errors?.['email']) {
+        return 'Ingrese un email válido';
+      }
+      if (control.errors?.['minlength']) {
+        return `Debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
+      }
+    }
+    return null;
   }
 
 

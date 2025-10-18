@@ -112,7 +112,7 @@
   left: 0;
   right: 0;
   min-width: 200px;
-  z-index: 9999;
+  z-index: 12000;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
