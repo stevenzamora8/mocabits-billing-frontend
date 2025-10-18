@@ -78,7 +78,8 @@ export class ClientsComponent implements OnInit {
       identification: ['', [Validators.required]],
       typeIdentification: ['CEDULA', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['']
+      phone: [''],
+      status: ['A', [Validators.required]]
     });
   }
 
@@ -204,7 +205,8 @@ export class ClientsComponent implements OnInit {
         identification: client.identification,
         typeIdentification: client.typeIdentification,
         email: client.email,
-        phone: client.phone
+        phone: client.phone,
+        status: client.status || 'A'
       });
     } else {
       this.clientForm.reset({
@@ -212,7 +214,8 @@ export class ClientsComponent implements OnInit {
         identification: '',
         typeIdentification: 'CEDULA',
         email: '',
-        phone: ''
+        phone: '',
+        status: 'A'
       });
     }
   }
@@ -243,7 +246,8 @@ export class ClientsComponent implements OnInit {
           identification: formData.identification,
           typeIdentification: formData.typeIdentification,
           email: formData.email,
-          phone: formData.phone
+          phone: formData.phone,
+          status: formData.status
         };
 
         this.clientService.updateClient(this.editingClient.id!, updatedClient).subscribe({
