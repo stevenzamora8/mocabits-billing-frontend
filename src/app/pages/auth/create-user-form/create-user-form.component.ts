@@ -15,12 +15,16 @@ import { InputComponent } from '../../../shared/components/ui/input/input.compon
   styleUrl: './create-user-form.component.css'
 })
 export class CreateUserFormComponent implements OnInit {
+  userIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
   userForm: FormGroup;
   isLoading: boolean = false;
   currentStep: string = 'form';
   showPassword: boolean = false;
   emailChecking: boolean = false;
   emailExists: boolean = false;
+
+  // Track field touched/dirty for validation feedback
+  fieldTouched: { [key: string]: boolean } = {};
 
   // Alert properties
   alertMessage: string = '';
@@ -42,10 +46,17 @@ export class CreateUserFormComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+    // Initialize fieldTouched
+    Object.keys(this.userForm.controls).forEach(key => this.fieldTouched[key] = false);
   }
 
   ngOnInit(): void {
-    // No hacer nada especial en el registro
+    // Subscribe to valueChanges to track dirty/touched
+    Object.keys(this.userForm.controls).forEach(key => {
+      this.userForm.get(key)?.valueChanges.subscribe(() => {
+        this.fieldTouched[key] = true;
+      });
+    });
   }
 
   goToLogin() {
@@ -63,48 +74,50 @@ export class CreateUserFormComponent implements OnInit {
     }
 
     this.isLoading = true;
-    
     const formValue = this.userForm.value;
     const userData = {
       email: formValue.email.trim(),
+      password: formValue.password,
       firstName: formValue.firstName.trim(),
-      lastName: formValue.lastName.trim(),
-      password: btoa(formValue.password) // Codificar contraseña en base64
+      lastName: formValue.lastName.trim()
     };
 
-    console.log('Creando usuario con datos:', {
-      email: userData.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      passwordEncoded: true
-    });
-
-    this.authService.createUser(userData).subscribe({
-      next: (response) => {
-        console.log('Usuario creado exitosamente:', response);
-        this.isLoading = false;
-        this.currentStep = 'success';
-        
-        this.showAlert('¡Cuenta creada exitosamente! Redirigiendo al login...', 'success');
-        
-        // Auto-regresar al login después de 3 segundos
-        setTimeout(() => {
-          this.goToLogin();
-        }, 3000);
-      },
-      error: (error) => {
-        console.error('Error al crear usuario:', error);
-        this.isLoading = false;
-        
-        // Extraer el mensaje de error
-        let errorMessage = 'Error al crear la cuenta. Intenta nuevamente.';
-        if (error?.error?.message) {
-          errorMessage = error.error.message;
-        } else if (error?.message) {
-          errorMessage = error.message;
+    // 1. Validar si el email ya existe antes de crear el usuario
+    this.authService.checkEmailExists(userData.email).subscribe({
+      next: (response: any) => {
+        if (response?.exists) {
+          this.isLoading = false;
+          this.emailExists = true;
+          this.showAlert('El correo electrónico ya está registrado. Usa otro o inicia sesión.', 'danger');
+        } else {
+          // 2. Si no existe, crear el usuario
+          this.authService.createUser(userData).subscribe({
+            next: (resp: any) => {
+              console.log('Usuario creado exitosamente:', resp);
+              this.isLoading = false;
+              this.currentStep = 'success';
+              this.showAlert('¡Cuenta creada exitosamente! Redirigiendo al login...', 'success');
+              setTimeout(() => {
+                this.goToLogin();
+              }, 3000);
+            },
+            error: (error: any) => {
+              console.error('Error al crear usuario:', error);
+              this.isLoading = false;
+              let errorMessage = 'Error al crear la cuenta. Intenta nuevamente.';
+              if (error?.error?.message) {
+                errorMessage = error.error.message;
+              } else if (error?.message) {
+                errorMessage = error.message;
+              }
+              this.showAlert(errorMessage, 'danger');
+            }
+          });
         }
-        
-        this.showAlert(errorMessage, 'danger');
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        this.showAlert('No se pudo validar el correo electrónico. Intenta nuevamente.', 'danger');
       }
     });
   }
@@ -112,11 +125,33 @@ export class CreateUserFormComponent implements OnInit {
   /**
    * Verificar si el email ya existe cuando el usuario termina de escribir
    */
-  onEmailBlur() {
+
+
+  onEmailInput() {
     const email = this.userForm.get('email')?.value;
+    this.fieldTouched['email'] = true;
     if (this.isEmailValid() && email?.trim()) {
       this.checkEmailAvailability();
+    } else {
+      this.emailExists = false;
     }
+  }
+  // Helper to get error message for a field, like setup component
+  getFieldError(fieldName: string): string {
+    const field = this.userForm.get(fieldName);
+    if (!field || !field.errors) return '';
+    if (!(field.touched || field.dirty || this.fieldTouched[fieldName])) return '';
+    const errors = field.errors;
+    if (errors['required']) return 'Este campo es requerido';
+    if (errors['email']) return 'Correo electrónico inválido';
+    if (errors['minlength']) return `Mínimo ${errors['minlength'].requiredLength} caracteres`;
+    if (errors['maxlength']) return `Máximo ${errors['maxlength'].requiredLength} caracteres`;
+    return 'Campo inválido';
+  }
+
+  onEmailBlur() {
+    // También valida en blur por si el usuario pega el email y sale del campo
+    this.onEmailInput();
   }
 
   private checkEmailAvailability() {
@@ -125,7 +160,7 @@ export class CreateUserFormComponent implements OnInit {
 
     const email = this.userForm.get('email')?.value?.trim();
     this.authService.checkEmailExists(email).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log('Email check response:', response);
         this.emailChecking = false;
         
@@ -134,7 +169,7 @@ export class CreateUserFormComponent implements OnInit {
         
         // No mostrar alert flotante, solo el mensaje debajo del input
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al verificar email:', error);
         this.emailChecking = false;
         // No mostrar error al usuario para esta validación opcional
@@ -160,5 +195,16 @@ export class CreateUserFormComponent implements OnInit {
 
   isFormValid(): boolean {
     return this.userForm.valid && !this.emailExists;
+  }
+
+  // For input state (error/success/default)
+  getEmailInputState(): 'success' | 'error' | 'default' {
+    const field = this.userForm.get('email');
+    if (this.emailChecking) return 'default';
+    if ((field?.dirty || field?.touched || this.fieldTouched['email'])) {
+      if (this.getFieldError('email')) return 'error';
+      if (field?.valid && !this.emailExists) return 'success';
+    }
+    return 'default';
   }
 }

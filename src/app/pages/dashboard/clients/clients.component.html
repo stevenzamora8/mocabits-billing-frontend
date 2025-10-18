@@ -24,7 +24,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-number">{{ totalClients }}</div>
+        <div class="stat-number">{{ totalElements }}</div>
         <div class="stat-label">Total Clientes</div>
       </div>
     </div>
@@ -62,25 +62,36 @@
       </svg>
       <input
         type="text"
-        placeholder="Buscar clientes..."
+        placeholder="Buscar por nombre..."
         [(ngModel)]="searchTerm"
-        (input)="filterClients()"
+        (input)="onSearchChange()"
       >
     </div>
 
-    <div class="filter-buttons">
-      <select [(ngModel)]="selectedType" (change)="filterClients()" class="filter-select">
+    <div class="filter-selects">
+      <select [(ngModel)]="selectedType" (change)="onFilterChange()" class="filter-select">
         <option value="">Todos los tipos</option>
-        <option value="PERSONA_NATURAL">Persona Natural</option>
-        <option value="EMPRESA">Empresa</option>
+        <option value="CEDULA">Cédula</option>
+        <option value="RUC">RUC</option>
+        <option value="PASAPORTE">Pasaporte</option>
       </select>
 
-      <select [(ngModel)]="selectedStatus" (change)="filterClients()" class="filter-select">
+      <input
+        type="text"
+        placeholder="Identificación..."
+        [(ngModel)]="selectedIdentification"
+        (input)="onFilterChange()"
+        class="filter-input"
+      >
+
+      <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="filter-select">
         <option value="">Todos los estados</option>
-        <option value="ACTIVO">Activo</option>
-        <option value="INACTIVO">Inactivo</option>
+        <option value="A">Activo</option>
+        <option value="I">Inactivo</option>
       </select>
+    </div>
 
+    <div class="filter-buttons">
       <button class="btn-secondary" (click)="clearFilters()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M4 2a1 1 0 0 0-1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 0 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 1 14.001 13H11a1 1 0 0 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z"/>
@@ -99,51 +110,35 @@
 
   <!-- Clients Table -->
   <div class="table-container">
-    <table class="clients-table">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando clientes...</p>
+    </div>
+
+    <table *ngIf="!isLoading" class="clients-table">
       <thead>
         <tr>
           <th>Cliente</th>
           <th>Identificación</th>
-          <th class="contact-header">Contacto</th>
-          <th class="type-header">Tipo</th>
-          <th class="status-header">Estado</th>
-          <th class="invoice-header">Última Factura</th>
-          <th class="actions-header">Acciones</th>
+          <th>Contacto</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let client of paginatedClients; trackBy: trackByClientId" class="client-row">
           <td class="client-info">
             <div class="client-name">{{ client.name }}</div>
-            <div class="client-created">Creado: {{ client.createdAt | date:'dd/MM/yyyy' }}</div>
           </td>
           <td>
             <div class="identification">{{ client.identification }}</div>
-            <div class="id-type">{{ client.identificationType }}</div>
+            <div class="id-type">{{ client.typeIdentification }}</div>
           </td>
           <td>
             <div class="contact-info">
               <div class="email">{{ client.email }}</div>
               <div class="phone" *ngIf="client.phone">{{ client.phone }}</div>
             </div>
-          </td>
-          <td>
-            <span class="type-badge" [ngClass]="client.type === 'EMPRESA' ? 'empresa' : 'persona'">
-              {{ client.type === 'EMPRESA' ? 'Empresa' : 'Persona' }}
-            </span>
-          </td>
-          <td>
-            <span class="status-badge" [ngClass]="client.status.toLowerCase()">
-              {{ client.status === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td>
-            <div class="last-invoice" *ngIf="client.lastInvoiceDate; else noInvoice">
-              {{ client.lastInvoiceDate | date:'dd/MM/yyyy' }}
-            </div>
-            <ng-template #noInvoice>
-              <span class="no-invoice">Sin facturas</span>
-            </ng-template>
           </td>
           <td>
             <div class="action-buttons">
@@ -170,7 +165,8 @@
     </table>
 
     <!-- Empty State -->
-    <div *ngIf="filteredClients.length === 0" class="empty-state">
+        <!-- Empty State -->
+    <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
       <svg width="64" height="64" fill="currentColor" viewBox="0 0 20 20" class="empty-icon">
         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
       </svg>
@@ -182,13 +178,13 @@
   <!-- Pagination -->
   <div class="pagination-container" *ngIf="totalPages > 1">
     <div class="pagination-info">
-      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredClients.length) }} de {{ filteredClients.length }} clientes
+      Mostrando {{ (currentPage) * itemsPerPage + 1 }} - {{ Math.min((currentPage + 1) * itemsPerPage, totalElements) }} de {{ totalElements }} clientes
     </div>
 
     <div class="pagination-controls">
       <button
         class="pagination-btn"
-        [disabled]="currentPage === 1"
+        [disabled]="currentPage === 0"
         (click)="goToPage(1)"
         title="Primera página"
       >
@@ -199,7 +195,7 @@
 
       <button
         class="pagination-btn"
-        [disabled]="currentPage === 1"
+        [disabled]="currentPage === 0"
         (click)="previousPage()"
         title="Página anterior"
       >
@@ -212,7 +208,7 @@
         <button
           *ngFor="let page of getPageNumbers()"
           class="pagination-number"
-          [class.active]="page === currentPage"
+          [class.active]="page === (currentPage + 1)"
           (click)="goToPage(page)"
         >
           {{ page }}
@@ -221,7 +217,7 @@
 
       <button
         class="pagination-btn"
-        [disabled]="currentPage === totalPages"
+        [disabled]="currentPage >= totalPages - 1"
         (click)="nextPage()"
         title="Página siguiente"
       >
@@ -232,7 +228,7 @@
 
       <button
         class="pagination-btn"
-        [disabled]="currentPage === totalPages"
+        [disabled]="currentPage >= totalPages - 1"
         (click)="goToPage(totalPages)"
         title="Última página"
       >
@@ -273,8 +269,8 @@
         </div>
 
         <div class="form-group">
-          <label for="identificationType">Tipo de Identificación *</label>
-          <select id="identificationType" formControlName="identificationType" class="form-select">
+          <label for="typeIdentification">Tipo de Identificación *</label>
+          <select id="typeIdentification" formControlName="typeIdentification" class="form-select">
             <option value="CEDULA">Cédula</option>
             <option value="RUC">RUC</option>
             <option value="PASAPORTE">Pasaporte</option>
@@ -298,16 +294,6 @@
         </div>
 
         <div class="form-group">
-          <label for="type">Tipo de Cliente *</label>
-          <select id="type" formControlName="type" class="form-select">
-            <option value="PERSONA_NATURAL">Persona Natural</option>
-            <option value="EMPRESA">Empresa</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
           <label for="email">Email *</label>
           <input
             id="email"
@@ -320,40 +306,23 @@
             Ingrese un email válido
           </div>
         </div>
-
-        <div class="form-group">
-          <label for="phone">Teléfono</label>
-          <input
-            id="phone"
-            type="tel"
-            formControlName="phone"
-            placeholder="0987654321"
-            class="form-input">
-        </div>
-      </div>
-
-      <div class="form-group full-width">
-        <label for="address">Dirección</label>
-        <textarea
-          id="address"
-          formControlName="address"
-          placeholder="Dirección completa"
-          class="form-textarea"
-          rows="3"></textarea>
       </div>
 
       <div class="form-group">
-        <label for="status">Estado *</label>
-        <select id="status" formControlName="status" class="form-select">
-          <option value="ACTIVO">Activo</option>
-          <option value="INACTIVO">Inactivo</option>
-        </select>
+        <label for="phone">Teléfono</label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          placeholder="0987654321"
+          class="form-input">
       </div>
 
       <div class="modal-actions">
         <button type="button" class="btn-secondary" (click)="closeClientModal()">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="clientForm.invalid">
-          {{ editingClient ? 'Actualizar' : 'Crear' }} Cliente
+        <button type="submit" class="btn-primary" [disabled]="clientForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="loading-spinner"></span>
+          {{ isSaving ? 'Creando...' : (editingClient ? 'Actualizar' : 'Crear') }} Cliente
         </button>
       </div>
     </form>

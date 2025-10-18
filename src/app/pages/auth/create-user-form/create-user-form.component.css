@@ -237,6 +237,16 @@
   animation: slideDown 0.3s ease;
 }
 
+.field-success {
+  color: #16a34a;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: slideDown 0.3s ease;
+}
+
 /* Botones */
 .btn-primary {
   width: 100% !important;

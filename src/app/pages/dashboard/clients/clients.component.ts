@@ -1,21 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-export interface Client {
-  id: string;
-  name: string;
-  identification: string;
-  identificationType: 'CEDULA' | 'RUC' | 'PASAPORTE';
-  email: string;
-  phone: string;
-  address: string;
-  type: 'PERSONA_NATURAL' | 'EMPRESA';
-  status: 'ACTIVO' | 'INACTIVO';
-  lastInvoiceDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { ClientService, Client, ClientPage } from '../../../services/client.service';
 
 @Component({
   selector: 'app-clients',
@@ -27,9 +13,9 @@ export interface Client {
 export class ClientsComponent implements OnInit {
   // Properties
   clients: Client[] = [];
-  filteredClients: Client[] = [];
   searchTerm: string = '';
   selectedType: string = '';
+  selectedIdentification: string = '';
   selectedStatus: string = '';
 
   // Modal
@@ -37,42 +23,52 @@ export class ClientsComponent implements OnInit {
   editingClient: Client | null = null;
   clientForm: FormGroup;
 
-  // Pagination
-  currentPage: number = 1;
-  itemsPerPage: number = 10;
+  // Pagination - now using API pagination
+  currentPage: number = 0; // 0-based for API
+  itemsPerPage: number = 5; // Mostrar solo 5 registros por página
   totalPages: number = 1;
+  totalElements: number = 0;
+  currentClientPage: ClientPage | null;
+
+  // Summary counts
+  totalClientsCount: number = 0;
+  activeClientsCount: number = 0;
+  inactiveClientsCount: number = 0;
+
+  // Loading states
+  isLoading: boolean = false;
+  isSaving: boolean = false;
 
   // Make Math available in template
   readonly Math = Math;
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private clientService: ClientService
   ) {
     this.clientForm = this.createClientForm();
+    this.currentClientPage = null;
   }
 
   ngOnInit(): void {
     this.loadClients();
-    this.filterClients();
   }
 
   // Computed properties
   get totalClients(): number {
-    return this.clients.length;
+    return this.totalClientsCount;
   }
 
   get activeClients(): number {
-    return this.clients.filter(client => client.status === 'ACTIVO').length;
+    return this.activeClientsCount;
   }
 
   get inactiveClients(): number {
-    return this.clients.filter(client => client.status === 'INACTIVO').length;
+    return this.inactiveClientsCount;
   }
 
   get paginatedClients(): Client[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.filteredClients.slice(startIndex, endIndex);
+    return this.clients; // Now clients already contains only the current page
   }
 
   // Form creation
@@ -80,299 +76,110 @@ export class ClientsComponent implements OnInit {
     return this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       identification: ['', [Validators.required]],
-      identificationType: ['CEDULA', [Validators.required]],
+      typeIdentification: ['CEDULA', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phone: [''],
-      address: [''],
-      type: ['PERSONA_NATURAL', [Validators.required]],
-      status: ['ACTIVO', [Validators.required]]
+      phone: ['']
     });
   }
 
   // Data loading
-  loadClients(): void {
-    // Mock data - replace with actual API call
-    this.clients = [
-      {
-        id: '1',
-        name: 'Juan Pérez',
-        identification: '0123456789',
-        identificationType: 'CEDULA',
-        email: 'juan.perez@email.com',
-        phone: '0987654321',
-        address: 'Av. Principal 123, Quito',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-01-15'),
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-15')
+  loadClients(page: number = 0): void {
+    this.isLoading = true;
+    
+    const filters = {
+      name: this.searchTerm,
+      type: this.selectedType,
+      identification: this.selectedIdentification,
+      status: this.selectedStatus
+    };
+    
+    this.clientService.getClients(page, this.itemsPerPage, filters).subscribe({
+      next: (clientPage) => {
+        this.currentClientPage = clientPage;
+        this.clients = clientPage.content;
+        this.totalPages = clientPage.totalPages;
+        this.totalElements = clientPage.totalElements;
+        this.currentPage = clientPage.number;
+        // Set summary counts
+        if (clientPage.summary) {
+          this.totalClientsCount = clientPage.summary.total;
+          this.activeClientsCount = clientPage.summary.active;
+          this.inactiveClientsCount = clientPage.summary.inactive;
+        } else {
+          this.totalClientsCount = clientPage.totalElements;
+          this.activeClientsCount = this.clients.filter(c => c.status === 'A').length;
+          this.inactiveClientsCount = this.clients.filter(c => c.status !== 'A').length;
+        }
+        this.isLoading = false;
       },
-      {
-        id: '2',
-        name: 'Empresa ABC S.A.',
-        identification: '1234567890001',
-        identificationType: 'RUC',
-        email: 'facturacion@empresaabc.com',
-        phone: '0234567890',
-        address: 'Calle Comercial 456, Guayaquil',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-01-20'),
-        createdAt: new Date('2023-12-15'),
-        updatedAt: new Date('2024-01-20')
-      },
-      {
-        id: '3',
-        name: 'María González',
-        identification: '0987654321',
-        identificationType: 'CEDULA',
-        email: 'maria.gonzalez@email.com',
-        phone: '0876543210',
-        address: 'Sector Norte 789, Cuenca',
-        type: 'PERSONA_NATURAL',
-        status: 'INACTIVO',
-        lastInvoiceDate: new Date('2023-12-20'),
-        createdAt: new Date('2023-11-01'),
-        updatedAt: new Date('2023-12-20')
-      },
-      {
-        id: '4',
-        name: 'Carlos Rodríguez',
-        identification: '0456789123',
-        identificationType: 'CEDULA',
-        email: 'carlos.rodriguez@email.com',
-        phone: '0965432109',
-        address: 'Barrio Centro 321, Ambato',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-01-25'),
-        createdAt: new Date('2023-10-15'),
-        updatedAt: new Date('2024-01-25')
-      },
-      {
-        id: '5',
-        name: 'Tech Solutions Corp',
-        identification: '2345678900012',
-        identificationType: 'RUC',
-        email: 'admin@techsolutions.com',
-        phone: '0223456789',
-        address: 'Edificio Empresarial 567, Quito',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-01'),
-        createdAt: new Date('2023-09-20'),
-        updatedAt: new Date('2024-02-01')
-      },
-      {
-        id: '6',
-        name: 'Ana López',
-        identification: '0567891234',
-        identificationType: 'CEDULA',
-        email: 'ana.lopez@email.com',
-        phone: '0954321098',
-        address: 'Conjunto Residencial 890, Guayaquil',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-01-30'),
-        createdAt: new Date('2023-08-10'),
-        updatedAt: new Date('2024-01-30')
-      },
-      {
-        id: '7',
-        name: 'Global Imports Ltda',
-        identification: '3456789010013',
-        identificationType: 'RUC',
-        email: 'imports@globalimports.com',
-        phone: '0212345678',
-        address: 'Zona Industrial 123, Manta',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-05'),
-        createdAt: new Date('2023-07-05'),
-        updatedAt: new Date('2024-02-05')
-      },
-      {
-        id: '8',
-        name: 'Luis Martínez',
-        identification: '0678912345',
-        identificationType: 'CEDULA',
-        email: 'luis.martinez@email.com',
-        phone: '0943210987',
-        address: 'Urbanización Moderna 456, Cuenca',
-        type: 'PERSONA_NATURAL',
-        status: 'INACTIVO',
-        lastInvoiceDate: new Date('2023-11-15'),
-        createdAt: new Date('2023-06-01'),
-        updatedAt: new Date('2023-11-15')
-      },
-      {
-        id: '9',
-        name: 'Digital Services Pro',
-        identification: '4567890120014',
-        identificationType: 'RUC',
-        email: 'contact@digitalservices.com',
-        phone: '0209876543',
-        address: 'Centro Empresarial 789, Quito',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-10'),
-        createdAt: new Date('2023-05-15'),
-        updatedAt: new Date('2024-02-10')
-      },
-      {
-        id: '10',
-        name: 'Sofia Ramírez',
-        identification: '0789123456',
-        identificationType: 'CEDULA',
-        email: 'sofia.ramirez@email.com',
-        phone: '0932109876',
-        address: 'Residencial del Valle 234, Loja',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-12'),
-        createdAt: new Date('2023-04-20'),
-        updatedAt: new Date('2024-02-12')
-      },
-      {
-        id: '11',
-        name: 'Construction Experts S.A.',
-        identification: '5678901230015',
-        identificationType: 'RUC',
-        email: 'projects@constructionexperts.com',
-        phone: '0198765432',
-        address: 'Av. Industrial 567, Guayaquil',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-15'),
-        createdAt: new Date('2023-03-10'),
-        updatedAt: new Date('2024-02-15')
-      },
-      {
-        id: '12',
-        name: 'Miguel Torres',
-        identification: '0891234567',
-        identificationType: 'CEDULA',
-        email: 'miguel.torres@email.com',
-        phone: '0921098765',
-        address: 'Sector Histórico 345, Quito',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-18'),
-        createdAt: new Date('2023-02-05'),
-        updatedAt: new Date('2024-02-18')
-      },
-      {
-        id: '13',
-        name: 'Fashion Boutique',
-        identification: '6789012340016',
-        identificationType: 'RUC',
-        email: 'sales@fashionboutique.com',
-        phone: '0187654321',
-        address: 'Centro Comercial 678, Cuenca',
-        type: 'EMPRESA',
-        status: 'INACTIVO',
-        lastInvoiceDate: new Date('2023-10-30'),
-        createdAt: new Date('2023-01-15'),
-        updatedAt: new Date('2023-10-30')
-      },
-      {
-        id: '14',
-        name: 'Gabriela Sánchez',
-        identification: '0901234567',
-        identificationType: 'CEDULA',
-        email: 'gabriela.sanchez@email.com',
-        phone: '0910987654',
-        address: 'Conjunto Habitacional 456, Ambato',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-20'),
-        createdAt: new Date('2022-12-01'),
-        updatedAt: new Date('2024-02-20')
-      },
-      {
-        id: '15',
-        name: 'Auto Parts Plus',
-        identification: '7890123450017',
-        identificationType: 'RUC',
-        email: 'parts@autopartsplus.com',
-        phone: '0176543210',
-        address: 'Zona Franca 789, Manta',
-        type: 'EMPRESA',
-        status: 'ACTIVO',
-        lastInvoiceDate: new Date('2024-02-22'),
-        createdAt: new Date('2022-11-10'),
-        updatedAt: new Date('2024-02-22')
+      error: (error) => {
+        console.error('Error loading clients:', error);
+        this.isLoading = false;
+        // Fallback to empty state
+        this.clients = [];
+        this.currentClientPage = null;
+        this.totalPages = 1;
+        this.totalElements = 0;
+        this.totalClientsCount = 0;
+        this.activeClientsCount = 0;
+        this.inactiveClientsCount = 0;
       }
-    ];
+    });
   }
 
   // Filtering and search
-  filterClients(): void {
-    let filtered = [...this.clients];
+  onSearchChange(): void {
+    // Reset to first page when searching
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
+  }
 
-    // Text search
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(client =>
-        client.name.toLowerCase().includes(term) ||
-        client.email.toLowerCase().includes(term) ||
-        client.identification.toLowerCase().includes(term) ||
-        client.phone?.toLowerCase().includes(term) ||
-        client.address?.toLowerCase().includes(term)
-      );
-    }
-
-    // Type filter
-    if (this.selectedType) {
-      filtered = filtered.filter(client => client.type === this.selectedType);
-    }
-
-    // Status filter
-    if (this.selectedStatus) {
-      filtered = filtered.filter(client => client.status === this.selectedStatus);
-    }
-
-    this.filteredClients = filtered;
-    this.updatePagination();
+  onFilterChange(): void {
+    // Reset to first page when filtering
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedType = '';
+    this.selectedIdentification = '';
     this.selectedStatus = '';
-    this.filterClients();
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
   }
 
-  // Pagination
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredClients.length / this.itemsPerPage);
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = 1;
-    }
-  }
-
+  // Pagination - now server-side
   previousPage(): void {
-    if (this.currentPage > 1) {
+    if (this.currentPage > 0) {
       this.currentPage--;
+      this.loadClients(this.currentPage);
     }
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages) {
+    if (this.currentPage < this.totalPages - 1) {
       this.currentPage++;
+      this.loadClients(this.currentPage);
     }
   }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+    // Convert from 1-based to 0-based for API
+    const apiPage = page - 1;
+    if (apiPage >= 0 && apiPage < this.totalPages) {
+      this.currentPage = apiPage;
+      this.loadClients(this.currentPage);
     }
   }
 
   getPageNumbers(): number[] {
     const pages: number[] = [];
     const maxVisiblePages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    // Convert to 1-based for display
+    const currentPage1Based = this.currentPage + 1;
+    
+    let startPage = Math.max(1, currentPage1Based - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
@@ -395,23 +202,17 @@ export class ClientsComponent implements OnInit {
       this.clientForm.patchValue({
         name: client.name,
         identification: client.identification,
-        identificationType: client.identificationType,
+        typeIdentification: client.typeIdentification,
         email: client.email,
-        phone: client.phone,
-        address: client.address,
-        type: client.type,
-        status: client.status
+        phone: client.phone
       });
     } else {
       this.clientForm.reset({
         name: '',
         identification: '',
-        identificationType: 'CEDULA',
+        typeIdentification: 'CEDULA',
         email: '',
-        phone: '',
-        address: '',
-        type: 'PERSONA_NATURAL',
-        status: 'ACTIVO'
+        phone: ''
       });
     }
   }
@@ -426,45 +227,60 @@ export class ClientsComponent implements OnInit {
   saveClient(): void {
     if (this.clientForm.valid) {
       const formData = this.clientForm.value;
-      const now = new Date();
+      this.isSaving = true;
 
       // Validar identificación según tipo
       if (!this.validateIdentification(formData.identification, formData.identificationType)) {
-        alert('La identificación no es válida para el tipo seleccionado.');
-        return;
-      }
-
-      // Verificar si ya existe un cliente con la misma identificación (excepto cuando editamos)
-      if (!this.editingClient && this.clients.some(c => c.identification === formData.identification)) {
-        alert('Ya existe un cliente con esta identificación.');
+        this.isSaving = false;
         return;
       }
 
       if (this.editingClient) {
         // Update existing client
-        const index = this.clients.findIndex(c => c.id === this.editingClient!.id);
-        if (index !== -1) {
-          this.clients[index] = {
-            ...this.editingClient,
-            ...formData,
-            updatedAt: now
-          };
-          console.log('Cliente actualizado:', this.clients[index]);
-        }
+        const updatedClient: Client = {
+          ...this.editingClient,
+          name: formData.name,
+          identification: formData.identification,
+          typeIdentification: formData.typeIdentification,
+          email: formData.email,
+          phone: formData.phone
+        };
+
+        this.clientService.updateClient(this.editingClient.id!, updatedClient).subscribe({
+          next: (updatedClientResponse) => {
+            // Reload current page to get updated data
+            this.loadClients(this.currentPage);
+            this.closeClientModal();
+            this.isSaving = false;
+          },
+          error: (error) => {
+            console.error('Error updating client:', error);
+            this.isSaving = false;
+          }
+        });
       } else {
         // Create new client
         const newClient: Client = {
-          id: this.generateClientId(),
-          ...formData,
-          createdAt: now,
-          updatedAt: now
+          name: formData.name,
+          identification: formData.identification,
+          typeIdentification: formData.typeIdentification,
+          email: formData.email,
+          phone: formData.phone
         };
-        this.clients.push(newClient);
-        console.log('Cliente creado:', newClient);
-      }
 
-      this.filterClients();
-      this.closeClientModal();
+        this.clientService.createClient(newClient).subscribe({
+          next: (createdClient) => {
+            // Reload current page to get updated data
+            this.loadClients(this.currentPage);
+            this.closeClientModal();
+            this.isSaving = false;
+          },
+          error: (error) => {
+            console.error('Error creating client:', error);
+            this.isSaving = false;
+          }
+        });
+      }
     } else {
       this.markFormGroupTouched();
     }
@@ -497,45 +313,64 @@ export class ClientsComponent implements OnInit {
   }
 
   editClient(client: Client): void {
-    this.openClientModal(client);
+    if (client.id) {
+      this.isLoading = true;
+      this.clientService.getClient(client.id).subscribe({
+        next: (freshClient) => {
+          this.openClientModal(freshClient);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error fetching client for edit:', error);
+          // Fallback to using the provided client data
+          this.openClientModal(client);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.openClientModal(client);
+    }
   }
 
   viewClient(client: Client): void {
     // Navigate to client detail view or open detail modal
     console.log('Ver detalles del cliente:', client);
     // Aquí podrías navegar a una vista de detalle o abrir un modal con más información
-    alert(`Detalles del cliente:\n\nNombre: ${client.name}\nEmail: ${client.email}\nIdentificación: ${client.identification}\nEstado: ${client.status}`);
   }
 
   deleteClient(client: Client): void {
     const confirmMessage = `¿Estás seguro de que deseas eliminar el cliente "${client.name}"?\n\nEsta acción no se puede deshacer.`;
-    if (confirm(confirmMessage)) {
-      this.clients = this.clients.filter(c => c.id !== client.id);
-      this.filterClients();
-      console.log('Cliente eliminado:', client.id);
+    if (confirm(confirmMessage) && client.id) {
+      this.isLoading = true;
+      this.clientService.deleteClient(client.id).subscribe({
+        next: () => {
+          // Reload current page to get updated data
+          this.loadClients(this.currentPage);
+          this.isLoading = false;
+          console.log('Cliente eliminado:', client.id);
+        },
+        error: (error) => {
+          console.error('Error deleting client:', error);
+          this.isLoading = false;
+        }
+      });
     }
   }
 
   // Utility functions
   trackByClientId(index: number, client: Client): string {
-    return client.id;
+    return client.id?.toString() || `client-${index}`;
   }
 
   exportClients(): void {
     try {
-      const dataToExport = this.filteredClients.map(client => ({
+      const dataToExport = this.clients.map((client: Client) => ({
         ID: client.id,
         Nombre: client.name,
-        'Tipo Identificación': client.identificationType,
+        'Tipo Identificación': client.typeIdentification,
         Identificación: client.identification,
         Email: client.email,
-        Teléfono: client.phone || '',
-        Dirección: client.address || '',
-        Tipo: client.type === 'PERSONA_NATURAL' ? 'Persona Natural' : 'Empresa',
-        Estado: client.status === 'ACTIVO' ? 'Activo' : 'Inactivo',
-        'Última Factura': client.lastInvoiceDate ? client.lastInvoiceDate.toLocaleDateString('es-ES') : 'Sin facturas',
-        'Fecha Creación': client.createdAt.toLocaleDateString('es-ES'),
-        'Última Actualización': client.updatedAt.toLocaleDateString('es-ES')
+        Teléfono: client.phone || ''
       }));
 
       const csvContent = this.convertToCSV(dataToExport);
@@ -543,7 +378,6 @@ export class ClientsComponent implements OnInit {
       console.log('Clientes exportados exitosamente');
     } catch (error) {
       console.error('Error al exportar clientes:', error);
-      alert('Error al exportar los clientes. Por favor, inténtalo de nuevo.');
     }
   }
 
@@ -585,15 +419,6 @@ export class ClientsComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
     }
-  }
-
-  // Additional utility methods
-  getClientStatusColor(status: string): string {
-    return status === 'ACTIVO' ? '#10b981' : '#ef4444';
-  }
-
-  getClientTypeIcon(type: string): string {
-    return type === 'EMPRESA' ? '🏢' : '👤';
   }
 
   formatDate(date: Date): string {

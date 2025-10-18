@@ -3,20 +3,34 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthErrorHandlerService } from './auth-error-handler.service';
+import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 
 /**
  * AuthErrorInterceptor
- * Interceptor que maneja errores específicos de autenticación
+ * Interceptor que maneja errores específicos de autenticación y redirige cuando el token expira
  */
 @Injectable()
 export class AuthErrorInterceptor implements HttpInterceptor {
 
-  constructor(private authErrorHandler: AuthErrorHandlerService) {}
+  constructor(
+    private authErrorHandler: AuthErrorHandlerService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        // Solo manejar errores de endpoints de autenticación
+        // Manejar errores 401 (Unauthorized) - token expirado o inválido
+        if (error.status === 401) {
+          console.warn('AuthErrorInterceptor - Token expired or invalid (401), redirecting to login');
+          this.authService.logoutLocal(); // Limpiar datos de autenticación
+          this.router.navigate(['/auth/login']);
+          return throwError(() => error);
+        }
+
+        // Solo manejar errores de endpoints de autenticación para otros códigos
         if (this.isAuthEndpoint(request.url)) {
           const customMessage = this.authErrorHandler.handleAuthError(error);
 

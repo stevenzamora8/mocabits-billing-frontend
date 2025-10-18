@@ -1,3 +1,9 @@
+/* Iconos para logout (usando CSS si no hay librería de iconos) */
+.icon-logout::before {
+  content: "🚪";
+  font-style: normal;
+  font-size: 14px;
+}
 /* ===== SETUP COMPONENT STYLES ===== */
 
 .setup-container {
@@ -16,7 +22,6 @@
   --input-focus-color: rgba(59, 130, 246, 0.15);
   --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   --transition-speed: 0.3s;
-}
 
 /* Fondo decorativo */
 .setup-container::before {
@@ -116,6 +121,8 @@
   gap: 12px;
 }
 
+/* === BOTÓN LOGOUT MEJORADO === */
+/* ===== BOTÓN LOGOUT ORIGINAL ===== */
 .btn-logout {
   display: inline-flex;
   align-items: center;
@@ -137,7 +144,6 @@
   position: relative;
   overflow: hidden;
 }
-
 .btn-logout::before {
   content: '';
   position: absolute;
@@ -151,7 +157,6 @@
     transparent);
   transition: left 0.5s ease;
 }
-
 .btn-logout:hover {
   background: linear-gradient(135deg, 
     rgba(239, 68, 68, 0.15) 0%, 
@@ -163,35 +168,23 @@
     0 4px 12px rgba(239, 68, 68, 0.2),
     0 2px 4px rgba(239, 68, 68, 0.1);
 }
-
 .btn-logout:hover::before {
   left: 100%;
 }
-
 .btn-logout:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.15);
 }
-
 .btn-logout i {
   font-size: 16px;
   transition: transform 0.3s ease;
 }
-
 .btn-logout:hover i {
   transform: rotate(-5deg);
 }
-
 .btn-logout span {
   font-weight: 600;
   letter-spacing: 0.025em;
-}
-
-/* Iconos para logout (usando CSS si no hay librería de iconos) */
-.icon-logout::before {
-  content: "🚪";
-  font-style: normal;
-  font-size: 14px;
 }
 
 /* ===== PROGRESS BAR ===== */
@@ -304,23 +297,26 @@
 
 /* ===== STEP CONTENT ===== */
 .step-content {
-  background: white;
-  border-radius: 20px;
-  padding: 32px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
   margin: 0 auto 24px auto;
   max-width: 800px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+  border: none;
   min-height: 400px;
   position: relative;
   z-index: 1;
   transform: translateY(0);
-  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  transition: box-shadow 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .step-content:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.13);
 }
 
 .step-header {
@@ -373,8 +369,8 @@
 
 .form-row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
 
@@ -391,14 +387,18 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.5rem;
+  margin-bottom: 0.125rem;
+  width: 100%;
 }
 
 .form-group label {
   font-weight: 600;
   color: #374151;
   font-size: 0.875rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
+  text-align: left;
+  display: block;
 }
 
 /* ===== FORM INPUTS - MISMO ESTILO QUE CREATE USER ===== */
@@ -427,7 +427,7 @@
 .setup-input {
   width: 100% !important;
   height: clamp(2.25rem, 5vh, 3rem) !important;
-  padding: 0 1rem 0 2.75rem !important; /* Padding extra a la izquierda para el icono */
+  padding: 0 3rem 0 1rem !important;
   border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: clamp(0.875rem, 2.5vh, 1rem) !important;
@@ -1155,15 +1155,14 @@ select.setup-input {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  gap: 1rem;
+  background: transparent;
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 0;
   margin: 0 auto;
   max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  border: none;
 }
 
 .navigation-buttons .btn-secondary {
@@ -1173,14 +1172,14 @@ select.setup-input {
 .btn-secondary,
 .btn-primary,
 .btn-success {
-  width: auto;
+  width: 100%;
   min-width: 120px;
   height: clamp(2.25rem, 5vh, 3rem);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 16px 32px;
+  padding: 0.75rem 1.5rem;
   border-radius: 12px;
   font-size: clamp(0.875rem, 2.5vh, 1rem);
   font-weight: 600;
@@ -1189,10 +1188,14 @@ select.setup-input {
   text-decoration: none;
   outline: none;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.10);
+  border: none;
 }
 
 .btn-success {
-  min-width: 200px;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+}
 }
 
 /* Alineación interna de botones */

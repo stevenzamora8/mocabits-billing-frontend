@@ -362,34 +362,38 @@ export class AuthService {
    * Crear un nuevo usuario
    * POST /security/v1/users
    */
+  /**
+   * Verificar si el usuario está autenticado (tiene token válido)
+   */
+  isAuthenticated(): boolean {
+    const token = this.getAccessToken();
+    return !!token;
+  }
+
+  /**
+   * Crear un nuevo usuario
+   * POST /security/v1/users
+   * userData debe tener: email, password, firstName, lastName
+   */
   createUser(userData: {
     email: string;
+    password: string;
     firstName: string;
     lastName: string;
-    password: string;
   }): Observable<any> {
     const url = `${environment.apiBaseUrl}/security/v1/users`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-
-    console.log('AuthService - Creating new user:', { 
-      email: userData.email, 
-      firstName: userData.firstName, 
-      lastName: userData.lastName 
-    });
-
+    console.log('AuthService - Creating new user (payload API):', userData);
     return this.http.post(url, userData, { headers }).pipe(
       tap((response: any) => {
         console.log('AuthService - User creation successful:', response);
         return response;
       }),
       catchError((error: any) => {
-        // Usar el manejador de errores personalizado para creación de usuario
         const customMessage = this.authErrorHandler.handleAuthError(error);
         console.error('AuthService - User creation error:', customMessage);
-
-        // Crear un nuevo error con el mensaje personalizado
         const customError = {
           ...error,
           error: {
@@ -399,7 +403,6 @@ export class AuthService {
             originalCode: error.error?.code
           }
         };
-
         return throwError(() => customError);
       })
     );
