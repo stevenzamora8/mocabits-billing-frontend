@@ -363,7 +363,7 @@
   background: #f1f5f9;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  display: inline-block;
+  display: block;
 }
 
 .id-type {
@@ -372,7 +372,7 @@
   background: #f1f5f9;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  display: inline-block;
+  display: block;
   margin-top: 0.25rem;
 }
 
@@ -712,7 +712,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 15000;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease;
 }

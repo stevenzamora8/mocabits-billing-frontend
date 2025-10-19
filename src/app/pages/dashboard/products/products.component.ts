@@ -2,24 +2,44 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ProductsService, Product, ProductCategory } from '../../../services/products.service';
+import { ProductsService } from '../../../services/products.service';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
+import { SelectComponent } from '../../../shared/components/ui/select/select.component';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+
+// Nuevo modelo de producto para el formulario
+export interface ProductFormModel {
+  id?: string;
+  name: string;
+  mainCode: string;
+  auxiliaryCode?: string;
+  description: string;
+  unitPrice: number;
+  quantity: number;
+  discount: number;
+  vat: number;
+  totalWithoutTax: number;
+}
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InputComponent, SelectComponent, ButtonComponent],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
 export class ProductsComponent implements OnInit, OnDestroy {
-  products: Product[] = [];
-  categories: ProductCategory[] = [];
-  filteredProducts: Product[] = [];
+  filterName: string = '';
+  filterMainCode: string = '';
+  filterAuxiliaryCode: string = '';
+  isLoading: boolean = false;
+  products: ProductFormModel[] = [];
+  filteredProducts: ProductFormModel[] = [];
 
   // Modal and form state
   showProductModal = false;
   isEditing = false;
-  currentProduct: Product = this.createEmptyProduct();
+  currentProduct: ProductFormModel = this.createEmptyProduct();
 
   // Filters and search
   searchTerm = '';
@@ -31,6 +51,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Make Math available in template
   readonly Math = Math;
+
+  // Icon strings for buttons
+  readonly clearIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2a1 1 0 0 0-1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 0 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 1 14.001 13H11a1 1 0 0 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z"/></svg>`;
 
   private subscriptions = new Subscription();
 
@@ -44,56 +67,69 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private loadData() {
-    // Subscribe to products
-    this.subscriptions.add(
-      this.productsService.products$.subscribe(products => {
-        this.products = products;
-        this.filterProducts();
-      })
-    );
-
-    // Subscribe to categories
-    this.subscriptions.add(
-      this.productsService.categories$.subscribe(categories => {
-        this.categories = categories;
-      })
-    );
+  clearProductFilters() {
+    this.filterName = '';
+    this.filterMainCode = '';
+    this.filterAuxiliaryCode = '';
+    this.loadData(); // Reload all products when clearing filters
   }
 
-  private createEmptyProduct(): Product {
+  private loadData() {
+    this.isLoading = true;
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      this.productsService.getProductsApi({}, token).subscribe({
+        next: (response: any) => {
+          const productsData = Array.isArray(response.content) ? response.content : [];
+          this.products = productsData.map((p: any) => ({
+            id: p.id,
+            name: p.name || '',
+            mainCode: p.mainCode,
+            auxiliaryCode: p.auxiliaryCode,
+            description: p.description,
+            unitPrice: p.unitPrice,
+            quantity: p.quantity,
+            discount: p.discount,
+            vat: p.vat,
+            totalWithoutTax: p.totalWithoutTax
+          }));
+          this.filteredProducts = [...this.products]; // Initialize filtered products with all products
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading products:', err);
+          alert('Error al cargar productos.');
+          this.isLoading = false;
+        }
+      });
+    } else {
+      alert('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.');
+      this.isLoading = false;
+    }
+  }
+
+  private createEmptyProduct(): ProductFormModel {
     return {
-      id: '',
       name: '',
+      mainCode: '',
+      auxiliaryCode: '',
       description: '',
-      price: 0,
-      category: '',
-      sku: '',
-      stock: 0,
-      minStock: 1,
-      unit: '',
-      taxRate: 16,
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      unitPrice: 0,
+      quantity: 1,
+      discount: 0,
+      vat: 12,
+      totalWithoutTax: 0
     };
   }
 
   // Computed properties
-  get activeProducts(): Product[] {
-    return this.products.filter(p => p.isActive);
-  }
-
-  get lowStockProducts(): Product[] {
-    return this.products.filter(p => p.stock <= p.minStock);
-  }
-
+  // Métodos de ejemplo para stats (puedes ajustar según lógica deseada)
   get totalValue(): number {
-    return this.products.reduce((total, product) => total + (product.price * product.stock), 0);
+    return this.products.reduce((total, product) => total + (product.unitPrice * product.quantity), 0);
   }
 
   // Pagination properties
-  get paginatedProducts(): Product[] {
+  get paginatedProducts(): ProductFormModel[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredProducts.slice(startIndex, endIndex);
@@ -118,10 +154,43 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.showProductModal = true;
   }
 
-  editProduct(product: Product) {
-    this.isEditing = true;
-    this.currentProduct = { ...product };
-    this.showProductModal = true;
+  editProduct(product: ProductFormModel) {
+    if (!product.id) {
+      alert('El producto no tiene un ID válido.');
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.');
+      return;
+    }
+
+    this.isLoading = true;
+    this.productsService.getProductByIdApi(product.id, token).subscribe({
+      next: (response: any) => {
+        this.isEditing = true;
+        this.currentProduct = {
+          id: response.id,
+          name: response.name || '',
+          mainCode: response.mainCode,
+          auxiliaryCode: response.auxiliaryCode,
+          description: response.description,
+          unitPrice: response.unitPrice,
+          quantity: response.quantity,
+          discount: response.discount,
+          vat: response.vat,
+          totalWithoutTax: response.totalWithoutTax
+        };
+        this.showProductModal = true;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al obtener producto:', err);
+        alert('Error al cargar los datos del producto. Por favor, inténtalo de nuevo.');
+        this.isLoading = false;
+      }
+    });
   }
 
   closeProductModal() {
@@ -131,49 +200,150 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // CRUD operations
   saveProduct() {
-    if (this.isEditing) {
-      this.productsService.updateProduct(this.currentProduct.id, this.currentProduct);
-    } else {
-      this.productsService.addProduct(this.currentProduct);
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.');
+      return;
     }
-    this.closeProductModal();
+
+    if (this.isEditing && this.currentProduct.id) {
+      // Update existing product
+      this.productsService.updateProductApi(this.currentProduct.id, this.currentProduct, token).subscribe({
+        next: (response) => {
+          this.closeProductModal();
+          alert('Producto actualizado exitosamente.');
+          this.loadData(); // Reload products to show updated data
+        },
+        error: (err) => {
+          console.error('Error al actualizar producto:', err);
+          alert('Error al actualizar el producto. Por favor, verifica los datos e inténtalo de nuevo.');
+        }
+      });
+    } else {
+      // Create new product
+      this.productsService.createProductApi(this.currentProduct, token).subscribe({
+        next: (response) => {
+          this.closeProductModal();
+          alert('Producto creado exitosamente.');
+          this.loadData(); // Reload products to show new product
+        },
+        error: (err) => {
+          console.error('Error al crear producto:', err);
+          alert('Error al crear el producto. Por favor, verifica los datos e inténtalo de nuevo.');
+        }
+      });
+    }
   }
 
-  deleteProduct(product: Product) {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
-      this.productsService.deleteProduct(product.id);
+  // Eliminar producto
+  deleteProduct(product: ProductFormModel) {
+    if (!product.id) {
+      alert('El producto no tiene un ID válido.');
+      return;
+    }
+
+    if (confirm(`¿Estás seguro de que quieres eliminar el producto "${product.name}"?`)) {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        alert('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.');
+        return;
+      }
+
+      this.productsService.deleteProductApi(product.id, token).subscribe({
+        next: (response) => {
+          alert('Producto eliminado exitosamente.');
+          this.loadData(); // Reload products to remove deleted product
+        },
+        error: (err) => {
+          console.error('Error al eliminar producto:', err);
+          alert('Error al eliminar el producto. Por favor, inténtalo de nuevo.');
+        }
+      });
     }
   }
 
   // Filter and search methods
   filterProducts() {
+    // If filtering by name, make API call
+    if (this.filterName.trim()) {
+      this.loadProductsWithFilters();
+      return;
+    }
+
+    // For other filters, use client-side filtering
     let filtered = this.products;
 
-    // Filter by search term
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
+    // Filtrar por código principal
+    if (this.filterMainCode.trim()) {
+      const mainCodeTerm = this.filterMainCode.toLowerCase();
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(term) ||
-        product.description.toLowerCase().includes(term) ||
-        product.sku.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term)
+        product.mainCode && product.mainCode.toLowerCase().includes(mainCodeTerm)
       );
     }
 
-    // Filter by category
-    if (this.selectedCategory) {
-      filtered = filtered.filter(product => product.category === this.selectedCategory);
+    // Filtrar por código auxiliar
+    if (this.filterAuxiliaryCode.trim()) {
+      const auxiliaryCodeTerm = this.filterAuxiliaryCode.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.auxiliaryCode && product.auxiliaryCode.toLowerCase().includes(auxiliaryCodeTerm)
+      );
+    }
+
+    // Filtrar por término de búsqueda general (si existe)
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        (product.mainCode && product.mainCode.toLowerCase().includes(term)) ||
+        (product.auxiliaryCode && product.auxiliaryCode.toLowerCase().includes(term)) ||
+        (product.description && product.description.toLowerCase().includes(term))
+      );
     }
 
     this.filteredProducts = filtered;
-    this.currentPage = 1; // Reset to first page when filtering
+    this.currentPage = 1;
   }
 
-  filterByCategory(category: string) {
-    this.selectedCategory = category;
-    this.currentPage = 1; // Reset to first page when filtering
-    this.filterProducts();
+  private loadProductsWithFilters() {
+    this.isLoading = true;
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.');
+      this.isLoading = false;
+      return;
+    }
+
+    const filters: any = {};
+    if (this.filterName.trim()) {
+      filters.name = this.filterName.trim();
+    }
+
+    this.productsService.getProductsApi(filters, token).subscribe({
+      next: (response: any) => {
+        const productsData = Array.isArray(response.content) ? response.content : [];
+        this.filteredProducts = productsData.map((p: any) => ({
+          id: p.id,
+          name: p.name || '',
+          mainCode: p.mainCode,
+          auxiliaryCode: p.auxiliaryCode,
+          description: p.description,
+          unitPrice: p.unitPrice,
+          quantity: p.quantity,
+          discount: p.discount,
+          vat: p.vat,
+          totalWithoutTax: p.totalWithoutTax
+        }));
+        this.currentPage = 1;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error filtering products:', err);
+        alert('Error al filtrar productos.');
+        this.isLoading = false;
+      }
+    });
   }
+
+  // El filtrado por categoría ya no aplica
 
   // Pagination methods
   goToPage(page: number) {
