@@ -53,6 +53,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // Make Math available in template
   readonly Math = Math;
 
+  // Icon for clear filters button
+  clearIcon = 'M6 18L18 6M6 6l12 12';
+
   // Current filters for pagination
   private currentFilters: any = {};
 

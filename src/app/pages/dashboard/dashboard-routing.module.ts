@@ -27,7 +27,14 @@ const routes: Routes = [
       {
         path: 'invoices',
         loadComponent: () => import('./invoices/invoices.component').then(m => m.InvoicesComponent),
-        title: 'Dashboard - Facturas'
+        title: 'Dashboard - Facturas',
+        children: [
+          {
+            path: 'create',
+            loadComponent: () => import('./invoices/create-invoice/create-invoice.component').then(m => m.CreateInvoiceComponent),
+            title: 'Dashboard - Crear Factura'
+          }
+        ]
       },
       {
         path: 'products',

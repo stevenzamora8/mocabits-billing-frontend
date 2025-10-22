@@ -60,16 +60,16 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   private clearUserSession(): void {
     const hasToken = this.authService.getAccessToken();
     const refreshToken = localStorage.getItem('refreshToken');
-    
+
     console.log('Login - clearUserSession ejecutado');
     console.log('Login - hasToken:', !!hasToken);
     console.log('Login - hasRefreshToken:', !!refreshToken);
     console.log('Login - accessToken preview:', hasToken ? hasToken.substring(0, 20) + '...' : 'null');
-    
+
     if (hasToken) {
       console.log('Login - Cerrando sesión automáticamente al acceder al login');
       console.log('Login - Invocando authService.logout()...');
-      
+
       // Cerrar sesión con el servidor
       this.authService.logout().subscribe({
         next: (response) => {
@@ -112,11 +112,11 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  onEmailInput(): void {
+  onPasswordInput(): void {
     this.clearAlert();
   }
 
-  onPasswordInput(): void {
+  onEmailInput(): void {
     this.clearAlert();
   }
 
@@ -132,37 +132,52 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   }
 
   onLogin(): void {
+    console.log('=== LOGIN ATTEMPT STARTED ===');
+    console.log('Login form valid:', this.loginForm.valid);
+    console.log('Login form value:', this.loginForm.value);
+
     if (this.loginForm.invalid) {
+      console.log('Login form is invalid, showing alert');
       this.showAlert('Por favor complete todos los campos correctamente', 'warning');
       return;
     }
 
+    console.log('Setting loading to true');
     this.isLoading = true;
     this.clearAlert();
 
     const { email, password } = this.loginForm.value;
+    console.log('Attempting login with email:', email);
+
     this.authService.login(email, password).subscribe({
       next: (result) => {
-        console.log('Login successful', result);
-        
+        console.log('=== LOGIN SUCCESSFUL ===');
+        console.log('Login result:', result);
+
         // Verificar el estado de setup del usuario para determinar a dónde redirigir
+        console.log('Checking setup status...');
         this.plansService.getSetupStatus().subscribe({
           next: (setupStatus) => {
-            console.log('User setup status:', setupStatus);
-            
+            console.log('Setup status received:', setupStatus);
+
             const { hasActivePlan, hasCompanyInfo } = setupStatus;
-            
+
             this.showSuccessMessage = true;
-            
+            console.log('Showing success message, will redirect in 2 seconds');
+
             // Redirigir basado en el estado de setup - FLUJO: Setup primero, luego Plan
             setTimeout(() => {
+              console.log('Redirecting based on setup status...');
               if (!hasCompanyInfo) {
+                console.log('Redirecting to setup');
                 // Si no tiene información de compañía, ir al setup primero
                 this.router.navigate(['/onboarding/setup']);
               } else if (!hasActivePlan) {
+                console.log('Redirecting to plan selection');
                 // Si tiene compañía pero no plan, ir a selección de plan
                 this.router.navigate(['/onboarding/plan-selection']);
               } else {
+                console.log('Redirecting to dashboard');
                 // Usuario completamente configurado (tiene compañía Y plan) - ir al dashboard
                 this.router.navigate(['/dashboard']);
               }
@@ -170,6 +185,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
           },
           error: (setupError) => {
             console.warn('Could not get user setup status:', setupError);
+            console.log('Defaulting to dashboard redirect');
             // En caso de error, ir al dashboard por defecto
             this.showSuccessMessage = true;
             setTimeout(() => {
@@ -179,11 +195,17 @@ export class LoginFormComponent implements OnInit, OnDestroy {
         });
       },
       error: (error: any) => {
-        console.error('Login error', error);
+        console.error('=== LOGIN ERROR ===');
+        console.error('Login error details:', error);
+        console.error('Error status:', error.status);
+        console.error('Error message:', error.message);
+        console.error('Error response:', error.error);
+
         this.showAlert(error.error?.message || error.message || 'Error al iniciar sesión', 'danger');
         this.isLoading = false; // Reset loading state on error
       },
       complete: () => {
+        console.log('Login observable completed');
         this.isLoading = false;
       }
     });

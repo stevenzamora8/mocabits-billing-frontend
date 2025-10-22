@@ -15,7 +15,7 @@
     <p class="welcome-subtitle">Inicia sesión en tu cuenta</p>
   </div>
 
-  <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+  <form class="auth-form" [formGroup]="loginForm">
     <div class="form-group">
       <app-input
         formControlName="email"
@@ -55,15 +55,16 @@
 
     <div class="form-actions">
       <app-button
-        type="submit"
+        type="button"
         variant="primary"
         size="lg"
-        [disabled]="loginForm.invalid"
+        [disabled]="loginForm.invalid || isLoading"
         [loading]="isLoading"
         [fullWidth]="true"
         [icon]="loginIcon"
         iconPosition="left"
-        [showIconWhenLoading]="false">
+        [showIconWhenLoading]="false"
+        (click)="onLogin()">
         <span *ngIf="!isLoading">Iniciar Sesión</span>
         <span *ngIf="isLoading">Validando credenciales...</span>
       </app-button>

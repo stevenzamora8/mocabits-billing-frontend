@@ -70,6 +70,9 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
   pendingAction: (() => void) | null = null;
 
+  // Flag to prevent multiple setup submissions
+  private isSubmittingSetup = false;
+
 
 
   accountingObligationOptions: SelectOption[] = [
@@ -562,11 +565,18 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async finishSetup() {
+    // Prevent multiple submissions
+    if (this.isSubmittingSetup || this.isLoading) {
+      console.log('Setup submission already in progress, ignoring duplicate call');
+      return;
+    }
+
     if (!this.validateAllSteps()) {
       this.showValidationErrors();
       return;
     }
 
+    this.isSubmittingSetup = true;
     this.isLoading = true;
 
     try {
@@ -579,6 +589,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         razonSocial: companyData.razonSocial,
         nombreComercial: companyData.nombreComercial,
         ruc: companyData.ruc,
+        codDoc: '01', // Código de documento para Factura (normativa SRI Ecuador)
         dirMatriz: companyData.dirMatriz,
         obligadoContabilidad: companyData.obligadoContabilidad,
         contribuyenteEspecial: 'NO',
@@ -624,6 +635,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       this.showValidationErrors();
     } finally {
       this.isLoading = false;
+      this.isSubmittingSetup = false;
     }
   }
 
@@ -712,7 +724,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   canFinish(): boolean {
-    return this.validateAllSteps() && !this.isLoading;
+    return this.validateAllSteps() && !this.isLoading && !this.isSubmittingSetup;
   }
 
 
