@@ -1,19 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+
+// Services
+import { InvoicesService, Invoice, InvoiceResponse, InvoiceSummary } from '../../../services/invoices.service';
+import { AuthService } from '../../../services/auth.service';
 
 // Interfaces
-interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  clientName: string;
-  issueDate: string;
-  dueDate: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
-  total: number;
-}
-
 interface InvoiceItem {
   product: any;
   quantity: number;
@@ -30,76 +25,98 @@ interface InvoiceItem {
   templateUrl: './invoices.component.html',
   styleUrls: ['./invoices.component.css']
 })
-export class InvoicesComponent implements OnInit {
-  // Mock data
-  invoices: Invoice[] = [
-    {
-      id: '1',
-      invoiceNumber: 'INV-2024-001',
-      clientName: 'Empresa ABC S.A.',
-      issueDate: '2024-01-15',
-      dueDate: '2024-02-15',
-      status: 'paid',
-      total: 2500.00
-    },
-    {
-      id: '2',
-      invoiceNumber: 'INV-2024-002',
-      clientName: 'Tech Solutions Ltd.',
-      issueDate: '2024-01-20',
-      dueDate: '2024-02-20',
-      status: 'sent',
-      total: 1800.50
-    },
-    {
-      id: '3',
-      invoiceNumber: 'INV-2024-003',
-      clientName: 'Consulting Group',
-      issueDate: '2024-01-25',
-      dueDate: '2024-02-25',
-      status: 'overdue',
-      total: 3200.75
-    },
-    {
-      id: '4',
-      invoiceNumber: 'INV-2024-004',
-      clientName: 'Digital Agency',
-      issueDate: '2024-02-01',
-      dueDate: '2024-03-01',
-      status: 'draft',
-      total: 950.25
-    },
-    {
-      id: '5',
-      invoiceNumber: 'INV-2024-005',
-      clientName: 'Manufacturing Corp',
-      issueDate: '2024-02-05',
-      dueDate: '2024-03-05',
-      status: 'paid',
-      total: 4200.00
-    }
-  ];
-
-  stats = {
-    total: 5,
-    draft: 1,
-    sent: 1,
-    paid: 2,
-    overdue: 1
+export class InvoicesComponent implements OnInit, OnDestroy {
+  // API data
+  invoices: Invoice[] = [];
+  stats: InvoiceSummary = {
+    total: 0,
+    authorized: 0,
+    pending: 0,
+    rejected: 0
   };
+
+  // Pagination
+  currentPage: number = 0;
+  pageSize: number = 5;
+  totalPages: number = 0;
+  totalElements: number = 0;
+
+  // Loading and error states
+  isLoading: boolean = false;
+  error: string | null = null;
 
   // Filter properties
   searchTerm: string = '';
   selectedStatus: string = '';
+  startDate: string = '';
+  endDate: string = '';
   filteredInvoices: Invoice[] = [];
 
-  constructor() {
+  // Unsubscribe subject
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private invoicesService: InvoicesService,
+    private authService: AuthService
+  ) {
     this.filteredInvoices = [...this.invoices];
   }
 
   ngOnInit(): void {
-    // Initialize filters
-    this.applyFilters();
+    this.loadInvoices();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadInvoices(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    const token = this.authService.getAccessToken();
+    if (!token) {
+      this.error = 'No se encontró token de autenticación';
+      this.isLoading = false;
+      return;
+    }
+
+    const params: any = {
+      page: this.currentPage,
+      size: this.pageSize,
+      sort: 'issueDate,desc'
+    };
+
+    // Add filters if they exist
+    if (this.selectedStatus) {
+      params.status = this.selectedStatus;
+    }
+    if (this.startDate) {
+      params.startDate = this.startDate;
+    }
+    if (this.endDate) {
+      params.endDate = this.endDate;
+    }
+
+    this.invoicesService.getInvoicesApi(params, token).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response: InvoiceResponse) => {
+        this.invoices = response.data;
+        this.stats = response.summary;
+        this.currentPage = response.pagination.currentPage;
+        this.totalPages = response.pagination.totalPages;
+        this.totalElements = response.pagination.totalElements;
+        this.filteredInvoices = [...this.invoices];
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading invoices:', error);
+        this.error = 'Error al cargar las facturas';
+        this.isLoading = false;
+      }
+    });
   }
 
   // Filter methods
@@ -118,16 +135,21 @@ export class InvoicesComponent implements OnInit {
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedStatus = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.currentPage = 0;
     this.applyFilters();
+    this.loadInvoices();
   }
 
   private applyFilters(): void {
     this.filteredInvoices = this.invoices.filter(invoice => {
       const matchesSearch = !this.searchTerm ||
         invoice.invoiceNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        invoice.clientName.toLowerCase().includes(this.searchTerm.toLowerCase());
+        invoice.clientBusinessName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        invoice.accessKey.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      const matchesStatus = !this.selectedStatus || invoice.status === this.selectedStatus;
+      const matchesStatus = !this.selectedStatus || invoice.receiptStatus === this.selectedStatus;
 
       return matchesSearch && matchesStatus;
     });
@@ -136,43 +158,36 @@ export class InvoicesComponent implements OnInit {
   // Utility methods
   getStatusClass(status: string): string {
     switch (status) {
-      case 'paid': return 'status-paid';
-      case 'sent': return 'status-sent';
-      case 'overdue': return 'status-overdue';
-      case 'draft': return 'status-draft';
+      case 'AUTORIZADO': return 'status-authorized';
+      case 'PENDIENTE': return 'status-pending';
+      case 'RECHAZADO': return 'status-rejected';
+      case 'ANULADO': return 'status-cancelled';
       default: return '';
     }
   }
 
   getStatusBadgeClass(status: string): string {
-    return `status-badge ${status}`;
+    return `status-badge ${status.toLowerCase()}`;
   }
 
   getStatusText(status: string): string {
     switch (status) {
-      case 'paid': return 'Pagada';
-      case 'sent': return 'Enviada';
-      case 'overdue': return 'Vencida';
-      case 'draft': return 'Borrador';
+      case 'AUTORIZADO': return 'Autorizado';
+      case 'PENDIENTE': return 'Pendiente';
+      case 'RECHAZADO': return 'Rechazado';
+      case 'ANULADO': return 'Anulado';
       default: return status;
     }
   }
 
   getStatusLabel(status: string): string {
-    const labels = {
-      draft: 'Borrador',
-      sent: 'Enviada',
-      paid: 'Pagada',
-      overdue: 'Vencida',
-      cancelled: 'Cancelada'
-    };
-    return labels[status as keyof typeof labels] || status;
+    return this.getStatusText(status);
   }
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'USD'
     }).format(amount);
   }
 
@@ -225,6 +240,10 @@ export class InvoicesComponent implements OnInit {
     // Mock implementation
   }
 
+  viewInvoice(invoice: Invoice): void {
+    alert(`Ver detalles de factura ${invoice.invoiceNumber}\nClave de acceso: ${invoice.accessKey}\nEstado: ${this.getStatusText(invoice.receiptStatus)}`);
+  }
+
   editInvoice(invoice: Invoice): void {
     alert(`Editar factura ${invoice.invoiceNumber} próximamente disponible`);
   }
@@ -233,11 +252,39 @@ export class InvoicesComponent implements OnInit {
     alert(`Eliminar factura ${invoice.invoiceNumber} próximamente disponible`);
   }
 
-  viewInvoice(invoice: Invoice): void {
-    alert(`Ver detalles de factura ${invoice.invoiceNumber} próximamente disponible`);
-  }
-
   updateStatus(invoice: Invoice): void {
     alert(`Cambiar estado de factura ${invoice.invoiceNumber} próximamente disponible`);
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+      this.loadInvoices();
+    }
+  }
+
+  getVisiblePages(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+
+    let startPage = Math.max(0, this.currentPage - halfVisible);
+    let endPage = Math.min(this.totalPages - 1, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(0, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  getMaxItemsForPage(): number {
+    return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
   }
 }

@@ -39,8 +39,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-number">{{ stats.paid }}</div>
-        <div class="stat-label">Pagadas</div>
+        <div class="stat-number">{{ stats.authorized }}</div>
+        <div class="stat-label">Autorizadas</div>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-number">{{ stats.sent }}</div>
+        <div class="stat-number">{{ stats.pending }}</div>
         <div class="stat-label">Pendientes</div>
       </div>
     </div>
@@ -63,8 +63,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-number">{{ stats.overdue }}</div>
-        <div class="stat-label">Vencidas</div>
+        <div class="stat-number">{{ stats.rejected }}</div>
+        <div class="stat-label">Rechazadas</div>
       </div>
     </div>
   </div>
@@ -75,7 +75,7 @@
       <input
         type="text"
         class="search-input"
-        placeholder="Buscar por número de factura..."
+        placeholder="Buscar por número de factura, cliente o clave de acceso..."
         [(ngModel)]="searchTerm"
         (input)="onSearchChange()">
     </div>
@@ -85,12 +85,23 @@
         [(ngModel)]="selectedStatus"
         (change)="onFilterChange()">
         <option value="">Todos los estados</option>
-        <option value="draft">Borrador</option>
-        <option value="sent">Enviada</option>
-        <option value="paid">Pagada</option>
-        <option value="overdue">Vencida</option>
-        <option value="cancelled">Cancelada</option>
+        <option value="AUTORIZADO">Autorizado</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="RECHAZADO">Rechazado</option>
+        <option value="ANULADO">Anulado</option>
       </select>
+      <input
+        type="date"
+        class="filter-input"
+        placeholder="Fecha inicio"
+        [(ngModel)]="startDate"
+        (change)="onFilterChange()">
+      <input
+        type="date"
+        class="filter-input"
+        placeholder="Fecha fin"
+        [(ngModel)]="endDate"
+        (change)="onFilterChange()">
     </div>
     <div class="filter-buttons">
       <button
@@ -101,15 +112,33 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando facturas...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="error-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+      </svg>
+    </div>
+    <h3>Error al cargar facturas</h3>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadInvoices()">Reintentar</button>
+  </div>
+
   <!-- Invoices Table -->
-  <div class="table-container">
+  <div class="table-container" *ngIf="!isLoading && !error">
     <table class="invoices-table">
       <thead>
         <tr>
           <th>Número</th>
           <th>Cliente</th>
+          <th>ID Cliente</th>
           <th>Fecha Emisión</th>
-          <th>Fecha Vencimiento</th>
           <th>Total</th>
           <th>Estado</th>
           <th>Acciones</th>
@@ -118,13 +147,13 @@
       <tbody>
         <tr *ngFor="let invoice of filteredInvoices" class="invoice-row">
           <td class="invoice-number">{{ invoice.invoiceNumber }}</td>
-          <td class="client-name">{{ invoice.clientName }}</td>
+          <td class="client-name">{{ invoice.clientBusinessName }}</td>
+          <td class="client-id">{{ invoice.clientIdentification }}</td>
           <td>{{ formatDate(invoice.issueDate) }}</td>
-          <td>{{ formatDate(invoice.dueDate) }}</td>
           <td class="total">{{ formatCurrency(invoice.total) }}</td>
           <td>
-            <span [class]="getStatusBadgeClass(invoice.status)">
-              {{ getStatusLabel(invoice.status) }}
+            <span [class]="getStatusBadgeClass(invoice.receiptStatus)">
+              {{ getStatusLabel(invoice.receiptStatus) }}
             </span>
           </td>
           <td>
@@ -166,15 +195,41 @@
     </div>
   </div>
 
+  <!-- Pagination Controls -->
+  <div class="pagination-container" *ngIf="!isLoading && !error && totalPages > 1">
+    <div class="pagination-info">
+      Mostrando {{ (currentPage * pageSize) + 1 }}-{{ getMaxItemsForPage() }} de {{ totalElements }} facturas
+    </div>
+    <div class="pagination-controls">
+      <button
+        class="btn-secondary pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="goToPage(currentPage - 1)">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        Anterior
+      </button>
 
+      <div class="pagination-numbers">
+        <button
+          *ngFor="let page of getVisiblePages()"
+          class="btn-secondary pagination-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page + 1 }}
+        </button>
+      </div>
 
-  <!-- Mock Notice -->
-  <div class="mock-notice">
-    <div class="mock-banner">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      <span>Esta es una versión mock. La funcionalidad completa estará disponible próximamente.</span>
+      <button
+        class="btn-secondary pagination-btn"
+        [disabled]="currentPage === totalPages - 1"
+        (click)="goToPage(currentPage + 1)">
+        Siguiente
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+      </button>
     </div>
   </div>
 </div>

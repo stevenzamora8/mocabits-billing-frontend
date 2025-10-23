@@ -15,21 +15,42 @@ export interface InvoiceItem {
 }
 
 export interface Invoice {
-  id?: string;
+  id: number;
+  accessKey: string;
+  receiptStatus: 'AUTORIZADO' | 'PENDIENTE' | 'RECHAZADO' | 'ANULADO';
+  receiptType: string;
   invoiceNumber: string;
-  clientId: string;
-  clientName?: string;
-  issueDate: string;
-  dueDate: string;
-  subtotal: number;
-  tax: number;
-  discount: number;
+  issuerRuc: string;
+  issuerBusinessName: string;
+  clientIdentification: string;
+  clientBusinessName: string;
   total: number;
-  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
-  notes?: string;
-  items: InvoiceItem[];
-  createdAt?: string;
-  updatedAt?: string;
+  environment: 'PRUEBAS' | 'PRODUCCION';
+  authorizationNumber?: string;
+  issueDate: string;
+  authorizationDate?: string;
+}
+
+export interface InvoicePagination {
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+  firstPage: boolean;
+  lastPage: boolean;
+}
+
+export interface InvoiceSummary {
+  total: number;
+  authorized: number;
+  pending: number;
+  rejected: number;
+}
+
+export interface InvoiceResponse {
+  data: Invoice[];
+  pagination: InvoicePagination;
+  summary: InvoiceSummary;
 }
 
 @Injectable({
@@ -39,25 +60,20 @@ export class InvoicesService {
   constructor(private http: HttpClient) {}
 
   getInvoicesApi(params: {
-    clientId?: string;
-    status?: string;
-    startDate?: string;
-    endDate?: string;
     page?: number;
-    size?: number
-  }, token: string): Observable<any> {
+    size?: number;
+    sort?: string;
+  }, token: string): Observable<InvoiceResponse> {
     const url = `${environment.apiBaseUrl}/billing/v1/invoices`;
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
     const queryParams: any = {};
-    if (params.clientId) queryParams.clientId = params.clientId;
-    if (params.status) queryParams.status = params.status;
-    if (params.startDate) queryParams.startDate = params.startDate;
-    if (params.endDate) queryParams.endDate = params.endDate;
     if (params.page !== undefined) queryParams.page = params.page;
     if (params.size !== undefined) queryParams.size = params.size;
-    return this.http.get(url, { headers, params: queryParams });
+    if (params.sort) queryParams.sort = params.sort;
+    return this.http.get<InvoiceResponse>(url, { headers, params: queryParams });
   }
 
   createInvoiceApi(invoiceData: Invoice, token: string): Observable<any> {
