@@ -55,11 +55,33 @@
 }
 
 .app-button__icon--left {
-  margin-right: -0.25rem;
+  /* Add a small positive margin so icon is separated from the text */
+  margin-right: 0.5rem;
 }
 
 .app-button__icon--right {
   margin-left: -0.25rem;
+}
+
+/* Inline icon markup used in templates: ensure spacing and alignment when
+   developers place <span class="app-button__icon-html">...</span> inside
+   the button content. This keeps a consistent gap between icon and label. */
+.app-button__icon-html {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem; /* space between icon and text */
+  line-height: 0; /* prevent extra descender spacing */
+}
+
+/* Ensure font-icon and SVG icons inside inline html icon wrapper render at a readable size */
+.app-button__icon-html i,
+.app-button__icon-html svg {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  color: inherit; /* inherit from button (so ghost/primary colors apply) */
 }
 
 /* Left icons container: positioned absolutely so content remains centered

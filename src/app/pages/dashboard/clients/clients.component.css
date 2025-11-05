@@ -163,7 +163,7 @@
 .stat-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  background: rgba(255,255,255,0.12);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -202,6 +202,23 @@
   letter-spacing: 0.5px;
   line-height: 1.3;
 }
+
+/* Per-card icon-only color themes: keep cards white, color the small icon circle */
+.stat-card.primary { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.primary .stat-icon { background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color)); }
+
+.stat-card.success { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.success .stat-icon { background: linear-gradient(135deg, #34d399, #10b981); }
+
+.stat-card.warning { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.warning .stat-icon { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+
+.stat-card.danger { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.danger .stat-icon { background: linear-gradient(135deg, #f87171, #ef4444); }
+
+/* Restore text colors for white cards */
+.stat-card .stat-number { color: #1e293b; }
+.stat-card .stat-label { color: #64748b; }
 
 /* FILTERS SECTION */
 .filters-section {
@@ -278,6 +295,27 @@
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Separate action controls (filter/new/clear) placed above filters */
+.action-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.action-controls app-button { align-self: center; }
+
+/* Top actions area (Nuevo Cliente above the stats grid) */
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.75rem 0;
+}
+
+.top-actions app-button {
+  align-self: center;
 }
 
 /* CLIENTS TABLE */
@@ -390,6 +428,15 @@
 .phone {
   color: #64748b;
   font-size: 0.8rem;
+}
+
+/* New table column cells for separated contacts */
+.email-cell {
+  min-width: 220px;
+}
+
+.phone-cell {
+  min-width: 140px;
 }
 
 .type-badge, .status-badge {
@@ -512,6 +559,36 @@
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
   box-shadow: 0 3px 12px rgba(239, 68, 68, 0.25);
+}
+
+/* Action icon color wiring */
+.action-buttons .app-button__icon-html i,
+.action-buttons .app-button__icon-html svg {
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+/* Specific icon colors per action (match the button theme) */
+.view-btn .app-button__icon-html i { color: #2563eb; }
+.view-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.edit-btn .app-button__icon-html i { color: #b45309; }
+.edit-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.delete-btn .app-button__icon-html i { color: #dc2626; }
+.delete-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.activate-btn .app-button__icon-html i { color: #059669; }
+.activate-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.deactivate-btn .app-button__icon-html i { color: #dc2626; }
+.deactivate-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+/* Slight lift on icon hover for subtle feedback */
+.action-buttons .app-button:hover .app-button__icon-html i {
+  transform: translateY(-1px);
 }
 
 /* Status toggle button */

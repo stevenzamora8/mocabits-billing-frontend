@@ -146,7 +146,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentPath = '/' + segments.join('/');
     const routeLabels: { [key: string]: string } = {
       '/dashboard/home': 'Inicio',
-      '/dashboard/clients': 'Clientes',
+      '/dashboard/clients': 'Gestión de Clientes',
       '/dashboard/invoices': 'Facturas',
       '/dashboard/products': 'Productos',
       '/dashboard/company': 'Mi Empresa',
