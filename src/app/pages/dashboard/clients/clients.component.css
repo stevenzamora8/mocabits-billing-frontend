@@ -1,10 +1,10 @@
 /* CLIENTS PAGE STYLES */
 .clients-container {
-  padding: 1rem;
-  max-width: 1400px;
+  padding: 1.5rem 1.25rem;
+  max-width: 1200px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  min-height: 100vh;
+  /* Let the dashboard main background control the page background so the clients page blends with layout */
+  background: transparent;
 }
 
 /* PAGE HEADER */
@@ -32,7 +32,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 16px 16px 0 0;
 }
 
@@ -45,7 +45,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: #1e293b;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -63,7 +63,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   color: white;
   border: none;
   border-radius: 16px;
@@ -71,14 +71,14 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.28);
   position: relative;
   z-index: 1;
 }
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.38);
 }
 
 .btn-primary:active {
@@ -133,7 +133,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -141,7 +141,7 @@
 .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  border-color: #667eea;
+  border-color: var(--logo-primary-color);
 }
 
 .stat-card:hover::before {
@@ -163,20 +163,20 @@
 .stat-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.18);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover .stat-icon {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.22);
 }
 
 .stat-content {
@@ -225,7 +225,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 20px 20px 0 0;
 }
 
@@ -261,7 +261,7 @@
 .filter-select:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .filter-input {
@@ -297,7 +297,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 16px 16px 0 0;
 }
 
@@ -537,7 +537,7 @@
 .empty-state {
   text-align: center;
   padding: 5rem 3rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 20px;
   margin: 2rem 0;
 }
@@ -546,13 +546,13 @@
   width: 100px;
   height: 100px;
   margin: 0 auto 2rem auto;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.28);
   animation: float 3s ease-in-out infinite;
 }
 
@@ -658,7 +658,7 @@
 .pagination-number.active {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  border-color: #667eea;
+  border-color: var(--logo-primary-color);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 

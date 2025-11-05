@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, forwardRef, ViewEncapsulation }
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 
-export type InputType = 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'textarea';
+export type InputType = 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'textarea' | 'date';
 export type InputSize = 'sm' | 'md' | 'lg';
 
 @Component({
@@ -21,7 +21,8 @@ export type InputSize = 'sm' | 'md' | 'lg';
   ]
 })
 export class InputComponent implements ControlValueAccessor {
-  @Input() type: InputType = 'text';
+  // Accept the typed InputType or arbitrary string (e.g., 'date') to be tolerant
+  @Input() type: InputType | string = 'text';
   @Input() size: InputSize = 'md';
   @Input() placeholder: string = '';
   @Input() label: string = '';
@@ -31,7 +32,8 @@ export class InputComponent implements ControlValueAccessor {
   @Input() state?: 'default' | 'success' | 'error' | 'warning';
   @Input() disabled: boolean = false;
   @Input() readonly: boolean = false;
-  @Input() required: boolean = false;
+  // accept boolean or attribute string so templates can use bare `required` without type errors
+  @Input() required: boolean | string = false;
   @Input() maxLength: number | null = null;
   @Input() minLength: number | null = null;
   @Input() pattern: string | null = null;
@@ -93,6 +95,11 @@ export class InputComponent implements ControlValueAccessor {
     this.inputBlur.emit(event);
   }
 
+  get requiredBool(): boolean {
+    // attribute-style `required` may come in as empty string or 'true'
+    return this.required === true || this.required === 'true' || this.required === '';
+  }
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
@@ -104,10 +111,11 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   get inputType(): string {
-    if (this.type === 'password' && this.showPasswordToggle) {
+    const t = String(this.type);
+    if (t === 'password' && this.showPasswordToggle) {
       return this.showPassword ? 'text' : 'password';
     }
-    return this.type;
+    return t;
   }
 
   get containerClasses(): string {

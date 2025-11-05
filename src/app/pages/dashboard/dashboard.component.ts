@@ -1,19 +1,21 @@
 import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 import { DashboardService, NavigationItem, UserData } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   currentPlan: string = 'Gratis';
   userName: string = 'José Martínez';
+  userInitials: string = 'JM';
+  userRole: string = 'Administrador';
   userEmail: string = 'jose.martinez@mocabits.com';
   isSidebarCollapsed: boolean = false;
   isUserModalOpen: boolean = false;
@@ -59,6 +61,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log('DashboardComponent received user:', user);
         this.currentUser = user;
         this.userName = user.name;
+        // compute initials (first letters of first and last name)
+        const parts = (user.name || '').trim().split(' ').filter(Boolean);
+        this.userInitials = parts.length >= 2 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : (user.name ? user.name.charAt(0).toUpperCase() : 'J');
+  this.userRole = (user as any).role || this.userRole;
         this.userEmail = user.email;
         this.currentPlan = user.plan;
         this.totalInvoices = user.totalInvoices;
@@ -126,40 +132,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const segments = url.split('/').filter(segment => segment !== '');
     this.breadcrumbs = [];
 
-    // Always start with Dashboard
-    this.breadcrumbs.push({
-      label: 'Dashboard',
-      path: '/dashboard',
-      active: segments.length === 1
-    });
+    // Template requires starting label 'Panel de Control'
+    this.breadcrumbs.push({ label: 'Panel de Control', path: '/dashboard', active: false });
 
-    if (segments.length > 1) {
-      const currentPath = '/' + segments.join('/');
-      
-      // Map all available routes to user-friendly names
-      const routeLabels: { [key: string]: string } = {
-        '/dashboard/home': 'Inicio',
-        '/dashboard/clients': 'Clientes',
-        '/dashboard/invoices': 'Facturas',
-        '/dashboard/products': 'Productos',
-        '/dashboard/company': 'Mi Empresa',
-        '/dashboard/settings': 'Configuración'
-      };
-
-      const currentLabel = routeLabels[currentPath] || 
-        segments[segments.length - 1].charAt(0).toUpperCase() + 
-        segments[segments.length - 1].slice(1);
-
-      this.breadcrumbs.push({
-        label: currentLabel,
-        path: currentPath,
-        active: true
-      });
+    // If we are on the dashboard root, show Inicio > Resumen
+    if (url === '/dashboard' || url === '/dashboard/' || segments.length === 1) {
+      this.breadcrumbs.push({ label: 'Inicio', path: '/dashboard', active: false });
+      this.breadcrumbs.push({ label: 'Resumen', path: '/dashboard', active: true });
+      return;
     }
+
+    // Otherwise map more specific routes
+    const currentPath = '/' + segments.join('/');
+    const routeLabels: { [key: string]: string } = {
+      '/dashboard/home': 'Inicio',
+      '/dashboard/clients': 'Clientes',
+      '/dashboard/invoices': 'Facturas',
+      '/dashboard/products': 'Productos',
+      '/dashboard/company': 'Mi Empresa',
+      '/dashboard/settings': 'Configuración'
+    };
+
+    const currentLabel = routeLabels[currentPath] || segments[segments.length - 1].charAt(0).toUpperCase() + segments[segments.length - 1].slice(1);
+    this.breadcrumbs.push({ label: currentLabel, path: currentPath, active: true });
   }
 
   navigateTo(path: string) {
-    this.router.navigate([path]);
+    console.log('DashboardComponent.navigateTo ->', path);
+    // Use navigateByUrl for absolute paths to avoid array-segmentation issues
+    try {
+      this.router.navigateByUrl(path);
+    } catch (err) {
+      console.error('Navigation error:', err);
+      // Fallback to navigate
+      this.router.navigate([path]);
+    }
+  }
+
+  /**
+   * Utility used from templates to determine if a path is active.
+   * Avoids using arrow functions inside template bindings (not supported by the Angular template parser).
+   */
+  isActive(path: string): boolean {
+    return this.navigationItems.some(i => i.path === path && i.active);
   }
 
   toggleSidebar() {
@@ -184,7 +199,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/onboarding/plan-selection']);
   }
 
-  toggleUserModal() {
+  toggleUserModal(event?: MouseEvent) {
+    // Prevent the click from bubbling to document level which would immediately close the modal
+    if (event) {
+      event.stopPropagation();
+    }
     this.isUserModalOpen = !this.isUserModalOpen;
   }
 

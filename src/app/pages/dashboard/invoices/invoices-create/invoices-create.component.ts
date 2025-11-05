@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
+import { InputComponent } from '../../../../shared/components/ui/input/input.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -49,11 +51,15 @@ interface InvoiceForm {
 @Component({
   selector: 'app-invoices-create',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent, InputComponent],
   templateUrl: './invoices-create.component.html',
   styleUrls: ['./invoices-create.component.css']
 })
 export class InvoicesCreateComponent implements OnInit, OnDestroy {
+  // Icons for buttons
+  readonly backIcon: string = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0L4.71 11.3c-.39.39-.39 1.02 0 1.41L11.3 19.3c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>`;
+  readonly addIcon: string = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4"/></svg>`;
+  readonly deleteIcon: string = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>`;
   // Form data
   invoiceForm: InvoiceForm = {
     clientId: null,
