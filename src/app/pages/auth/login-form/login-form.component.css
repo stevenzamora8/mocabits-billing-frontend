@@ -29,6 +29,31 @@
   text-align: left;
 }
 
+/* Ensure the form sits in a centered column with same max-width as other auth forms */
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Ensure controls inside the auth form share the same outer box sizing and stretch to full width */
+.auth-form .app-input-wrapper,
+.auth-form app-button,
+.auth-form .app-button,
+.auth-form .btn-login,
+.auth-form .primary-button {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.form-actions {
+  align-items: stretch; /* make sure button fills the container width */
+}
+
 /* ===== FORM ELEMENTS ===== */
 .login-form {
   margin-bottom: 2rem;
@@ -185,6 +210,22 @@
   gap: 0.5rem;
 }
 
+/* Match dimensions of inputs: same height, padding, font-size and border-radius */
+.btn-login {
+  height: clamp(2.25rem, 5vh, 3rem) !important;
+  padding: 0 1rem !important; /* same horizontal padding as .app-input */
+  font-size: clamp(0.875rem, 2.5vh, 1rem) !important;
+  line-height: 1.2 !important;
+  border-radius: 12px !important;
+}
+
+/* Ensure the visible button content (text) vertically centers in smaller heights */
+.btn-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .btn-login:hover:not(:disabled) {
   background: var(--primary-dark);
   transform: translateY(-1px);
@@ -306,4 +347,29 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Ensure app-button inside auth-form matches input dimensions exactly */
+.auth-form app-button.app-button,
+.auth-form .app-button {
+  height: clamp(2.25rem, 5vh, 3rem) !important;
+  min-height: clamp(2.25rem, 5vh, 3rem) !important;
+  padding: 0 1rem !important; /* match .form-input horizontal padding */
+  font-size: clamp(0.875rem, 2.5vh, 1rem) !important;
+  line-height: 1.2 !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove extra padding on the content so centering is consistent */
+.form-actions .app-button__content {
+  padding: 0 !important;
+}
+
+.form-actions .app-button__content > span {
+  display: block;
+  width: 100%;
+  text-align: center;
 }

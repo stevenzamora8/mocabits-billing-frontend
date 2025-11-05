@@ -2,17 +2,20 @@
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { InputComponent } from '../../../shared/components/ui/input/input.component';
+import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, InputComponent, ButtonComponent],
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent implements OnInit, AfterViewInit {
+  submitted = false;
   // ===== FORM PROPERTIES =====
   loginForm!: FormGroup;
   isLoading = false;
@@ -115,6 +118,7 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
 
   // ===== FORM SUBMISSION =====
   onSubmit(): void {
+    this.submitted = true;
     if (this.loginForm.invalid) {
       this.markFormGroupTouched();
       return;
@@ -161,15 +165,23 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
 
   getFieldError(fieldName: string): string {
     const control = this.loginForm.get(fieldName);
-    if (control?.errors && control.touched) {
+    const interacted = !!(control && (control.touched || control.dirty || this.submitted));
+    const value = control?.value ?? '';
+    const hasValue = value !== null && value !== undefined && (value.toString().trim().length > 0);
+
+    if (control?.errors && interacted) {
       if (control.errors['required']) {
-        return 'Este campo es obligatorio';
+        // show required only after interaction or submit
+        if (this.submitted || hasValue) return 'Este campo es obligatorio';
+        return '';
       }
       if (control.errors['minlength']) {
-        return 'La contraseña debe tener al menos 6 caracteres';
+        if (hasValue || this.submitted) return 'La contraseña debe tener al menos 6 caracteres';
+        return '';
       }
       if (control.errors['email']) {
-        return 'Ingresa un correo electrónico válido';
+        if (hasValue || this.submitted) return 'Ingresa un correo electrónico válido';
+        return '';
       }
     }
     return '';

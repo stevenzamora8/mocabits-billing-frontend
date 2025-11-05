@@ -43,6 +43,9 @@ html, body {
   --text-secondary: var(--gray-600);
   --text-muted: var(--gray-500);
   --border-color: var(--gray-200);
+  /* Legacy names used by shared components */
+  --logo-primary-color: var(--primary);
+  --logo-secondary-color: var(--primary-dark);
 }
 
 /* Make sure brand icons and small header icon pick expected colors by default */
