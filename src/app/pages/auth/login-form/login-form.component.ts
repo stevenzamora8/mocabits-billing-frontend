@@ -6,6 +6,7 @@ import { InputComponent } from '../../../shared/components/ui/input/input.compon
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login-form',
@@ -133,18 +134,21 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Set loading state
+    // Call real backend via AuthService
     this.setLoadingState(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      if (this.checkCredentials(username, password)) {
-        this.handleLoginSuccess();
-      } else {
-        this.showError('Usuario o contraseña incorrectos. Por favor, verifica tus credenciales e intenta nuevamente.');
-        this.setLoadingState(false);
-      }
-    }, this.CONFIG.loginDelay);
+    this.authService.login(username, password)
+      .pipe(finalize(() => this.setLoadingState(false)))
+      .subscribe({
+        next: (resp: any) => {
+          // AuthService persists tokens; navigate to dashboard
+          setTimeout(() => this.router.navigate(['/dashboard']), 250);
+        },
+        error: (err: any) => {
+          const msg = err?.error?.message || 'Usuario o contraseña incorrectos. Por favor, verifica tus credenciales e intenta nuevamente.';
+          this.showError(msg);
+        }
+      });
   }
 
   private handleLoginSuccess(): void {
