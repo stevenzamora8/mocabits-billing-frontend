@@ -156,15 +156,20 @@ html, body {
 }
 
 /* When button is loading, place spinner where icon would be and hide other icons */
-.auth-form .app-button--loading .app-button__left-icons,
 .auth-form .app-button--loading .app-button__icon-html,
 .auth-form .app-button--loading .app-button__icon {
+  /* Hide visual icons when loading, but keep left-icons container visible so spinner can be positioned inside it */
   display: none !important;
+}
+
+.auth-form .app-button--loading .app-button__left-icons {
+  /* ensure the left icons container remains for positioning the spinner */
+  display: flex !important;
 }
 
 .auth-form .app-button--loading .app-button__spinner {
   position: absolute !important;
-  left: 1rem !important;
+  left: 0.75rem !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   z-index: 5 !important;

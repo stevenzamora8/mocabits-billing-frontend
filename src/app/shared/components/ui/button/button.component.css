@@ -22,9 +22,10 @@
   overflow: hidden;
 }
 
-/* Button with left icons - align to start */
+/* Button with left icons - keep text centered while placing icons absolutely */
 .app-button:has(.app-button__left-icons) {
-  justify-content: flex-start;
+  /* Keep overall content centered; left icons will be absolutely positioned */
+  justify-content: center;
 }
 
 .app-button:focus-visible {
@@ -61,13 +62,19 @@
   margin-left: -0.25rem;
 }
 
-/* Left icons container */
+/* Left icons container: positioned absolutely so content remains centered
+   and spinner/icon does not shift the text. This ensures spinner appears to the left
+   of the centered text. */
 .app-button__left-icons {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0.25rem;
-  margin-right: 0.25rem;
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* icons are decorative by default */
 }
 
 /* Loading spinner */
@@ -81,6 +88,22 @@
   width: 1rem;
   height: 1rem;
   animation: spin 1s linear infinite;
+}
+
+/* Ensure spinner is visible on dark/primary buttons */
+.app-button--primary .app-button__spinner-icon {
+  color: white;
+}
+
+/* Optional helper: place spinner above content when this modifier is present */
+.app-button--spinner-top.app-button--loading .app-button__left-icons {
+  position: static;
+  transform: none;
+  margin-bottom: 0.5rem;
+}
+.app-button--spinner-top.app-button--loading {
+  flex-direction: column;
+  align-items: center;
 }
 
 @keyframes spin {
