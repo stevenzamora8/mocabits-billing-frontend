@@ -1,1831 +1,551 @@
-:host {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(135deg, 
-    var(--logo-primary-color) 0%, 
-    var(--logo-secondary-color) 35%, 
-    var(--logo-accent-color) 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
+/* ===== CSS VARIABLES ===== */
+:root {
+  /* Brand Colors */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --secondary: #059669;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
-  /* VARIABLES DE BRANDING - FÁCIL PERSONALIZACIÓN */
-  --brand-name: 'MocaBits';
-  --brand-subtitle: 'Plataforma de Facturación Empresarial';
-  --brand-tagline: 'Transforma tu negocio • Facturación inteligente • Gestión simplificada';
-  --brand-description: 'La solución completa para la gestión financiera y facturación electrónica de tu empresa';
-  --brand-version: 'v1.0.0';
+  /* Neutral Colors */
+  --white: #ffffff;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
 
-  /* COLORES DEL LOGO - CONFIGURADOS GLOBALMENTE POR BrandService */
-  --logo-primary-color: #1e3a8a;
-  --logo-secondary-color: #3b82f6;
-  --logo-accent-color: #764ba2;
-  --logo-text-color: white;
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* TAMAÑOS DEL LOGO */
-  --logo-size-main: 50px;
-  --logo-size-signature: 24px;
-  --logo-border-radius: 22%;
-  
-  /* SOMBRAS Y EFECTOS */
-  --text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  /* Layout Variables */
+  --bg-primary: var(--white);
+  --bg-card: var(--white);
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --border-color: var(--gray-200);
 
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-/*
- * INSTRUCCIONES PARA CAMBIO DE LOGO:
- *
- * 1. Para usar imagen personalizada (recomendado):
- *    - Coloca tu logo en src/assets/images/logo.png
- *    - Descomenta la clase .brand-logo-image y ajusta la ruta
- *    - Comenta o elimina el SVG actual en el HTML
- *
- * 2. Para personalizar el logo SVG actual:
- *    - Modifica las variables CSS arriba (--brand-name, colores, etc.)
- *    - El SVG se actualizará automáticamente
- *
- * 3. Para cambiar texto del branding:
- *    - Actualiza las variables --brand-name, --brand-subtitle, etc.
- *    - Los textos se actualizarán en toda la aplicación
- */
-
-/* CLASE PARA LOGO PERSONALIZADO (descomenta cuando tengas tu logo) */
-/*
-.brand-logo-image {
-  width: var(--logo-size-main);
-  height: var(--logo-size-main);
-  background-image: url('/assets/images/logo.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: var(--logo-border-radius);
-  animation: float 6s ease-in-out infinite;
+/* ===== RESET & BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.signature-logo-image {
-  width: var(--logo-size-signature);
-  height: var(--logo-size-signature);
-  background-image: url('/assets/images/logo.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: var(--logo-border-radius);
-  animation: float 4s ease-in-out infinite;
-}
-*/
-
-/* CONTENEDOR PRINCIPAL - RESPONSIVE MEJORADO */
-.login-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  /* Flexbox responsive por defecto */
-  flex-direction: row;
+.login-wrapper {
+  font-family: var(--font-family);
+  background: var(--gray-100);
+  color: var(--text-primary);
+  font-feature-settings: 'cv02','cv03','cv04','cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 400px;
 }
 
-/* MEJORAS RESPONSIVE BASE */
-@media (max-width: 1200px) {
-  .illustration-panel {
-    flex: 0 0 45%;
-  }
-  
-  .form-panel {
-    flex: 0 0 55%;
-  }
-}
-
-@media (max-width: 992px) {
-  .illustration-panel {
-    flex: 0 0 40%;
-  }
-  
-  .form-panel {
-    flex: 0 0 60%;
-  }
-}
-
-/* PANEL IZQUIERDO - ILUSTRACIÓN MEJORADO */
-.illustration-panel {
-  background: linear-gradient(135deg, 
-    var(--logo-primary-color) 0%, 
-    var(--logo-secondary-color) 35%, 
-    var(--logo-accent-color) 100%);
+/* ===== BRANDING PANEL ===== */
+.branding-panel {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(1rem, 3vh, 2rem);
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 3rem;
+  color: var(--white);
   position: relative;
   overflow: hidden;
-  flex: 1;
-  min-width: 50%;
 }
 
-.illustration-panel::before {
+.branding-panel::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  animation: backgroundShift 20s ease-in-out infinite;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
 }
 
-.illustration-panel::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%),
-    linear-gradient(-45deg, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%);
-  pointer-events: none;
-  opacity: 0.5;
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.illustration-content {
+.branding-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 500px;
+}
+
+.brand-logo-large {
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  color: white;
-  z-index: 2;
-  position: relative;
-  width: 100%;
-  max-width: min(90%, 450px);
-  margin: 0 auto;
-  flex: 1;
-  gap: clamp(0.25rem, 0.75vh, 0.75rem);
-  padding: 0;
+  font-size: 3rem;
+  margin: 0 auto 2rem auto;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-xl);
 }
 
-.brand-logo {
-  margin-bottom: clamp(0.4rem, 1.2vh, 1.2rem);
-  animation: float 6s ease-in-out infinite;
-  position: relative;
-}
-
-.brand-logo::before {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: breathe 4s ease-in-out infinite;
-  z-index: -1;
-}
-
-.brand-logo svg {
-  width: var(--logo-size-main);
-  height: var(--logo-size-main);
-  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+/* Force icon color inside large brand logo to white (matches reference) */
+.brand-logo-large i {
+  color: var(--white);
 }
 
 .brand-title {
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  font-size: 4rem;
   font-weight: 900;
-  margin-bottom: clamp(0.4rem, 1vh, 0.8rem);
-  letter-spacing: -0.04em;
-  color: white;
-  text-shadow: 
-    var(--text-shadow),
-    0 0 50px rgba(255, 255, 255, 0.4),
-    0 4px 20px rgba(0, 0, 0, 0.3);
-  line-height: 1.05;
-  position: relative;
-  animation: titleGlow 3s ease-in-out infinite alternate;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.05em;
+  color: var(--white);
+}
+
+.brand-highlight {
+  color: #fbbf24;
+  font-weight: 800;
 }
 
 .brand-subtitle {
-  font-size: clamp(0.9rem, 3vw, 1.35rem);
-  opacity: 0.92;
-  margin-bottom: clamp(0.8rem, 1.5vh, 2rem);
-  font-weight: 500;
-  text-shadow: 
-    0 2px 20px rgba(0, 0, 0, 0.3),
-    0 1px 4px rgba(0, 0, 0, 0.4);
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.92);
-  letter-spacing: 0.4px;
-  position: relative;
-  animation: subtitleFloat 4s ease-in-out infinite;
-}
-
-.brand-subtitle::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.6) 25%, 
-    rgba(255, 255, 255, 0.8) 50%, 
-    rgba(255, 255, 255, 0.6) 75%, 
-    transparent 100%);
-  border-radius: 1px;
-  animation: lineGlow 2s ease-in-out infinite alternate;
-}
-
-.illustration {
-  margin: clamp(0.25rem, 1vh, 1rem) 0;
-  flex-shrink: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.illustration svg {
-  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.2));
-  animation: float 8s ease-in-out infinite;
-  width: clamp(200px, 80%, 380px);
-  height: auto;
-  max-height: clamp(180px, 25vh, 280px);
-}
-
-/* ANIMACIONES MEJORADAS */
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px) scale(1); 
-  }
-  50% { 
-    transform: translateY(-12px) scale(1.02); 
-  }
-}
-
-@keyframes backgroundShift {
-  0%, 100% {
-    transform: translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateX(-10px) translateY(-5px);
-  }
-  50% {
-    transform: translateX(0) translateY(-10px);
-  }
-  75% {
-    transform: translateX(10px) translateY(-5px);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-}
-
-/* PANEL DERECHO - FORMULARIO MEJORADO */
-.form-panel {
-  background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(1rem, 3vh, 2rem);
-  box-shadow: 
-    -20px 0 40px rgba(0, 0, 0, 0.08),
-    inset 1px 0 0 rgba(255, 255, 255, 0.8);
-  flex: 1;
-  min-width: 50%;
-  max-width: 520px;
-  overflow-y: auto;
-  position: relative;
-  height: 100%;
-  /* Prevenir desfases */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: auto;
-  contain: layout style paint;
-}
-
-.form-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, 
-    var(--logo-primary-color) 0%, 
-    var(--logo-secondary-color) 35%, 
-    var(--logo-accent-color) 100%);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.form-container {
-  width: 100%;
-  max-width: 440px;
-  padding: clamp(0.75rem, 1.5vh, 1rem);
-  padding-bottom: clamp(1.5rem, 3vh, 2rem); /* Espacio reducido para la firma */
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  overflow: visible;
-  box-sizing: border-box;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.02) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
-  border-radius: 12px;
-  /* Prevenir desfases */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-}
-
-/* FIRMA DE LA EMPRESA ULTRA MEJORADA */
-.company-signature {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1.25rem 2rem;
-  background: 
-    linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.98) 0%, 
-      rgba(248, 250, 252, 0.95) 100%);
-  backdrop-filter: blur(25px);
-  border-top: 1px solid rgba(226, 232, 240, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  animation: slideInUp 1s ease-out 0.8s both;
-  box-shadow: 
-    0 -8px 32px rgba(0, 0, 0, 0.12),
-    0 -2px 8px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  position: relative;
-  overflow: hidden;
-}
-
-.company-signature::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, 
-    var(--logo-primary-color) 0%, 
-    var(--logo-secondary-color) 35%, 
-    var(--logo-accent-color) 70%,
-    var(--logo-primary-color) 100%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.company-signature::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.4), 
-    transparent);
-  animation: shimmer 3s ease-in-out infinite;
-  animation-delay: 2s;
-}
-
-.signature-line {
-  position: absolute;
-  top: 0;
-  left: 2rem;
-  right: 2rem;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent 0%,
-    var(--logo-primary-color) 20%, 
-    var(--logo-secondary-color) 50%, 
-    var(--logo-accent-color) 80%,
-    transparent 100%);
-  border-radius: 1px;
-  opacity: 0.6;
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.signature-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-  z-index: 2;
-}
-
-.signature-logo {
-  animation: float 4s ease-in-out infinite;
-  position: relative;
-  padding: 0.25rem;
-  border-radius: 50%;
-  background: 
-    linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.8) 0%, 
-      rgba(248, 250, 252, 0.6) 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.signature-logo:hover {
-  transform: scale(1.1) rotate(5deg);
-}
-
-.signature-logo svg {
-  width: var(--logo-size-signature);
-  height: var(--logo-size-signature);
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
-}
-
-/* ESTILOS PARA LOGOS PERSONALIZADOS */
-.brand-logo-image {
-  width: var(--logo-size-main);
-  height: var(--logo-size-main);
-  object-fit: contain;
-  border-radius: var(--logo-border-radius);
-  animation: float 6s ease-in-out infinite;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-}
-
-.signature-logo-image {
-  width: var(--logo-size-signature);
-  height: var(--logo-size-signature);
-  object-fit: contain;
-  border-radius: var(--logo-border-radius);
-  animation: float 4s ease-in-out infinite;
-}
-
-.signature-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  transition: transform 0.3s ease;
-}
-
-.signature-text:hover {
-  transform: translateY(-1px);
-}
-
-.company-name {
-  font-size: 1rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, 
-    var(--logo-primary-color) 0%, 
-    var(--logo-secondary-color) 50%, 
-    var(--logo-accent-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.04em;
-  line-height: 1.2;
-  position: relative;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.company-name::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    var(--logo-primary-color), 
-    var(--logo-secondary-color), 
-    var(--logo-accent-color));
-  transition: width 0.4s ease;
-  border-radius: 1px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.company-name:hover::after {
-  width: 100%;
-}
-
-/* FALLBACK: Usar contenido CSS si Angular no funciona */
-.company-name:empty::before {
-  content: var(--brand-name, 'MocaBits');
-}
-
-.company-tagline:empty::before {
-  content: var(--brand-tagline, 'Facturación Inteligente • Gestión Simplificada');
-}
-
-.signature-version:empty::before {
-  content: var(--brand-version, 'v1.0.0');
-}
-
-.company-tagline {
-  font-size: 0.85rem;
-  background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  opacity: 0.95;
-  transition: all 0.3s ease;
-  line-height: 1.3;
-}
-
-.company-tagline:hover {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.signature-version {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.4rem 0.8rem;
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.1) 0%, 
-    rgba(139, 92, 246, 0.1) 100%);
-  color: #6366f1;
-  border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.signature-version::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.3), 
-    transparent);
-  transition: left 0.5s ease;
-}
-
-.signature-version:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 4px 12px rgba(99, 102, 241, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-color: rgba(99, 102, 241, 0.4);
-}
-
-.signature-version:hover::before {
-  left: 100%;
-}
-
-/* ESTRUCTURA DE BRAND HEADER MEJORADO */
-.brand-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 0.75rem;
-  margin-top: clamp(1rem, 3vh, 1.5rem);
-  z-index: 2;
-  position: relative;
-  animation: slideInDown 1s ease-out 0.2s both;
-}
-
-/* Welcome header spacing */
-.welcome-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  margin-bottom: 0.25rem;
-}
-
-.brand-header::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
-  border-radius: 50%;
-  z-index: -1;
-  animation: pulse 6s ease-in-out infinite;
-}
-
-.brand-text {
-  margin-top: clamp(0.5rem, 2vh, 1rem);
-}
-
-/* ACTUALIZACIÓN DE FEATURE BADGES PARA CONSISTENCIA */
-.feature-badges {
-  display: flex;
-  gap: clamp(0.5rem, 2vw, 1rem);
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 0;
-  margin-bottom: clamp(1rem, 2vh, 2rem); /* Espacio optimizado para el copyright */
-  z-index: 2;
-  position: relative;
-}
-
-.feature-badge {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.12) 100%);
-  backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 50px;
-  padding: clamp(0.6rem, 2vh, 0.8rem) clamp(1rem, 2.5vw, 1.4rem);
-  display: flex;
-  align-items: center;
-  gap: clamp(0.5rem, 1.4vw, 0.7rem);
-  font-size: clamp(0.8rem, 2.4vw, 0.95rem);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.98);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-  letter-spacing: 0.3px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.feature-badge::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.feature-badge:hover {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(255, 255, 255, 0.18) 50%,
-    rgba(255, 255, 255, 0.22) 100%);
-  transform: translateY(-6px) scale(1.05);
-  box-shadow: 
-    0 12px 35px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border-color: rgba(255, 255, 255, 0.45);
-}
-
-.feature-badge:hover::before {
-  left: 100%;
-}
-
-.badge-icon {
-  font-size: clamp(0.8rem, 2.5vw, 1rem);
-}
-
-/* COPYRIGHT - DISEÑO ULTRA ELEGANTE Y MODERNO */
-.copyright {
-  position: absolute;
-  bottom: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.4;
-  z-index: 10;
-  padding: 0.75rem 1.5rem;
-  background: 
-    linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.08) 0%, 
-      rgba(255, 255, 255, 0.04) 100%);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
-  animation: fadeInUp 1.2s ease-out 1s both;
-  max-width: 95%;
-  font-weight: 400;
-  letter-spacing: 0.4px;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.copyright::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent);
-  transition: left 0.8s ease;
-}
-
-.copyright:hover {
-  transform: translateX(-50%) translateY(-3px);
-  background: 
-    linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.15) 0%, 
-      rgba(255, 255, 255, 0.08) 100%);
-  box-shadow: 
-    0 8px 30px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.copyright:hover::before {
-  left: 100%;
-}
-
-.copyright p {
-  margin: 0;
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.4),
-    0 0 10px rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.copyright:hover p {
-  opacity: 1;
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.5),
-    0 0 15px rgba(255, 255, 255, 0.2);
-}
-
-.copyright-detail {
-  font-size: 0.7rem !important;
-  color: rgba(255, 255, 255, 0.7) !important;
-  margin-top: 0.3rem !important;
-  font-weight: 300 !important;
-  letter-spacing: 0.3px !important;
-  transition: color 0.3s ease !important;
-}
-
-.copyright:hover .copyright-detail {
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* ANIMACIONES PARA ILUSTRACIONES */
-.main-illustration {
-  filter: 
-    drop-shadow(0 20px 40px rgba(0, 0, 0, 0.25))
-    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
-  animation: float 10s ease-in-out infinite;
-  width: clamp(220px, 85%, 400px);
-  height: auto;
-  max-height: clamp(200px, 28vh, 300px);
-  transform-origin: center;
-  transition: transform 0.3s ease;
-}
-
-.main-illustration:hover {
-  transform: scale(1.02);
-}
-
-.floating-circle {
-  animation: float 6s ease-in-out infinite;
-}
-
-.floating-circle.floating-delay-1 {
-  animation-delay: 1s;
-}
-
-.floating-circle.floating-delay-2 {
-  animation-delay: 2s;
-}
-
-.floating-circle.floating-delay-3 {
-  animation-delay: 3s;
-}
-
-.floating-path {
-  animation: float 8s ease-in-out infinite;
-}
-
-.floating-path.floating-delay-1 {
-  animation-delay: 1.5s;
-}
-
-.device-main {
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.pulse-animation {
-  animation: pulse 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
-
-/* ANIMACIONES */
-@keyframes slideInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-  }
-}
-
-@keyframes titleGlow {
-  0% {
-    text-shadow: 
-      0 2px 20px rgba(0, 0, 0, 0.3),
-      0 0 40px rgba(255, 255, 255, 0.3),
-      0 4px 20px rgba(0, 0, 0, 0.3);
-  }
-  100% {
-    text-shadow: 
-      0 2px 25px rgba(0, 0, 0, 0.4),
-      0 0 60px rgba(255, 255, 255, 0.5),
-      0 6px 30px rgba(0, 0, 0, 0.4);
-  }
-}
-
-@keyframes subtitleFloat {
-  0%, 100% {
-    transform: translateY(0px);
-    opacity: 0.92;
-  }
-  50% {
-    transform: translateY(-3px);
-    opacity: 0.96;
-  }
-}
-
-@keyframes lineGlow {
-  0% {
-    opacity: 0.6;
-    width: 40px;
-  }
-  100% {
-    opacity: 0.9;
-    width: 70px;
-  }
-}
-
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-  .illustration svg {
-    max-width: 280px;
-  }
-
-  .form-container {
-    max-width: 380px;
-    padding: 0.875rem;
-    padding-bottom: clamp(4rem, 8vh, 5rem);
-  }
-
-  .welcome-header h1 {
-    font-size: 1.5rem;
-  }
-}
-
-/* RESPONSIVE DESIGN MEJORADO - TABLETS */
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  .illustration-panel {
-    flex: 0 0 auto;
-    height: clamp(200px, 35vh, 280px);
-    min-height: 200px;
-    max-height: 300px;
-    width: 100%;
-    padding: clamp(0.75rem, 2.5vw, 1.25rem);
-    overflow: hidden;
-  }
-
-  .brand-header::before {
-    width: 150%;
-    height: 150%;
-  }
-
-  .illustration-content {
-    gap: clamp(0.25rem, 0.75vh, 0.75rem);
-    padding: clamp(0.5rem, 1vh, 1rem) 0;
-    height: 100%;
-  }
-
-  .brand-title {
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-  }
-
-  .brand-subtitle {
-    font-size: clamp(0.7rem, 3vw, 1rem);
-    margin-bottom: clamp(0.25rem, 1vh, 0.75rem);
-  }
-
-  .illustration svg {
-    width: clamp(150px, 70%, 250px);
-    max-height: clamp(120px, 20vh, 180px);
-  }
-
-  .features-badge {
-    gap: clamp(0.3rem, 1.5vw, 0.8rem);
-    margin-top: 0;
-    margin-bottom: clamp(3rem, 6vh, 4rem);
-  }
-
-  .feature-item {
-    font-size: clamp(0.6rem, 2.5vw, 0.8rem);
-    padding: clamp(0.3rem, 1vh, 0.5rem) clamp(0.4rem, 1.5vw, 0.8rem);
-  }
-
-  .feature-icon {
-    font-size: clamp(0.7rem, 3vw, 0.9rem);
-  }
-
-  .form-panel {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: calc(100vh - 280px);
-    max-height: calc(100vh - 200px);
-    width: 100%;
-    padding: clamp(0.75rem, 2vw, 1.25rem);
-    box-shadow: none;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .form-container {
-    padding: clamp(0.5rem, 2vw, 1rem);
-    max-width: 100%;
-    width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 0;
-  }
-}
-
-/* RESPONSIVE DESIGN - MÓVILES PEQUEÑOS */
-@media (max-width: 480px) {
-  :host {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height para móviles */
-    overflow: hidden;
-  }
-  
-  .login-container {
-    height: 100vh;
-    height: 100dvh;
-  }
-
-  .illustration-panel {
-    height: clamp(150px, 25vh, 200px);
-    min-height: 150px;
-    max-height: 200px;
-    padding: clamp(0.5rem, 2vw, 0.75rem);
-  }
-
-  .brand-header {
-    margin-bottom: clamp(0.5rem, 2vh, 1rem);
-  }
-
-  .brand-title {
-    font-size: clamp(1rem, 5vw, 1.3rem);
-    margin-bottom: 0.25rem;
-  }
-
-  .brand-subtitle {
-    font-size: clamp(0.7rem, 3.5vw, 0.9rem);
-    margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
-  }
-
-  .illustration-content {
-    gap: clamp(0.25rem, 1vh, 0.5rem);
-    padding: 0;
-  }
-
-  .illustration svg,
-  .main-illustration {
-    width: clamp(100px, 50vw, 150px) !important;
-    height: clamp(100px, 50vw, 150px) !important;
-    max-width: 150px;
-    max-height: 150px;
-  }
-
-  .feature-badges {
-    gap: clamp(0.25rem, 1vw, 0.5rem);
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: clamp(0.5rem, 1vh, 1rem) 0;
-  }
-
-  .feature-badge {
-    font-size: clamp(0.6rem, 2.5vw, 0.75rem);
-    padding: clamp(0.25rem, 1vw, 0.4rem) clamp(0.4rem, 1.5vw, 0.6rem);
-    min-width: auto;
-  }
-
-  .badge-icon {
-    font-size: clamp(0.7rem, 3vw, 0.9rem);
-  }
-
-  .form-panel {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: calc(100vh - 150px);
-    min-height: calc(100dvh - 150px);
-    padding: clamp(0.5rem, 2vw, 1rem);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .form-container {
-    padding: clamp(0.5rem, 2vw, 0.75rem);
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  /* Mejoras para la información de la empresa en móviles */
-  .signature-text {
-    margin-top: clamp(0.5rem, 2vh, 1rem) !important;
-    padding: clamp(0.4rem, 1.5vw, 0.6rem) !important;
-  }
-}
-
-/* RESPONSIVE EXTRA PEQUEÑO - Móviles muy pequeños */
-@media (max-width: 360px) {
-  .illustration-panel {
-    height: clamp(120px, 20vh, 160px);
-    min-height: 120px;
-    max-height: 160px;
-    padding: 0.5rem;
-  }
-
-  .brand-title {
-    font-size: clamp(0.9rem, 4.5vw, 1.1rem);
-  }
-
-  .brand-subtitle {
-    font-size: clamp(0.65rem, 3vw, 0.8rem);
-  }
-
-  .illustration svg,
-  .main-illustration {
-    width: clamp(80px, 45vw, 120px) !important;
-    height: clamp(80px, 45vw, 120px) !important;
-  }
-
-  .form-panel {
-    min-height: calc(100vh - 120px);
-    min-height: calc(100dvh - 120px);
-    padding: 0.5rem;
-  }
-
-  .form-container {
-    padding: 0.4rem;
-  }
-}
-
-/* RESPONSIVE LANDSCAPE - Móviles en horizontal */
-@media (max-width: 768px) and (orientation: landscape) {
-  .login-container {
-    flex-direction: row;
-  }
-
-  .illustration-panel {
-    flex: 0 0 35%;
-    height: 100vh;
-    height: 100dvh;
-    width: auto;
-    min-height: 100vh;
-    max-height: none;
-    overflow-y: auto;
-  }
-
-  .form-panel {
-    flex: 0 0 65%;
-    height: 100vh;
-    height: 100dvh;
-    min-height: 100vh;
-    max-height: none;
-  }
-
-  .brand-header {
-    margin-bottom: 0.5rem;
-  }
-
-  .illustration-content {
-    padding: 0.5rem 0;
-  }
-
-  .illustration svg,
-  .main-illustration {
-    width: clamp(120px, 25vw, 180px) !important;
-    height: clamp(120px, 25vw, 180px) !important;
-  }
-
-  .feature-badges {
-    margin: 0.5rem 0;
-  }
-
-  .copyright {
-    position: relative;
-    bottom: auto;
-    margin-top: auto;
-    padding: 0.5rem;
-  }
-}
-
-/* RESPONSIVE TABLET PORTRAIT */
-@media (min-width: 481px) and (max-width: 768px) and (orientation: portrait) {
-  .illustration-panel {
-    height: clamp(250px, 40vh, 350px);
-    max-height: 350px;
-  }
-
-  .illustration svg,
-  .main-illustration {
-    width: clamp(180px, 35vw, 250px) !important;
-    height: clamp(180px, 35vw, 250px) !important;
-  }
-
-  .form-panel {
-    min-height: calc(100vh - 300px);
-    min-height: calc(100dvh - 300px);
-  }
-}
-
-/* RESPONSIVE DESKTOP PEQUEÑO */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .illustration-panel {
-    flex: 0 0 42%;
-    padding: clamp(1rem, 2vw, 1.5rem);
-  }
-
-  .form-panel {
-    flex: 0 0 58%;
-    padding: clamp(1rem, 2vw, 1.5rem);
-  }
-
-  .illustration svg,
-  .main-illustration {
-    width: clamp(200px, 25vw, 280px) !important;
-    height: clamp(200px, 25vw, 280px) !important;
-  }
-}
-
-/* Responsive mejorado para la firma y copyright */
-@media (max-width: 768px) {
-  .company-signature {
-    padding: 1rem 1.25rem;
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .signature-line {
-    left: 1.25rem;
-    right: 1.25rem;
-  }
-
-  .signature-content {
-    gap: 0.75rem;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .signature-text {
-    align-items: center;
-    text-align: center;
-  }
-
-  .company-name {
-    font-size: 0.95rem;
-    text-align: center;
-  }
-
-  .company-tagline {
-    text-align: center;
-    font-size: 0.8rem;
-  }
-
-  .signature-version {
-    padding: 0.35rem 0.7rem;
-    font-size: 0.75rem;
-  }
-
-  .copyright {
-    bottom: 0.75rem;
-    font-size: 0.75rem;
-    max-width: 95%;
-    padding: 0.6rem 1.2rem;
-  }
-
-  .copyright-detail {
-    font-size: 0.65rem !important;
-    margin-top: 0.25rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .company-signature {
-    padding: 0.75rem 1rem;
-  }
-
-  .signature-line {
-    left: 1rem;
-    right: 1rem;
-  }
-
-  .signature-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-
-  .signature-logo {
-    padding: 0.2rem;
-  }
-
-  .signature-text {
-    text-align: center;
-  }
-
-  .company-name {
-    font-size: 0.9rem;
-    text-align: center;
-  }
-
-  .company-tagline {
-    font-size: 0.75rem;
-    text-align: center;
-  }
-
-  .signature-version {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 15px;
-  }
-
-  .copyright {
-    bottom: 0.5rem;
-    font-size: 0.7rem;
-    max-width: 98%;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-  }
-
-  .copyright-detail {
-    font-size: 0.6rem !important;
-    margin-top: 0.2rem !important;
-  }
-}
-
-/* ESTILOS PARA LA INFORMACIÓN DE LA EMPRESA DEBAJO DEL FORMULARIO */
-.form-container .signature-text {
-  margin-top: clamp(0.75rem, 1.5vw, 1rem);
-  padding: clamp(0.5rem, 1vw, 0.75rem);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(5px);
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.02) 0%, 
-    rgba(255, 255, 255, 0.05) 50%, 
-    rgba(255, 255, 255, 0.02) 100%);
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  opacity: 0.8;
-}
-
-.form-container .signature-text .signature-logo {
-  position: relative;
-  padding: 0.25rem;
-  border-radius: 50%;
-  background: 
-    linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.3) 0%, 
-      rgba(248, 250, 252, 0.2) 100%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.form-container .signature-text .signature-logo:hover {
-  transform: scale(1.02);
-  opacity: 0.9;
-}
-
-.form-container .signature-text .signature-logo svg {
-  width: 20px;
-  height: 20px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-  opacity: 0.8;
-}
-
-.form-container .signature-text .signature-logo-image {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  border-radius: 4px;
-  opacity: 0.8;
-}
-
-.form-container .signature-text .signature-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  text-align: center;
-  flex: 1;
-}
-
-.form-container .signature-text .company-name {
-  font-size: clamp(0.625rem, 1vw, 0.75rem) !important;
-  font-weight: 400 !important;
-  color: rgba(107, 114, 128, 0.6) !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.02em !important;
-  background: none !important;
-  -webkit-text-fill-color: rgba(107, 114, 128, 0.6) !important;
-}
-
-.form-container .signature-text .company-tagline {
-  font-size: clamp(0.625rem, 1vw, 0.75rem) !important;
-  color: rgba(107, 114, 128, 0.5) !important;
-  font-weight: 300 !important;
-  line-height: 1.2 !important;
-  background: none !important;
-  -webkit-text-fill-color: rgba(107, 114, 128, 0.5) !important;
-}
-
-.form-container .signature-text .company-version {
-  font-size: clamp(0.5rem, 0.8vw, 0.625rem) !important;
-  font-weight: 500 !important;
-  color: rgba(107, 114, 128, 0.8) !important;
-  margin-top: 0.125rem !important;
-  align-self: center !important;
-  display: inline-block !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
-  padding: 0.2rem 0.4rem !important;
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.1) 0%, 
-    rgba(139, 92, 246, 0.1) 100%) !important;
-  border: 1px solid rgba(99, 102, 241, 0.2) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* FALLBACK: CSS para la información debajo del formulario si Angular no funciona */
-.form-container .signature-text .company-name:empty::before {
-  content: var(--brand-name, 'MocaBits');
-}
-
-.form-container .signature-text .company-tagline:empty::before {
-  content: var(--brand-tagline, 'Facturación Inteligente • Gestión Simplificada');
-}
-
-.form-container .signature-text .company-version:empty::before {
-  content: var(--brand-version, 'v1.0.0');
-}
-
-/* PREVENIR DESFASES EN ELEMENTOS ANIMADOS */
-.brand-title,
-.brand-subtitle,
-.illustration svg,
-.feature-badge {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
-  -webkit-transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-}
-
-/* ESTABILIZAR ANIMACIONES */
-@keyframes titleGlow {
-  0% {
-    text-shadow: 
-      0 2px 20px rgba(0, 0, 0, 0.3),
-      0 0 40px rgba(255, 255, 255, 0.3),
-      0 4px 20px rgba(0, 0, 0, 0.3);
-  }
-  100% {
-    text-shadow: 
-      0 2px 25px rgba(0, 0, 0, 0.4),
-      0 0 60px rgba(255, 255, 255, 0.5),
-      0 6px 30px rgba(0, 0, 0, 0.4);
-  }
-}
-
-@keyframes subtitleFloat {
-  0%, 100% {
-    transform: translateY(0px) translateZ(0);
-    opacity: 0.92;
-  }
-  50% {
-    transform: translateY(-3px) translateZ(0);
-    opacity: 0.96;
-  }
-}
-
-@keyframes lineGlow {
-  0% {
-    opacity: 0.6;
-    width: 40px;
-    transform: translateX(-50%) translateZ(0);
-  }
-  100% {
-    opacity: 0.9;
-    width: 70px;
-    transform: translateX(-50%) translateZ(0);
-  }
-}
-
-/* RESPONSIVE: Información de la empresa - Tablets */
-@media (max-width: 768px) {
-  .form-container .signature-text {
-    margin-top: clamp(0.75rem, 2vh, 1rem) !important;
-    padding: clamp(0.6rem, 1.5vw, 0.8rem) !important;
-    gap: 0.4rem;
-    transform: translateZ(0);
-  }
-
-  .form-container .signature-text .company-name {
-    font-size: clamp(0.65rem, 1.2vw, 0.8rem) !important;
-  }
-  
-  .form-container .signature-text .company-tagline {
-    font-size: clamp(0.65rem, 1.2vw, 0.8rem) !important;
-  }
-  
-  .form-container .signature-text .company-version {
-    font-size: clamp(0.55rem, 1vw, 0.7rem) !important;
-    color: rgba(107, 114, 128, 0.9) !important;
-    padding: 0.15rem 0.3rem !important;
-  }
-
-  /* Prevenir desfases en tablets */
-  .form-panel {
-    contain: layout style paint;
-    isolation: isolate;
-  }
-  
-  .form-container {
-    padding-bottom: clamp(1.5rem, 3vh, 2.5rem);
-    transform: translateZ(0);
-  }
-}
-
-/* RESPONSIVE: Información de la empresa - Móviles */
-@media (max-width: 480px) {
-  .form-container .signature-text {
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: clamp(0.4rem, 1.5vw, 0.6rem) !important;
-    margin-top: clamp(0.5rem, 1.5vh, 0.75rem) !important;
-    border-radius: 0.4rem;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-
-  /* Prevenir desfases en móviles */
-  .form-panel {
-    padding: clamp(0.75rem, 2vh, 1.25rem);
-    overflow-x: hidden;
-    contain: layout style paint;
-  }
-  
-  .form-container {
-    padding: clamp(0.75rem, 1.5vh, 1rem);
-    padding-bottom: clamp(1rem, 2.5vh, 1.5rem);
-    max-width: 100%;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-  
-  /* Estabilizar animaciones en móviles */
-  .brand-title,
-  .brand-subtitle {
-    will-change: auto;
-    animation-duration: 4s; /* Reducir frecuencia */
-  }
-  
-  .illustration svg {
-    animation-duration: 10s; /* Hacer más lenta la animación */
-  }
-  
-  .form-container .signature-text .signature-logo {
-    padding: 0.15rem;
-    transform: translateZ(0);
-  }
-  
-  .form-container .signature-text .signature-logo svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .form-container .signature-text .signature-logo-image {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .form-container .signature-text .company-name {
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
-  }
-  
-  .form-container .signature-text .company-tagline {
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
-  }
-  
-  .form-container .signature-text .company-version {
-    font-size: clamp(0.5rem, 1.8vw, 0.6rem) !important;
-    margin-top: 0.1rem !important;
-    color: rgba(107, 114, 128, 0.9) !important;
-    padding: 0.1rem 0.25rem !important;
-  }
-}
-
-/* RESPONSIVE: Información de la empresa - Móviles extra pequeños */
-@media (max-width: 360px) {
-  .form-container .signature-text {
-    padding: 0.3rem !important;
-    margin-top: 0.4rem !important;
-  }
-  
-  .form-container .signature-text .company-name {
-    font-size: 0.5rem !important;
-  }
-  
-  .form-container .signature-text .company-tagline {
-    font-size: 0.5rem !important;
-  }
-  
-  .form-container .signature-text .company-version {
-    font-size: 0.45rem !important;
-  }
-}
-
-/* ================================= */
-/* ESTILOS PARA LOS NUEVOS COMPONENTES */
-/* Hacemos que se vean exactamente como el diseño original */
-/* ================================= */
-
-/* Contenedor del formulario */
-.form-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-/* Header del formulario */
-.form-header {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.form-header h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  color: #1f2937;
-  margin-bottom: 0.25rem;
+  font-size: 2rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.025em;
+  color: var(--white);
 }
 
-.form-header p {
-  color: #6b7280;
-  font-size: clamp(0.875rem, 2.5vw, 1rem);
-  margin: 0;
+.brand-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  font-weight: 400;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  color: var(--white);
+}
+
+/* ===== LOGIN PANEL ===== */
+.login-panel {
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+  position: relative;
+}
+
+.login-header {
+  text-align: right;
+  margin-bottom: 3rem;
+}
+
+.brand-logo-small {
+  width: 80px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.025em;
+}
+
+.required::after {
+  content: ' *';
+  color: var(--danger);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: var(--white);
+  transition: all 0.2s ease;
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  background-color: var(--white);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.form-input:hover {
+  border-color: var(--gray-400);
+}
+
+.form-input.invalid {
+  border-color: var(--gray-300);
+  background-color: var(--gray-50);
+}
+
+.form-input.invalid:focus {
+  border-color: var(--gray-400);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1), var(--shadow-sm);
+}
+
+.form-input.valid {
+  border-color: var(--success);
+}
+
+.form-input.valid:focus {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-sm);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ===== INPUT ICONS ===== */
+.input-wrapper,
+.password-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.with-icon {
+  padding-left: 3rem !important;
+}
+
+.form-input:focus + .input-icon {
+  color: var(--primary);
+}
+
+.form-input.invalid + .input-icon {
+  color: var(--gray-400);
+}
+
+.form-input.invalid:focus + .input-icon {
+  color: var(--gray-500);
+}
+
+.form-input.valid + .input-icon {
+  color: var(--success);
+}
+
+.form-input.valid:focus + .input-icon {
+  color: var(--success);
+}
+
+.password-wrapper .input-icon {
+  left: 1rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+  padding: 0.25rem;
+  z-index: 3;
+}
+
+.password-toggle:hover {
+  color: var(--primary);
+}
+
+/* ===== BUTTONS ===== */
+.btn-login {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-transform: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-login:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===== LINKS & DIVIDERS ===== */
+.action-links {
+  margin-bottom: 2rem;
+}
+
+.forgot-password,
+.create-account {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.forgot-password a,
+.create-account a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.forgot-password a:hover,
+.create-account a:hover {
+  text-decoration: underline;
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.create-account a {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.create-account a:hover {
+  color: #047857;
+  background-color: rgba(5, 150, 105, 0.05);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.divider span {
+  padding: 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--bg-card);
+}
+
+/* ===== MESSAGES ===== */
+.error-message {
+  display: none;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.error-message i {
+  margin-right: 0.5rem;
+}
+
+.terms {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
   line-height: 1.5;
 }
 
-/* Estilos específicos para formularios */
-.form-group {
-  margin-bottom: 0.125rem;
-  width: 100%;
-}
-
-.form-actions {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-footer {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.signup-prompt {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.signup-prompt span {
-  white-space: nowrap;
-}
-
-/* Estilos específicos para botones ghost en el footer */
-.form-footer ::ng-deep app-button[variant="ghost"] {
-  width: auto !important;
-  display: inline-block !important;
-}
-
-.form-footer ::ng-deep app-button[variant="ghost"] .btn {
-  width: auto !important;
-  padding: 0 !important;
-  background: none !important;
-  color: var(--logo-primary-color, #3b82f6) !important;
-  font-weight: 500 !important;
-  font-size: 0.875rem !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  text-decoration: underline !important;
-  text-underline-offset: 2px !important;
-}
-
-.form-footer ::ng-deep app-button[variant="ghost"] .btn:hover {
-  background: none !important;
-  color: var(--logo-secondary-color, #1e40af) !important;
-  transform: none !important;
-  box-shadow: none !important;
-  text-decoration: underline !important;
-}
-
-.form-footer ::ng-deep app-button[variant="ghost"] .btn:active {
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.form-footer ::ng-deep app-button[variant="ghost"] .btn:focus {
-  box-shadow: 
-    0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
-.form-footer ::ng-deep app-button[variant="ghost"] .btn::before {
-  display: none !important;
-}
-
-.form-link {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-.form-link a {
-  color: var(--logo-primary-color, #3b82f6);
+.terms a {
+  color: var(--primary);
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.875rem;
-  transition: color 0.3s ease;
 }
 
-.form-link a:hover {
-  color: var(--logo-secondary-color, #1e40af);
+.terms a:hover {
   text-decoration: underline;
 }
 
-/* Checkbox styling si es necesario */
-::ng-deep app-input[type="checkbox"] .input-field {
-  width: auto !important;
-  margin-right: 0.5rem !important;
-  position: relative !important;
-  top: 1px !important;
+/* ===== LOADING STATES ===== */
+.loading-spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--white);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
 }
 
-/* Responsive para los nuevos estilos */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1024px) {
+  .login-wrapper {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
 @media (max-width: 768px) {
-  ::ng-deep app-input .input-field {
-    padding: 0.75rem 0.875rem !important;
-    font-size: 0.9rem !important;
+  .login-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
   }
 
-  ::ng-deep app-button .btn {
-    padding: 0.75rem 0.875rem !important;
-    font-size: 0.9rem !important;
+  .branding-panel {
+    padding: 2rem 1.5rem;
+    min-height: 300px;
   }
 
-  .form-header h1 {
-    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  .brand-logo-large {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+    margin-bottom: 1rem;
   }
 
-  .form-header p {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  .brand-title {
+    font-size: 2.5rem;
+  }
+
+  .brand-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .brand-description {
+    font-size: 1rem;
+  }
+
+  .login-panel {
+    padding: 2rem 1.5rem;
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
   }
 }
 
 @media (max-width: 480px) {
-  ::ng-deep app-input .input-field {
-    padding: 0.625rem 0.75rem !important;
-    font-size: 0.875rem !important;
+  .branding-panel {
+    padding: 1.5rem 1rem;
   }
 
-  ::ng-deep app-button .btn {
-    padding: 0.625rem 0.75rem !important;
-    font-size: 0.875rem !important;
+  .login-panel {
+    padding: 1.5rem 1rem;
   }
 
-  .form-content {
-    gap: clamp(0.75rem, 2vh, 1rem);
+  .brand-title {
+    font-size: 2rem;
   }
 
-  .form-header {
-    margin-bottom: clamp(1rem, 2vh, 1.5rem);
+  .brand-subtitle {
+    font-size: 1.25rem;
   }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.branding-panel {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.login-panel {
+  animation: slideInRight 0.6s ease-out;
 }

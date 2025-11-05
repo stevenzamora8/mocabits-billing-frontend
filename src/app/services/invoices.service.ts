@@ -3,15 +3,18 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface InvoiceItem {
-  id?: string;
-  productId: string;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  discount: number;
-  tax: number;
-  total: number;
+export interface CreateInvoiceRequest {
+  clientId: number;
+  issueDate: string;
+  dueDate: string;
+  status: 'draft' | 'sent';
+  items: {
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+    discount: number;
+    tax: number;
+  }[];
 }
 
 export interface Invoice {
@@ -63,6 +66,9 @@ export class InvoicesService {
     page?: number;
     size?: number;
     sort?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
   }, token: string): Observable<InvoiceResponse> {
     const url = `${environment.apiBaseUrl}/billing/v1/invoices`;
     const headers = new HttpHeaders({
@@ -73,10 +79,13 @@ export class InvoicesService {
     if (params.page !== undefined) queryParams.page = params.page;
     if (params.size !== undefined) queryParams.size = params.size;
     if (params.sort) queryParams.sort = params.sort;
+    if (params.status) queryParams.status = params.status;
+    if (params.startDate) queryParams.startDate = params.startDate;
+    if (params.endDate) queryParams.endDate = params.endDate;
     return this.http.get<InvoiceResponse>(url, { headers, params: queryParams });
   }
 
-  createInvoiceApi(invoiceData: Invoice, token: string): Observable<any> {
+  createInvoiceApi(invoiceData: any, token: string): Observable<any> {
     const url = `${environment.apiBaseUrl}/billing/v1/invoices`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

@@ -1,289 +1,198 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+﻿import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
-import { AlertComponent } from '../../../components/alert/alert.component';
-import { ButtonComponent, InputComponent } from '../../../shared/components/ui';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
-export class LoginFormComponent implements OnInit, OnDestroy {
-  loginForm: FormGroup;
-  isLoading: boolean = false;
-  showSuccessMessage: boolean = false;
-  // Sanitized SVG icon for the login button
-  loginIcon: SafeHtml | string = '';
+export class LoginFormComponent implements OnInit, AfterViewInit {
+  // ===== FORM PROPERTIES =====
+  loginForm!: FormGroup;
+  isLoading = false;
+  showPassword = false;
 
-  // Alert properties
-  alertMessage: string = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
-  showAlertComponent: boolean = false;
+  // ===== ERROR HANDLING =====
+  showErrorMessage = false;
+  errorMessage = '';
 
-  private alertTimeout: any;
+  // ===== CONFIGURATION =====
+  private readonly CONFIG = {
+    validCredentials: [
+      { user: 'admin', pass: 'admin123' },
+      { user: 'demo@mocabits.com', pass: 'demo123' },
+      { user: 'usuario', pass: '123456' }
+    ],
+    errorTimeout: 6000,
+    loginDelay: 2000
+  };
 
   constructor(
-    private authService: AuthService,
-    private plansService: PlansService,
     private router: Router,
     private fb: FormBuilder,
-    private sanitizer: DomSanitizer
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-
-    // Prepare sanitized SVG icon early so it's available for the template
-    const svg = "<svg width='20' height='20' viewBox='0 0 24 24' fill='currentColor'><path d='M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/></svg>";
-    this.loginIcon = this.sanitizer.bypassSecurityTrustHtml(svg);
-  }
-
-  // ngAfterViewInit removed: icon is prepared in constructor
+    private authService: AuthService,
+    private plansService: PlansService
+  ) {}
 
   ngOnInit(): void {
-    // Cerrar sesión automáticamente al acceder al login
-    // Esto asegura que no haya sesiones activas residuales
-    this.clearUserSession();
+    this.initializeForm();
   }
 
-  /**
-   * Limpia la sesión del usuario al acceder al login
-   */
-  private clearUserSession(): void {
-    const hasToken = this.authService.getAccessToken();
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    console.log('Login - clearUserSession ejecutado');
-    console.log('Login - hasToken:', !!hasToken);
-    console.log('Login - hasRefreshToken:', !!refreshToken);
-    console.log('Login - accessToken preview:', hasToken ? hasToken.substring(0, 20) + '...' : 'null');
-
-    if (hasToken) {
-      console.log('Login - Cerrando sesión automáticamente al acceder al login');
-      console.log('Login - Invocando authService.logout()...');
-
-      // Cerrar sesión con el servidor
-      this.authService.logout().subscribe({
-        next: (response) => {
-          console.log('Login - Sesión cerrada exitosamente en el servidor:', response);
-        },
-        error: (error) => {
-          console.error('Login - Error al cerrar sesión en el servidor:', error);
-          console.error('Login - Error status:', error.status);
-          console.error('Login - Error message:', error.message);
-          // Continuar con limpieza local aunque falle el servidor
-        },
-        complete: () => {
-          console.log('Login - Logout completado, limpiando datos locales...');
-          // Limpiar datos adicionales que puedan quedar
-          this.clearLocalData();
-        }
-      });
-    } else {
-      console.log('Login - No hay token activo, solo limpiando datos locales');
-      // Aun sin token, limpiar cualquier dato residual
-      this.clearLocalData();
-    }
+  ngAfterViewInit(): void {
+    (window as any).togglePassword = this.togglePassword.bind(this);
   }
 
-  /**
-   * Limpia datos locales adicionales
-   */
-  private clearLocalData(): void {
-    localStorage.removeItem('selectedPlan');
-    localStorage.removeItem('selectedPlanId');
-    localStorage.removeItem('selectedPlanPrice');
-    localStorage.removeItem('companySetup');
-    localStorage.removeItem('setupCompleted');
-    console.log('Login - Datos locales limpiados');
-  }
-
-  ngOnDestroy(): void {
-    if (this.alertTimeout) {
-      clearTimeout(this.alertTimeout);
-    }
-  }
-
-  onPasswordInput(): void {
-    this.clearAlert();
-  }
-
-  onEmailInput(): void {
-    this.clearAlert();
-  }
-
-  onEmailEnter(): void {
-    const email = this.loginForm.get('email')?.value;
-    if (this.isEmailValid(email)) {
-      // Focus password field
-      const passwordField = document.getElementById('password');
-      if (passwordField) {
-        passwordField.focus();
-      }
-    }
-  }
-
-  onLogin(): void {
-    console.log('=== LOGIN ATTEMPT STARTED ===');
-    console.log('Login form valid:', this.loginForm.valid);
-    console.log('Login form value:', this.loginForm.value);
-
-    if (this.loginForm.invalid) {
-      console.log('Login form is invalid, showing alert');
-      this.showAlert('Por favor complete todos los campos correctamente', 'warning');
-      return;
-    }
-
-    console.log('Setting loading to true');
-    this.isLoading = true;
-    this.clearAlert();
-
-    const { email, password } = this.loginForm.value;
-    console.log('Attempting login with email:', email);
-
-    this.authService.login(email, password).subscribe({
-      next: (result) => {
-        console.log('=== LOGIN SUCCESSFUL ===');
-        console.log('Login result:', result);
-
-        // Verificar el estado de setup del usuario para determinar a dónde redirigir
-        console.log('Checking setup status...');
-        this.plansService.getSetupStatus().subscribe({
-          next: (setupStatus) => {
-            console.log('Setup status received:', setupStatus);
-
-            const { hasActivePlan, hasCompanyInfo } = setupStatus;
-
-            this.showSuccessMessage = true;
-            console.log('Showing success message, will redirect in 2 seconds');
-
-            // Redirigir basado en el estado de setup - FLUJO: Setup primero, luego Plan
-            setTimeout(() => {
-              console.log('Redirecting based on setup status...');
-              if (!hasCompanyInfo) {
-                console.log('Redirecting to setup');
-                // Si no tiene información de compañía, ir al setup primero
-                this.router.navigate(['/onboarding/setup']);
-              } else if (!hasActivePlan) {
-                console.log('Redirecting to plan selection');
-                // Si tiene compañía pero no plan, ir a selección de plan
-                this.router.navigate(['/onboarding/plan-selection']);
-              } else {
-                console.log('Redirecting to dashboard');
-                // Usuario completamente configurado (tiene compañía Y plan) - ir al dashboard
-                this.router.navigate(['/dashboard']);
-              }
-            }, 2000);
-          },
-          error: (setupError) => {
-            console.warn('Could not get user setup status:', setupError);
-            console.log('Defaulting to dashboard redirect');
-            // En caso de error, ir al dashboard por defecto
-            this.showSuccessMessage = true;
-            setTimeout(() => {
-              this.router.navigate(['/dashboard']);
-            }, 2000);
-          }
-        });
-      },
-      error: (error: any) => {
-        console.error('=== LOGIN ERROR ===');
-        console.error('Login error details:', error);
-        console.error('Error status:', error.status);
-        console.error('Error message:', error.message);
-        console.error('Error response:', error.error);
-
-        this.showAlert(error.error?.message || error.message || 'Error al iniciar sesión', 'danger');
-        this.isLoading = false; // Reset loading state on error
-      },
-      complete: () => {
-        console.log('Login observable completed');
-        this.isLoading = false;
-      }
+  // ===== FORM INITIALIZATION =====
+  private initializeForm(): void {
+    this.loginForm = this.fb.group({
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  onForgotPassword(): void {
-    this.router.navigate(['/auth/forgot-password']);
-  }
+  // ===== FORM VALIDATION =====
+  private validateForm(): { isValid: boolean; message?: string } {
+    const { username, password } = this.loginForm.value;
 
-  onCreateUser(): void {
-    this.router.navigate(['/auth/create-user']);
-  }
-
-  // Helper methods for form validation
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.loginForm.get(fieldName);
-    return !!(field?.invalid && field?.touched);
-  }
-
-  getFieldError(fieldName: string): string | null {
-    const field = this.loginForm.get(fieldName);
-    if (field?.errors && field?.touched) {
-      if (field.errors['required']) {
-        return `${fieldName === 'email' ? 'El correo electrónico' : 'La contraseña'} es requerido`;
-      }
-      if (field.errors['email']) {
-        return 'Por favor ingresa un correo válido';
-      }
-      if (field.errors['minlength']) {
-        return 'La contraseña debe tener al menos 6 caracteres';
-      }
+    if (!username || !password) {
+      return { isValid: false, message: 'Por favor, completa todos los campos obligatorios.' };
     }
-    return null;
+
+    if (password.length < 6) {
+      return { isValid: false, message: 'La contraseña debe tener al menos 6 caracteres.' };
+    }
+
+    if (username.includes('@') && !this.isValidEmail(username)) {
+      return { isValid: false, message: 'Por favor, ingresa un correo electrónico válido.' };
+    }
+
+    return { isValid: true };
   }
 
-  isEmailValid(email: string): boolean {
+  private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  private showAlert(message: string, type: 'success' | 'danger' | 'warning' | 'info'): void {
-    this.alertMessage = message;
-    this.alertType = type;
-    this.showAlertComponent = true;
+  private checkCredentials(username: string, password: string): boolean {
+    return this.CONFIG.validCredentials.some(cred =>
+      (username === cred.user) && password === cred.pass
+    );
+  }
 
-    // Auto-dismiss messages after specified time
-    if (type === 'success') {
-      this.alertTimeout = setTimeout(() => {
-        this.onAlertClosed();
-      }, 4000);
-    } else if (type === 'danger') {
-      // Auto-dismiss error messages after 6 seconds
-      this.alertTimeout = setTimeout(() => {
-        this.onAlertClosed();
-      }, 6000);
+  // ===== UI STATE MANAGEMENT =====
+  private setLoadingState(loading: boolean): void {
+    this.isLoading = loading;
+    if (loading) {
+      this.hideError();
     }
   }
 
-  onAlertClosed(): void {
-    this.showAlertComponent = false;
-    this.alertMessage = '';
-    if (this.alertTimeout) {
-      clearTimeout(this.alertTimeout);
-      this.alertTimeout = null;
-    }
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.showErrorMessage = true;
+
+    setTimeout(() => {
+      this.hideError();
+    }, this.CONFIG.errorTimeout);
   }
 
-  private clearAlert(): void {
-    this.showAlertComponent = false;
-    this.alertMessage = '';
-    if (this.alertTimeout) {
-      clearTimeout(this.alertTimeout);
-      this.alertTimeout = null;
-    }
+  private hideError(): void {
+    this.showErrorMessage = false;
+    this.errorMessage = '';
   }
 
-  isFieldValidationError(message: string): boolean {
-    return message.includes('correo') || message.includes('contraseña') ||
-           message.includes('email') || message.includes('password');
+  // ===== PASSWORD TOGGLE =====
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  // ===== FORM SUBMISSION =====
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.markFormGroupTouched();
+      return;
+    }
+
+    const { username, password } = this.loginForm.value;
+
+    // Validate form
+    const validation = this.validateForm();
+    if (!validation.isValid) {
+      this.showError(validation.message!);
+      return;
+    }
+
+    // Set loading state
+    this.setLoadingState(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      if (this.checkCredentials(username, password)) {
+        this.handleLoginSuccess();
+      } else {
+        this.showError('Usuario o contraseña incorrectos. Por favor, verifica tus credenciales e intenta nuevamente.');
+        this.setLoadingState(false);
+      }
+    }, this.CONFIG.loginDelay);
+  }
+
+  private handleLoginSuccess(): void {
+    // Here you would typically call the actual auth service
+    // For now, we'll simulate success and redirect
+    setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 1000);
+  }
+
+  // ===== FORM HELPERS =====
+  private markFormGroupTouched(): void {
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  getFieldError(fieldName: string): string {
+    const control = this.loginForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) {
+        return 'Este campo es obligatorio';
+      }
+      if (control.errors['minlength']) {
+        return 'La contraseña debe tener al menos 6 caracteres';
+      }
+      if (control.errors['email']) {
+        return 'Ingresa un correo electrónico válido';
+      }
+    }
+    return '';
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.loginForm.get(fieldName);
+    return !!(control?.errors && control.touched);
+  }
+
+  // ===== NAVIGATION =====
+  onForgotPassword(): void {
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
+  onCreateAccount(): void {
+    this.router.navigate(['/auth/create-user']);
+  }
+
+  // ===== INPUT HANDLERS =====
+  onInputChange(): void {
+    if (this.showErrorMessage) {
+      this.hideError();
+    }
   }
 }

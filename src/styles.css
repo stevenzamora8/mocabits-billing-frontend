@@ -12,3 +12,46 @@ html, body {
   color: #334155;
   overflow-x: hidden;
 }
+
+/* Global CSS variables (moved from component-scoped file so all components share the same palette) */
+:root {
+  /* Brand Colors */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --secondary: #059669;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Neutral Colors */
+  --white: #ffffff;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+
+  --bg-primary: var(--white);
+  --bg-card: var(--white);
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --border-color: var(--gray-200);
+}
+
+/* Make sure brand icons and small header icon pick expected colors by default */
+.brand-logo-large i {
+  color: var(--white) !important;
+}
+
+.login-header .brand-logo-small i,
+.brand-logo-small i {
+  color: var(--primary) !important;
+  font-size: 2rem;
+}

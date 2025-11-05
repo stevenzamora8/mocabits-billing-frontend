@@ -1,108 +1,84 @@
-<!-- Alert Component -->
-<div class="alert-container" *ngIf="showAlertComponent">
-  <app-alert
-    [message]="alertMessage"
-    [type]="alertType"
-    [dismissible]="true"
-    (closed)="onAlertClosed()">
-  </app-alert>
+<!-- Header con logo -->
+<div class="login-header">
+  <div class="brand-logo-small">
+    <i class="fas fa-cube" style="color: var(--primary); font-size: 2rem;"></i>
+  </div>
+</div>
+
+<h1 class="login-title">Inicio de sesión</h1>
+
+<!-- Mensaje de Error -->
+<div class="error-message" id="errorMessage" [style.display]="showErrorMessage ? 'block' : 'none'">
+  <i class="fas fa-exclamation-triangle"></i>
+  <span id="errorText">{{ errorMessage }}</span>
 </div>
 
 <!-- Formulario de Login -->
-<div *ngIf="!showSuccessMessage" class="auth-section">
-  <div class="welcome-header">
-    <h1>¡Bienvenido a MocaBits!</h1>
-    <p class="welcome-subtitle">Inicia sesión en tu cuenta</p>
+<form class="login-form" id="loginForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <label for="username" class="form-label required">Usuario o correo electrónico</label>
+    <div class="input-wrapper">
+      <i class="fas fa-user input-icon"></i>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        formControlName="username"
+        class="form-input with-icon"
+        placeholder=""
+        autocomplete="username"
+        (input)="onInputChange()"
+      />
+    </div>
   </div>
 
-  <form class="auth-form" [formGroup]="loginForm">
-    <div class="form-group">
-      <app-input
-        formControlName="email"
-        type="email"
-        label="Correo Electrónico"
-        placeholder="correo@empresa.com"
-        rightIcon="email"
-        [required]="true"
-        [errorMessage]="getFieldError('email')"
-        [state]="isFieldInvalid('email') ? 'error' : (loginForm.get('email')?.valid && loginForm.get('email')?.value ? 'success' : 'default')"
-        autocomplete="email"
-        (inputChange)="onEmailInput()">
-        <svg slot="right-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-        </svg>
-      </app-input>
-    </div>
-
-    <div class="form-group">
-      <app-input
+  <div class="form-group">
+    <label for="password" class="form-label required">Contraseña</label>
+    <div class="password-wrapper">
+      <i class="fas fa-lock input-icon"></i>
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        id="password"
+        name="password"
         formControlName="password"
-        type="password"
-        label="Contraseña"
-        placeholder="Ingresa tu contraseña"
-        rightIcon="password"
-        [showPasswordToggle]="true"
-        [required]="true"
-        [errorMessage]="getFieldError('password')"
-        [state]="isFieldInvalid('password') ? 'error' : 'default'"
+        class="form-input with-icon"
+        placeholder=""
         autocomplete="current-password"
-        (inputChange)="onPasswordInput()">
-        <svg slot="right-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-        </svg>
-      </app-input>
+        (input)="onInputChange()"
+      />
+      <i
+        class="fas password-toggle"
+        [class.fa-eye]="!showPassword"
+        [class.fa-eye-slash]="showPassword"
+        (click)="togglePassword()"
+      ></i>
     </div>
+  </div>
 
-    <div class="form-actions">
-      <app-button
-        type="button"
-        variant="primary"
-        size="lg"
-        [disabled]="loginForm.invalid || isLoading"
-        [loading]="isLoading"
-        [fullWidth]="true"
-        [icon]="loginIcon"
-        iconPosition="left"
-        [showIconWhenLoading]="false"
-        (click)="onLogin()">
-        <span *ngIf="!isLoading">Iniciar Sesión</span>
-        <span *ngIf="isLoading">Validando credenciales...</span>
-      </app-button>
-    </div>
+  <button type="submit" class="btn-login" id="loginBtn" [disabled]="isLoading">
+    <span class="loading-spinner" id="loadingSpinner" [style.display]="isLoading ? 'inline-block' : 'none'"></span>
+    <i class="fas" id="loginIcon" [class.fa-sign-in-alt]="!isLoading" [class.fa-check]="isLoading"></i>
+    <span id="loginBtnText">{{ isLoading ? 'Iniciando sesión...' : 'Iniciar sesión' }}</span>
+  </button>
+</form>
 
-    <div class="form-footer">
-      <app-button 
-        type="button" 
-        variant="ghost"
-        size="sm"
-        (click)="onForgotPassword()">
-        ¿Olvidaste tu contraseña?
-      </app-button>
+<!-- Enlaces de acción -->
+<div class="action-links">
+  <div class="forgot-password">
+    <a href="javascript:void(0)" (click)="onForgotPassword()">¿Olvidaste tu contraseña?</a>
+  </div>
 
-      <div class="signup-prompt">
-        ¿No tienes cuenta?
-        <app-button 
-          type="button" 
-          variant="ghost"
-          size="sm"
-          (click)="onCreateUser()">
-          Crear cuenta
-        </app-button>
-      </div>
-    </div>
-  </form>
+  <div class="divider">
+    <span>o</span>
+  </div>
+
+  <div class="create-account">
+    <a href="javascript:void(0)" (click)="onCreateAccount()" id="createAccountLink">¿No tienes cuenta? Crear una nueva</a>
+  </div>
 </div>
 
-<!-- Mensaje de éxito del login -->
-<div *ngIf="showSuccessMessage" class="success-message login-success">
-  <div class="success-icon">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-    </svg>
-  </div>
-  <h3>¡Bienvenido a MocaBits!</h3>
-  <p>Inicio de sesión exitoso. Redirigiendo al dashboard...</p>
-  <div class="loading-bar">
-    <div class="progress"></div>
-  </div>
+<!-- Términos y condiciones -->
+<div class="terms">
+  Al ingresar a MocaBits, estás aceptando nuestros
+  <a href="#" target="_blank">Términos y condiciones</a>.
 </div>

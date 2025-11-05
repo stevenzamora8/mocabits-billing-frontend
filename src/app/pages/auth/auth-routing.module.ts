@@ -1,16 +1,21 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
+import { LoginFormComponent } from './login-form/login-form.component';
 
 const routes: Routes = [
   {
     path: '',
     component: AuthLayoutComponent,
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+      },
       {
         path: 'login',
-        loadComponent: () => import('./login-form/login-form.component').then(m => m.LoginFormComponent)
+        component: LoginFormComponent
       },
       {
         path: 'forgot-password',
@@ -23,7 +28,7 @@ const routes: Routes = [
       {
         path: 'reset-password/:uid',
         loadComponent: () => import('./reset-password-form/reset-password-form.component').then(m => m.ResetPasswordFormComponent)
-      },
+      }
     ]
   }
 ];

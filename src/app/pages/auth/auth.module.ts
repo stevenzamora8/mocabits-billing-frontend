@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { AuthRoutingModule } from './auth-routing.module';
 
 // Importar componentes standalone
@@ -17,6 +18,8 @@ import { AlertComponent } from '../../components/alert/alert.component';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
     AuthRoutingModule,
     AlertComponent,
     AuthLayoutComponent,

@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MocaBits - Iniciar Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            /* Brand Colors */
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+
+            /* Neutral Colors */
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            /* Layout Variables */
+            --bg-primary: var(--white);
+            --bg-card: var(--white);
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --text-muted: var(--gray-500);
+            --border-color: var(--gray-200);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--gray-100);
+            color: var(--text-primary);
+            font-feature-settings: 'cv02','cv03','cv04','cv11';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        /* ===== LAYOUT ===== */
+        .login-wrapper {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+        }
+
+        /* ===== BRANDING PANEL ===== */
+        .branding-panel {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 3rem;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .branding-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .branding-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .brand-logo-large {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 2rem auto;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .brand-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.05em;
+        }
+
+        .brand-highlight {
+            color: #fbbf24;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.025em;
+        }
+
+        .brand-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.95;
+            font-weight: 400;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== LOGIN PANEL ===== */
+        .login-panel {
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+            position: relative;
+        }
+
+        .login-header {
+            text-align: right;
+            margin-bottom: 3rem;
+        }
+
+        .siigo-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.025em;
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            color: var(--text-primary);
+            background-color: var(--white);
+            transition: all 0.2s ease;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+
+        .form-input:hover {
+            border-color: var(--gray-400);
+        }
+
+        .form-input.invalid {
+            border-color: var(--gray-300);
+            background-color: var(--gray-50);
+        }
+
+        .form-input.invalid:focus {
+            border-color: var(--gray-400);
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1), var(--shadow-sm);
+        }
+
+        .form-input.valid {
+            border-color: var(--success);
+        }
+
+        .form-input.valid:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-sm);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ===== INPUT ICONS ===== */
+        .input-wrapper,
+        .password-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .with-icon {
+            padding-left: 3rem !important;
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        .form-input.invalid + .input-icon {
+            color: var(--gray-400);
+        }
+
+        .form-input.invalid:focus + .input-icon {
+            color: var(--gray-500);
+        }
+
+        .form-input.valid + .input-icon {
+            color: var(--success);
+        }
+
+        .form-input.valid:focus + .input-icon {
+            color: var(--success);
+        }
+
+        .password-wrapper .input-icon {
+            left: 1rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+            padding: 0.25rem;
+            z-index: 3;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-login {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            text-transform: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ===== LINKS & DIVIDERS ===== */
+        .action-links {
+            margin-bottom: 2rem;
+        }
+
+        .forgot-password,
+        .create-account {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .forgot-password a,
+        .create-account a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .forgot-password a:hover,
+        .create-account a:hover {
+            text-decoration: underline;
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .create-account a {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .create-account a:hover {
+            color: #047857;
+            background-color: rgba(5, 150, 105, 0.05);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: var(--bg-card);
+        }
+
+        /* ===== MESSAGES ===== */
+        .error-message {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .error-message i {
+            margin-right: 0.5rem;
+        }
+
+        .terms {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1024px) {
+            .login-wrapper {
+                grid-template-columns: 1fr 380px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .branding-panel {
+                padding: 2rem 1.5rem;
+                min-height: 300px;
+            }
+
+            .brand-logo-large {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .brand-title {
+                font-size: 2.5rem;
+            }
+
+            .brand-subtitle {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .brand-description {
+                font-size: 1rem;
+            }
+
+            .login-panel {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-header {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .branding-panel {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-panel {
+                padding: 1.5rem 1rem;
+            }
+
+            .brand-title {
+                font-size: 2rem;
+            }
+
+            .brand-subtitle {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .branding-panel {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .login-panel {
+            animation: slideInRight 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Panel Izquierdo - Branding y Marketing -->
+        <div class="branding-panel">
+            <div class="branding-content">
+                <div class="brand-logo-large">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h1 class="brand-title">
+                    Moca<span class="brand-highlight">Bits</span>
+                </h1>
+                <h2 class="brand-subtitle">
+                    + que un software empresarial
+                </h2>
+                <p class="brand-description">
+                    Gestiona tu empresa con inteligencia artificial, automatización avanzada y análisis en tiempo real.
+                    La plataforma integral que necesitas para hacer crecer tu negocio.
+                </p>
+            </div>
+        </div>
+
+        <!-- Panel Derecho - Formulario de Login -->
+        <div class="login-panel">
+            <!-- Header con logo -->
+            <div class="login-header">
+                <div class="brand-logo-small">
+                    <i class="fas fa-cube" style="color: var(--primary); font-size: 2rem;"></i>
+                </div>
+            </div>
+
+            <h1 class="login-title">Inicio de sesión</h1>
+
+            <!-- Mensaje de Error -->
+            <div id="errorMessage" class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username" class="form-label required">Usuario o correo electrónico</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input with-icon"
+                            placeholder=""
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label required">Contraseña</label>
+                    <div class="password-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input with-icon"
+                            placeholder=""
+                            required
+                            autocomplete="current-password"
+                        >
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="loading-spinner" id="loadingSpinner"></span>
+                    <i class="fas fa-sign-in-alt" id="loginIcon"></i>
+                    <span id="loginBtnText">Iniciar sesión</span>
+                </button>
+            </form>
+
+            <!-- Enlaces de acción -->
+            <div class="action-links">
+                <div class="forgot-password">
+                    <a href="recover-password-mocabits.html">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <div class="divider">
+                    <span>o</span>
+                </div>
+
+                <div class="create-account">
+                    <a href="register-mocabits.html" id="createAccountLink">¿No tienes cuenta? Crear una nueva</a>
+                </div>
+            </div>
+
+            <!-- Términos y condiciones -->
+            <div class="terms">
+                Al ingresar a MocaBits, estás aceptando nuestros
+                <a href="#" target="_blank">Términos y condiciones</a>.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURATION =====
+        const CONFIG = {
+            validCredentials: [
+                { user: 'admin', pass: 'admin123' },
+                { user: 'demo@mocabits.com', pass: 'demo123' },
+                { user: 'usuario', pass: '123456' }
+            ],
+            redirectUrl: '../dashboard/dashboard-v2-mocabits.html',
+            errorTimeout: 6000,
+            loginDelay: 2000
+        };
+
+        // ===== DOM ELEMENTS =====
+        const elements = {
+            loginForm: document.getElementById('loginForm'),
+            username: document.getElementById('username'),
+            password: document.getElementById('password'),
+            loginBtn: document.getElementById('loginBtn'),
+            loginBtnText: document.getElementById('loginBtnText'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            loginIcon: document.getElementById('loginIcon'),
+            errorMessage: document.getElementById('errorMessage'),
+            errorText: document.getElementById('errorText'),
+            passwordToggle: document.querySelector('.password-toggle')
+        };
+
+        // ===== UTILITY FUNCTIONS =====
+        const utils = {
+            isValidEmail: (email) => {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            },
+
+            validateForm: (username, password) => {
+                if (!username || !password) {
+                    return { isValid: false, message: 'Por favor, completa todos los campos obligatorios.' };
+                }
+
+                if (password.length < 6) {
+                    return { isValid: false, message: 'La contraseña debe tener al menos 6 caracteres.' };
+                }
+
+                if (username.includes('@') && !utils.isValidEmail(username)) {
+                    return { isValid: false, message: 'Por favor, ingresa un correo electrónico válido.' };
+                }
+
+                return { isValid: true };
+            },
+
+            checkCredentials: (username, password) => {
+                return CONFIG.validCredentials.some(cred =>
+                    (username === cred.user) && password === cred.pass
+                );
+            }
+        };
+
+        // ===== UI FUNCTIONS =====
+        const ui = {
+            showError: (message) => {
+                elements.errorText.textContent = message;
+                elements.errorMessage.style.display = 'block';
+
+                setTimeout(() => {
+                    ui.hideError();
+                }, CONFIG.errorTimeout);
+            },
+
+            hideError: () => {
+                elements.errorMessage.style.display = 'none';
+            },
+
+            setLoadingState: (isLoading) => {
+                elements.loginBtn.disabled = isLoading;
+
+                if (isLoading) {
+                    elements.loginBtnText.textContent = 'Iniciando sesión...';
+                    elements.loadingSpinner.style.display = 'inline-block';
+                    ui.hideError();
+                } else {
+                    elements.loginBtnText.textContent = 'Iniciar sesión';
+                    elements.loadingSpinner.style.display = 'none';
+                    elements.loginBtn.style.background = 'var(--primary)';
+                }
+            },
+
+            setSuccessState: () => {
+                elements.loginBtnText.textContent = '¡Acceso concedido!';
+                elements.loadingSpinner.style.display = 'none';
+                elements.loginIcon.className = 'fas fa-check';
+                elements.loginBtn.style.background = '#10b981';
+
+                setTimeout(() => {
+                    window.location.href = CONFIG.redirectUrl;
+                }, 1000);
+            },
+
+            updateInputValidation: (input, isValid) => {
+                input.classList.remove('valid', 'invalid');
+                if (isValid !== null) {
+                    input.classList.add(isValid ? 'valid' : 'invalid');
+                }
+            }
+        };
+
+        // ===== PASSWORD TOGGLE =====
+        function togglePassword() {
+            const isPassword = elements.password.type === 'password';
+            elements.password.type = isPassword ? 'text' : 'password';
+            elements.passwordToggle.classList.toggle('fa-eye', !isPassword);
+            elements.passwordToggle.classList.toggle('fa-eye-slash', isPassword);
+        }
+
+        // ===== FORM HANDLER =====
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = elements.username.value.trim();
+            const password = elements.password.value;
+
+            // Validate form
+            const validation = utils.validateForm(username, password);
+            if (!validation.isValid) {
+                ui.showError(validation.message);
+                return;
+            }
+
+            // Set loading state
+            ui.setLoadingState(true);
+
+            // Simulate API call
+            setTimeout(() => {
+                if (utils.checkCredentials(username, password)) {
+                    ui.setSuccessState();
+                } else {
+                    ui.showError('Usuario o contraseña incorrectos. Por favor, verifica tus credenciales e intenta nuevamente.');
+                    ui.setLoadingState(false);
+                }
+            }, CONFIG.loginDelay);
+        }
+
+        // ===== EVENT LISTENERS =====
+        function initializeEventListeners() {
+            // Form submission
+            elements.loginForm.addEventListener('submit', handleLogin);
+
+            // Password toggle
+            elements.passwordToggle.addEventListener('click', togglePassword);
+
+            // Input focus effects
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('focused');
+                });
+            });
+
+            // Real-time validation and error clearing
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    if (elements.errorMessage.style.display === 'block') {
+                        ui.hideError();
+                    }
+
+                    // Email validation for username field
+                    if (this.id === 'username' && this.value.includes('@')) {
+                        const isValid = utils.isValidEmail(this.value);
+                        ui.updateInputValidation(this, isValid);
+                    } else if (this.id === 'username') {
+                        ui.updateInputValidation(this, null);
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        ui.updateInputValidation(this, null);
+                    }
+                });
+            });
+        }
+
+        // ===== INITIALIZATION =====
+        function initializeApp() {
+            initializeEventListeners();
+            console.log('MocaBits Login initialized');
+        }
+
+        // Start the application
+        initializeApp();
+    </script>
+</body>
+</html>
