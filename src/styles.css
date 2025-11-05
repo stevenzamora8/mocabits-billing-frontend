@@ -59,6 +59,14 @@ html, body {
   font-size: 2rem;
 }
 
+/* Position the logo to the right for all auth pages */
+.login-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 /* Shared auth form styles - make login/create/forgot/reset use same layout and controls */
 .auth-form {
   width: 100%;

@@ -7,6 +7,13 @@
   (closed)="onAlertClosed()">
 </app-alert>
 
+<!-- Brand logo (shared across auth forms) -->
+<div class="login-header">
+  <div class="brand-logo-small">
+    <i class="fas fa-cube" style="color: var(--primary); font-size: 2rem;"></i>
+  </div>
+</div>
+
 <!-- Formulario de Creación de Usuario -->
 <div *ngIf="currentStep === 'form'" class="auth-section">
   <div class="welcome-header">
@@ -18,7 +25,7 @@
     <div class="form-row">
       <div class="form-group">
         <app-input
-          label="Nombre *"
+          label="Nombre"
           placeholder="Juan"
           formControlName="firstName"
           [disabled]="isLoading"
@@ -34,7 +41,7 @@
       </div>
       <div class="form-group">
         <app-input
-          label="Apellido *"
+          label="Apellido"
           placeholder="Pérez"
           formControlName="lastName"
           [disabled]="isLoading"
@@ -52,7 +59,7 @@
 
     <div class="form-group">
       <app-input
-        label="Correo Electrónico *"
+        label="Correo Electrónico"
         placeholder="usuario@empresa.com"
         formControlName="email"
         [disabled]="isLoading"
@@ -78,8 +85,8 @@
     </div>
 
     <div class="form-group">
-      <app-input
-  label="Contraseña *"
+    <app-input
+  label="Contraseña"
   placeholder="••••••••"
   formControlName="password"
   [disabled]="isLoading"
@@ -94,7 +101,8 @@
           <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
         </svg>
       </app-input>
-    </div>    <div class="form-actions">
+    </div>
+    <div class="form-actions">
       <app-button
         type="submit"
         variant="primary"
@@ -102,11 +110,11 @@
         [disabled]="!isFormValid() || isLoading"
         [loading]="isLoading"
         [fullWidth]="true"
-        [icon]="userIcon"
         iconPosition="left"
         [showIconWhenLoading]="false">
-        <span *ngIf="!isLoading">Crear Cuenta</span>
-        <span *ngIf="isLoading">Creando cuenta...</span>
+        <span class="app-button__icon-html"><i class="fas fa-user-plus"></i></span>
+        <span>&nbsp;<span *ngIf="!isLoading">Crear Cuenta</span>
+        <span *ngIf="isLoading">Creando cuenta...</span></span>
       </app-button>
     </div>
   </form>
@@ -128,26 +136,5 @@
         Iniciar Sesión
       </app-button>
     </div>
-  </div>
-</div>
-
-<div *ngIf="currentStep === 'success'" class="auth-section">
-  <div class="success-header">
-    <h1>Cuenta Creada!</h1>
-    <p class="success-message">
-      Tu cuenta ha sido creada exitosamente.
-    </p>
-    <p class="info-message">
-      Ahora puedes iniciar sesión con tu correo y contraseña.
-    </p>
-
-    <app-button
-      variant="secondary"
-      size="lg"
-      (click)="goToLogin()">
-      Ir a Iniciar Sesión
-    </app-button>
-
-    <p class="auto-redirect">Serás redirigido al login en 3 segundos...</p>
   </div>
 </div>

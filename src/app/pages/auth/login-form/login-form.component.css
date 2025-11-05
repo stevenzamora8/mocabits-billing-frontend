@@ -29,30 +29,8 @@
   text-align: left;
 }
 
-/* Ensure the form sits in a centered column with same max-width as other auth forms */
-.auth-form {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Ensure controls inside the auth form share the same outer box sizing and stretch to full width */
-.auth-form .app-input-wrapper,
-.auth-form app-button,
-.auth-form .app-button,
-.auth-form .btn-login,
-.auth-form .primary-button {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.form-actions {
-  align-items: stretch; /* make sure button fills the container width */
-}
+/* Note: shared auth sizing rules (auth-form, app-button sizing, etc.) were
+   centralized into `src/styles.css`. Keep component-specific rules below. */
 
 /* ===== FORM ELEMENTS ===== */
 .login-form {

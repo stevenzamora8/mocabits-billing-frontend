@@ -2,7 +2,8 @@
 .app-input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.0625rem;
+  /* Increase gap so form fields have proper spacing between them */
+  gap: 0.75rem;
   width: 100%;
 }
 
@@ -11,6 +12,8 @@
   font-weight: 600;
   color: #374151;
   font-size: 0.875rem;
+  /* Add space above the label so it separates from headings or previous elements */
+  margin-top: 0.5rem;
   margin-bottom: 0.25rem;
   text-align: left;
   display: block;

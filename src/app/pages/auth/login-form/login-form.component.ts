@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, AfterViewInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -15,7 +15,7 @@ import { finalize } from 'rxjs/operators';
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
-export class LoginFormComponent implements OnInit, AfterViewInit {
+export class LoginFormComponent implements OnInit {
   submitted = false;
   // ===== FORM PROPERTIES =====
   loginForm!: FormGroup;
@@ -27,14 +27,9 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
   errorMessage = '';
 
   // ===== CONFIGURATION =====
+  // Centralized small config values for the component. Do not keep test credentials here.
   private readonly CONFIG = {
-    validCredentials: [
-      { user: 'admin', pass: 'admin123' },
-      { user: 'demo@mocabits.com', pass: 'demo123' },
-      { user: 'usuario', pass: '123456' }
-    ],
-    errorTimeout: 6000,
-    loginDelay: 2000
+    errorTimeout: 6000
   };
 
   constructor(
@@ -48,9 +43,6 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
     this.initializeForm();
   }
 
-  ngAfterViewInit(): void {
-    (window as any).togglePassword = this.togglePassword.bind(this);
-  }
 
   // ===== FORM INITIALIZATION =====
   private initializeForm(): void {
@@ -61,7 +53,7 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
   }
 
   // ===== FORM VALIDATION =====
-  private validateForm(): { isValid: boolean; message?: string } {
+  private validateInputs(): { isValid: boolean; message?: string } {
     const { username, password } = this.loginForm.value;
 
     if (!username || !password) {
@@ -84,11 +76,6 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
     return emailRegex.test(email);
   }
 
-  private checkCredentials(username: string, password: string): boolean {
-    return this.CONFIG.validCredentials.some(cred =>
-      (username === cred.user) && password === cred.pass
-    );
-  }
 
   // ===== UI STATE MANAGEMENT =====
   private setLoadingState(loading: boolean): void {
@@ -128,7 +115,7 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
     const { username, password } = this.loginForm.value;
 
     // Validate form
-    const validation = this.validateForm();
+    const validation = this.validateInputs();
     if (!validation.isValid) {
       this.showError(validation.message!);
       return;
@@ -151,13 +138,7 @@ export class LoginFormComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private handleLoginSuccess(): void {
-    // Here you would typically call the actual auth service
-    // For now, we'll simulate success and redirect
-    setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 1000);
-  }
+  
 
   // ===== FORM HELPERS =====
   private markFormGroupTouched(): void {
