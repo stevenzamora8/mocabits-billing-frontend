@@ -327,15 +327,18 @@
 
 /* Styled intro box for the clients page */
 .page-intro {
+  /* Make the intro card visually match the filters card (white, padded, rounded, subtle shadow) */
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(90deg, rgba(99,102,241,0.03), rgba(14,165,233,0.02));
-  border: 1px solid rgba(99,102,241,0.08);
-  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .intro-icon {
@@ -349,6 +352,18 @@
   color: white;
   font-size: 0.95rem;
   box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+.page-intro::before {
+  /* Top gradient strip like other cards */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  border-radius: 16px 16px 0 0;
 }
 
 .intro-text .intro-title {
@@ -402,6 +417,8 @@
 .clients-table {
   width: 100%;
   border-collapse: collapse;
+  /* Use fixed table layout to keep columns stable when content is long */
+  table-layout: fixed;
 }
 
 .clients-table thead th {
@@ -414,6 +431,15 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Header column icons */
+.clients-table thead th .col-icon {
+  margin-right: 0.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .clients-table tbody td {
@@ -429,7 +455,7 @@
 
 .client-row:hover {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%);
-  transform: scale(1.01);
+  /* removed scale to prevent layout shifts when hovering rows */
 }
 
 .client-row:hover td {
@@ -497,6 +523,31 @@
 
 .phone-cell {
   min-width: 140px;
+}
+
+/* Column width hints when using fixed table layout to avoid unexpected wrapping */
+.clients-table thead th:nth-child(1) { width: 260px; } /* Cliente */
+.clients-table thead th:nth-child(2) { width: 120px; } /* Tipo ID */
+.clients-table thead th:nth-child(3) { width: 140px; } /* Identificación */
+.clients-table thead th:nth-child(4) { width: 220px; } /* Correo */
+.clients-table thead th:nth-child(5) { width: 140px; } /* Teléfono */
+.clients-table thead th:nth-child(6) { width: 120px; } /* Estado */
+.clients-table thead th:nth-child(7) { width: 120px; } /* Acciones */
+
+/* Truncate long text fields with ellipsis to keep rows compact and prevent overflow */
+.client-name,
+.email,
+.identification {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Ensure table cells don't force growth when inner content is long */
+.clients-table tbody td {
+  max-width: 0; /* allows children with max-width:100% to truncate properly */
 }
 
 .type-badge, .status-badge {

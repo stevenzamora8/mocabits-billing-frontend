@@ -160,8 +160,8 @@
           <th>Cliente</th>
           <th>Tipo ID</th>
           <th>Identificación</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
+          <th><span class="col-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span> Correo</th>
+          <th><span class="col-icon" aria-hidden="true"><i class="fas fa-phone"></i></span> Teléfono</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -169,11 +169,8 @@
       <tbody>
         <tr *ngFor="let client of paginatedClients; trackBy: trackByClientId" class="client-row">
           <td class="client-info">
-            <div class="client-info-inner">
-              <div class="client-avatar-table">{{ client.name ? client.name.charAt(0) : 'C' }}</div>
-              <div class="client-meta-text">
-                <div class="client-name">{{ client.name }}</div>
-              </div>
+            <div>
+              <div class="client-name">{{ client.name }}</div>
             </div>
           </td>
           <td class="id-type-cell">
@@ -184,13 +181,11 @@
           </td>
           <td class="email-cell">
             <div class="contact-line">
-              <i class="fas fa-envelope contact-icon" aria-hidden="true"></i>
               <span class="email">{{ client.email || '-' }}</span>
             </div>
           </td>
           <td class="phone-cell">
             <div class="contact-line">
-              <i class="fas fa-phone contact-icon" aria-hidden="true"></i>
               <span class="phone">{{ client.phone || '-' }}</span>
             </div>
           </td>
