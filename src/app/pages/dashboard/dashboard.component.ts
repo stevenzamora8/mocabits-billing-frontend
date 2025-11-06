@@ -144,11 +144,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Otherwise map more specific routes
     const currentPath = '/' + segments.join('/');
-    // Special case: clients page should show a parent title 'Gestión de Clientes'
-    // and an active sub-route 'Lista de Clientes' in the breadcrumb trail.
+    // Special case: clients area. For the base list we show 'Lista de Clientes'.
+    // For child routes like 'create' or ':id/edit' show 'Clientes' as parent
+    // and the action (crear/editar) as the active label.
     if (currentPath === '/dashboard/clients') {
       // User prefers breadcrumb: Principal / Lista de Clientes
       this.breadcrumbs.push({ label: 'Lista de Clientes', path: '/dashboard/clients', active: true });
+      return;
+    }
+
+    if (currentPath.startsWith('/dashboard/clients')) {
+      // segments example: ['dashboard','clients','create'] or ['dashboard','clients','123','edit']
+      this.breadcrumbs.push({ label: 'Clientes', path: '/dashboard/clients', active: false });
+
+      // determine action label
+      if (segments.includes('create')) {
+        this.breadcrumbs.push({ label: 'crear', path: currentPath, active: true });
+        return;
+      }
+
+      if (segments.includes('edit') || segments.includes('update')) {
+        this.breadcrumbs.push({ label: 'editar', path: currentPath, active: true });
+        return;
+      }
+
+      // fallback: show last segment capitalized
+      const last = segments[segments.length - 1];
+      const fallbackLabel = last.charAt(0).toUpperCase() + last.slice(1);
+      this.breadcrumbs.push({ label: fallbackLabel, path: currentPath, active: true });
       return;
     }
 

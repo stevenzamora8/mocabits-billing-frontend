@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Crear Cliente — Diseño MocaBits</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --logo-primary-color:#2563eb;
+      --logo-secondary-color:#059669;
+      --page-bg: #f3f7fb;
+      --card-bg: #ffffff;
+      --muted:#64748b;
+    }
+    body{font-family:Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial; background:var(--page-bg); margin:0; padding:32px; color:#0f172a}
+    .container{max-width:1100px; margin:0 auto}
+
+    .top-row{display:flex; align-items:center; gap:16px; margin-bottom:18px}
+    .breadcrumb{font-size:0.9rem; color:var(--muted); display:flex; gap:8px; align-items:center}
+    .breadcrumb .current{color:var(--logo-primary-color); font-weight:700}
+
+    .card{background:var(--card-bg); border-radius:12px; box-shadow:0 8px 24px rgba(12,23,54,0.06); overflow:hidden}
+    .card .card-header{display:flex; align-items:center; gap:16px; padding:18px 20px}
+    .card .stripe{height:6px; width:100%; background:linear-gradient(90deg,var(--logo-primary-color),var(--logo-secondary-color)); position:relative; top:0}
+
+    .intro-icon{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--logo-primary-color),var(--logo-secondary-color)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px}
+    .intro-text h2{margin:0;font-size:1.1rem}
+    .intro-text p{margin:4px 0 0;color:var(--muted); font-size:0.95rem}
+
+    .card-body{padding:20px}
+    .form-grid{display:grid; grid-template-columns: repeat(2, 1fr); gap:14px}
+    .form-group{display:flex; flex-direction:column;}
+    label{font-weight:600; font-size:0.85rem; margin-bottom:6px}
+    input[type=text], input[type=email], input[type=tel], select, textarea{padding:10px 12px; border-radius:8px; border:1px solid #e6eef8; background:#fbfdff; font-size:0.95rem}
+    textarea{min-height:88px; resize:vertical}
+
+    .full{grid-column:1/-1}
+    .help{font-size:0.8rem;color:var(--muted); margin-top:6px}
+
+    .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px}
+    .btn{padding:10px 14px; border-radius:10px; border:none; font-weight:700; cursor:pointer}
+    .btn.secondary{background:#f1f5f9; color:#0f172a}
+    .btn.ghost{background:transparent; color:var(--muted); border:1px solid transparent}
+    .btn.primary{background:linear-gradient(90deg,var(--logo-primary-color),var(--logo-secondary-color)); color:white; box-shadow:0 8px 20px rgba(37,99,235,0.15)}
+
+    .row-stats{display:flex; gap:12px; margin-bottom:14px}
+    .stat{background:#fbfdff; border-radius:10px; padding:10px 12px; border:1px solid #eef6ff; display:flex; gap:10px; align-items:center}
+    .stat .num{font-weight:800; color:#0f172a}
+    .muted{color:var(--muted)}
+
+    @media (max-width:860px){.form-grid{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+  /* Table styles for clients list sample */
+  .clients-table{width:100%; border-collapse:collapse; margin-top:22px}
+  .clients-table th, .clients-table td{padding:12px 14px; text-align:left; border-bottom:1px solid #eef6ff; font-size:0.95rem}
+  .clients-table thead th{color:var(--muted); font-weight:700; background:#fbfdff}
+  .clients-table tbody tr:hover{background:#fbfdff}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700}
+  .chip.active{background:rgba(5,150,105,0.12); color:#059669}
+  .chip.inactive{background:rgba(156,163,175,0.08); color:#64748b}
+  .actions-cell{white-space:nowrap}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="top-row">
+      <div class="breadcrumb">
+        <i class="fas fa-home"></i>
+        <span>Principal</span>
+        <span>/</span>
+        <span class="current">Clientes</span>
+        <span>/</span>
+        <span>Crear</span>
+      </div>
+      </div>
+
+      <!-- Sample clients list with requested columns -->
+      <div style="margin-top:20px">
+        <div style="font-weight:700; margin-bottom:8px; color:#0f172a">Lista de clientes (muestra)</div>
+        <table class="clients-table" role="table" aria-label="Lista de clientes">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Tipo ID</th>
+              <th>Identificación</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ACME S.A.</td>
+              <td>RUC</td>
+              <td>1790012345001</td>
+              <td>contacto@acme.com</td>
+              <td>0999-123-456</td>
+              <td><span class="chip active">Activo</span></td>
+              <td class="actions-cell"><button class="btn ghost" style="margin-right:6px"><i class="fas fa-eye"></i></button><button class="btn ghost" style="margin-right:6px"><i class="fas fa-edit"></i></button><button class="btn ghost"><i class="fas fa-trash-alt"></i></button></td>
+            </tr>
+            <tr>
+              <td>Juan Pérez</td>
+              <td>Cédula</td>
+              <td>0102030405</td>
+              <td>juan.perez@mail.com</td>
+              <td>0998-765-432</td>
+              <td><span class="chip inactive">Inactivo</span></td>
+              <td class="actions-cell"><button class="btn ghost" style="margin-right:6px"><i class="fas fa-eye"></i></button><button class="btn ghost" style="margin-right:6px"><i class="fas fa-edit"></i></button><button class="btn ghost"><i class="fas fa-trash-alt"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    <div class="card">
+      <div class="stripe"></div>
+      <div class="card-header">
+        <div class="intro-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="intro-text">
+          <h2>Crear Cliente</h2>
+          <p class="muted">Gestión de clientes — Crea un nuevo cliente con su información fiscal y de contacto. Puedes crear personas naturales o jurídicas.</p>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <div class="stat">
+            <div style="font-size:12px;color:var(--muted)">Estado</div>
+            <div style="margin-left:8px; font-weight:800; color:#059669">Activo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form>
+          <div class="row-stats">
+            <div class="stat"><div class="num">#</div><div class="muted">ID: (autogenerado)</div></div>
+            <div class="stat"><div class="num">0</div><div class="muted">Facturas</div></div>
+            <div class="stat"><div class="num">0</div><div class="muted">Pagos</div></div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Cliente</label>
+              <input id="name" name="name" type="text" placeholder="Nombre o razón social" />
+              <div class="help">Nombre completo o razón social.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="idType">Tipo ID</label>
+              <select id="idType" name="idType">
+                <option value="ruc">RUC</option>
+                <option value="cedula">Cédula</option>
+                <option value="pasaporte">Pasaporte</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="identification">Identificación</label>
+              <input id="identification" name="identification" type="text" placeholder="Número de identificación" />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Correo</label>
+              <input id="email" name="email" type="email" placeholder="correo@cliente.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Teléfono</label>
+              <input id="phone" name="phone" type="tel" placeholder="0999-999-999" />
+            </div>
+
+            <div class="form-group">
+              <label for="status">Estado</label>
+              <select id="status" name="status">
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost">Cancelar</button>
+            <button type="reset" class="btn secondary">Limpiar</button>
+            <button type="submit" class="btn primary">Guardar cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

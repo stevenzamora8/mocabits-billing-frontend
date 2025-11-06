@@ -137,7 +137,7 @@ export class ClientService {
 
   getClients(page: number = 0, size: number = 10, filters?: {
     name?: string;
-    type?: string;
+    typeIdentification?: string;
     identification?: string;
     status?: string;
   }): Observable<ClientPage> {
@@ -147,8 +147,9 @@ export class ClientService {
       if (filters.name && filters.name.trim()) {
         url += `&name=${encodeURIComponent(filters.name.trim())}`;
       }
-      if (filters.type && filters.type.trim()) {
-        url += `&type=${encodeURIComponent(filters.type.trim())}`;
+      // filter by typeIdentification to match the Client model field
+      if ((filters as any).typeIdentification && (filters as any).typeIdentification.trim()) {
+        url += `&typeIdentification=${encodeURIComponent((filters as any).typeIdentification.trim())}`;
       }
       if (filters.identification && filters.identification.trim()) {
         url += `&identification=${encodeURIComponent(filters.identification.trim())}`;

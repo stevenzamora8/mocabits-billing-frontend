@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertType } from '../../../components/alert/alert.component';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
+import { Router } from '@angular/router';
 import { AlertComponent } from '../../../components/alert/alert.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
@@ -11,7 +13,7 @@ import { SelectComponent, SelectOption } from '../../../shared/components/ui/sel
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
@@ -93,7 +95,8 @@ export class ClientsComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private clientService: ClientService
+    private clientService: ClientService,
+    private router: Router
   ) {
     this.clientForm = this.createClientForm();
     this.currentClientPage = null;
@@ -138,7 +141,7 @@ export class ClientsComponent implements OnInit {
     
     const filters = {
       name: this.searchTerm,
-      type: this.selectedType,
+      typeIdentification: this.selectedType,
       identification: this.selectedIdentification,
       status: this.selectedStatus
     };
@@ -194,6 +197,30 @@ export class ClientsComponent implements OnInit {
     this.searchTerm = '';
     this.selectedType = '';
     this.selectedIdentification = '';
+    this.selectedStatus = '';
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
+  }
+
+  clearType(): void {
+    this.selectedType = '';
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
+  }
+
+  clearIdentification(): void {
+    this.selectedIdentification = '';
+    this.currentPage = 0;
+    this.loadClients(this.currentPage);
+  }
+
+  clearStatus(): void {
     this.selectedStatus = '';
     this.currentPage = 0;
     this.loadClients(this.currentPage);
@@ -366,8 +393,10 @@ export class ClientsComponent implements OnInit {
   }
 
   editClient(client: Client): void {
-    // Abrir el modal directamente con los datos actuales del cliente
-    this.openClientModal(client);
+    // Navigate to the edit route for the selected client
+    if (client && client.id != null) {
+      this.router.navigate(['/dashboard', 'clients', client.id, 'edit']);
+    }
   }
 
   viewClient(client: Client): void {

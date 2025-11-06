@@ -261,9 +261,35 @@
 
 .filter-selects {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
+  gap: 1rem;
+  align-items: flex-start;
   flex-wrap: wrap;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 200px;
+}
+
+.filter-field-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Make the input/select inside filter rows expand to available space */
+.filter-field-row app-input,
+.filter-field-row app-select {
+  flex: 1 1 auto;
+  min-width: 0; /* allow truncation in narrow containers */
+}
+
+.filter-label {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 700;
 }
 
 /* Ensure select dropdown panels render above other content without forcing their position
@@ -361,6 +387,20 @@
   color: white;
   font-size: 0.95rem;
   box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+/* Ensure the left block containing icon + text is aligned vertically */
+.intro-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Make sure the inner icon (<i>) is centered and sized consistently */
+.intro-icon i {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-block;
 }
 
 .page-intro::before {

@@ -21,7 +21,7 @@ const routes: Routes = [
       },
       {
         path: 'clients',
-        loadComponent: () => import('./clients/clients.component').then(m => m.ClientsComponent),
+        loadChildren: () => import('./clients/clients.module').then(m => m.ClientsModule),
         title: 'Dashboard - Clientes'
       },
       {

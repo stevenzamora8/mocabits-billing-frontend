@@ -129,12 +129,24 @@
           </button>
 
           <div class="breadcrumb-nav" *ngIf="breadcrumbs.length">
-            <a *ngIf="breadcrumbs.length>0" [routerLink]="breadcrumbs[0].path"><i class="fas fa-home"></i> {{ breadcrumbs[0].label }}</a>
-            <span>/</span>
-            <span class="current">{{ breadcrumbs[breadcrumbs.length-1].label || 'Resumen' }}</span>
+            <ng-container *ngFor="let b of breadcrumbs; let i = index; let last = last">
+              <ng-container *ngIf="i === 0">
+                <a [routerLink]="b.path"><i class="fas fa-home"></i> {{ b.label }}</a>
+              </ng-container>
+
+              <ng-container *ngIf="i > 0 && !last">
+                <span class="separator">/</span>
+                <a [routerLink]="b.path">{{ b.label }}</a>
+              </ng-container>
+
+              <ng-container *ngIf="last && i > 0">
+                <span class="separator">/</span>
+                <span class="current">{{ b.label || 'Resumen' }}</span>
+              </ng-container>
+            </ng-container>
           </div>
 
-          <h1 *ngIf="!(breadcrumbs && breadcrumbs.length > 1 && breadcrumbs[1].label === 'Lista de Clientes')">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
+          <h1 *ngIf="!(breadcrumbs && breadcrumbs.length > 1 && breadcrumbs[1].path === '/dashboard/clients')">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
         </div>
       </div>
       <div class="header-right">

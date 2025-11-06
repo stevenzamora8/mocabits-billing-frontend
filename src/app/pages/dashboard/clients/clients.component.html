@@ -26,7 +26,7 @@
     </div>
 
     <div class="intro-action">
-      <app-button variant="primary" size="md" (click)="openClientModal()">
+      <app-button variant="primary" size="md" [routerLink]="['/dashboard','clients','create']">
         <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
         Nuevo Cliente
       </app-button>
@@ -95,37 +95,62 @@
   </div>
 
   <div class="filters-section">
-    <div class="search-box">
-      <app-input
-        type="text"
-        placeholder="Buscar clientes por nombre, email o identificación..."
-        [(ngModel)]="searchTerm"
-        (input)="onSearchChange()"
-        leftIcon="search">
-        <svg slot="left-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-      </app-input>
-    </div>
     <div class="filter-selects">
-      <app-select
-        placeholder="Todos los tipos"
-        [options]="typeOptions"
-        [(ngModel)]="selectedType"
-        (selectionChange)="onFilterChange()"
-      ></app-select>
-      <app-input
-        type="text"
-        placeholder="Identificación..."
-        [(ngModel)]="selectedIdentification"
-        (input)="onFilterChange()"
-      ></app-input>
-      <app-select
-        placeholder="Todos los estados"
-        [options]="statusOptions"
-        [(ngModel)]="selectedStatus"
-        (selectionChange)="onFilterChange()"
-      ></app-select>
+      <div class="filter-field">
+        <label class="filter-label">Nombre</label>
+        <div class="filter-field-row">
+          <app-input
+            type="text"
+            placeholder="Buscar por nombre, email o identificación..."
+            [(ngModel)]="searchTerm"
+            (input)="onFilterChange()"
+            rightIcon="true">
+            <i slot="right-icon" class="fas fa-user"></i>
+          </app-input>
+        </div>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label">Tipo ID</label>
+        <div class="filter-field-row">
+          <app-select
+            placeholder="Todos los tipos"
+            [options]="typeOptions"
+            [(ngModel)]="selectedType"
+            (selectionChange)="onFilterChange()"
+            rightIcon="true">
+            <i slot="right-icon" class="fas fa-id-card"></i>
+          </app-select>
+        </div>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label">Estado</label>
+        <div class="filter-field-row">
+          <app-select
+            placeholder="Todos los estados"
+            [options]="statusOptions"
+            [(ngModel)]="selectedStatus"
+            (selectionChange)="onFilterChange()"
+            rightIcon="true">
+            <i slot="right-icon" class="fas fa-flag"></i>
+          </app-select>
+        </div>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label">Identificación</label>
+        <div class="filter-field-row">
+          <app-input
+            type="text"
+            placeholder="Identificación..."
+            [(ngModel)]="selectedIdentification"
+            (input)="onFilterChange()"
+            rightIcon="true">
+            <i slot="right-icon" class="fas fa-hashtag"></i>
+          </app-input>
+        </div>
+      </div>
     </div>
     <div class="filter-buttons">
       <!-- filter inputs area (buttons moved to separate action-controls) -->
