@@ -20,8 +20,7 @@
     <div class="intro-left">
       <span class="intro-icon" aria-hidden="true"><i class="fas fa-info"></i></span>
       <div class="intro-text">
-        <div class="intro-title">Gestión de clientes</div>
-        <div class="intro-desc">Busca, filtra y administra clientes. Crear, ver, editar, activar/inactivar y eliminar clientes desde esta pantalla.</div>
+    <div class="intro-desc">Gestión de clientes — Busca, filtra y administra clientes. Crear, ver, editar, activar/inactivar y eliminar clientes desde esta pantalla.</div>
       </div>
     </div>
 
@@ -194,7 +193,7 @@
               {{ client.status === 'A' ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
-          <td>
+          <td class="actions">
             <div class="action-buttons">
               <app-button variant="ghost" size="sm" (click)="viewClient(client)" ariaLabel="Ver cliente" class="view-btn" title="Ver cliente">
                 <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-eye"></i></span>

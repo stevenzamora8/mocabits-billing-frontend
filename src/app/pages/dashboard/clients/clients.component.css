@@ -417,8 +417,8 @@
 .clients-table {
   width: 100%;
   border-collapse: collapse;
-  /* Use fixed table layout to keep columns stable when content is long */
-  table-layout: fixed;
+  /* Use automatic table layout so columns (especially Acciones) can size to their content */
+  table-layout: auto;
 }
 
 .clients-table thead th {
@@ -532,7 +532,7 @@
 .clients-table thead th:nth-child(4) { width: 220px; } /* Correo */
 .clients-table thead th:nth-child(5) { width: 140px; } /* Teléfono */
 .clients-table thead th:nth-child(6) { width: 120px; } /* Estado */
-.clients-table thead th:nth-child(7) { width: 120px; } /* Acciones */
+.clients-table thead th:nth-child(7) { width: 220px; } /* Acciones: reservar más espacio para los botones */
 
 /* Truncate long text fields with ellipsis to keep rows compact and prevent overflow */
 .client-name,
@@ -548,6 +548,31 @@
 /* Ensure table cells don't force growth when inner content is long */
 .clients-table tbody td {
   max-width: 0; /* allows children with max-width:100% to truncate properly */
+}
+
+/* Ensure the actions cell doesn't get truncated so all buttons remain visible */
+.clients-table tbody td.actions {
+  max-width: none;
+  white-space: nowrap;
+  /* let actions occupy reasonable space; avoid forcing 1% which truncated content */
+  width: auto;
+  min-width: 180px;
+}
+
+/* Allow action buttons to keep their intrinsic size */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* On very small screens, allow action buttons to wrap to multiple lines to avoid overflow */
+@media (max-width: 520px) {
+  .clients-table thead th:nth-child(7) { width: 1fr; }
+  .clients-table tbody td.actions { white-space: normal; }
+  .action-buttons { flex-wrap: wrap; gap: 0.35rem; }
+  .action-buttons app-button { height: 32px; padding: 0 6px; }
 }
 
 .type-badge, .status-badge {
