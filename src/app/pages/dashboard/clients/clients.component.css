@@ -318,6 +318,66 @@
   align-self: center;
 }
 
+/* Brief description text under the top actions */
+.page-description {
+  margin: 0.5rem 0 1rem 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+/* Styled intro box for the clients page */
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(90deg, rgba(99,102,241,0.03), rgba(14,165,233,0.02));
+  border: 1px solid rgba(99,102,241,0.08);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.intro-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+.intro-text .intro-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.intro-text .intro-desc {
+  color: #475569;
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+/* Action area inside the intro (button aligned right) */
+.intro-action {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.intro-action app-button { height: 40px; }
+
+@media (max-width: 720px) {
+  .page-intro { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .intro-left { display: flex; gap: 0.5rem; }
+  .intro-action { justify-content: flex-end; }
+}
+
 /* CLIENTS TABLE */
 .table-container {
   background: white;

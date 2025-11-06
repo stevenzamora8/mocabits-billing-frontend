@@ -15,12 +15,22 @@
   ></app-alert>
   <!-- Top actions (moved into the card header below) -->
 
-  <!-- Top action: Nuevo Cliente placed above the stats grid -->
-  <div class="top-actions">
-    <app-button variant="primary" size="md" (click)="openClientModal()">
-      <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
-      Nuevo Cliente
-    </app-button>
+  <!-- Short description explaining the purpose of this component (styled) -->
+  <div class="page-intro">
+    <div class="intro-left">
+      <span class="intro-icon" aria-hidden="true"><i class="fas fa-info"></i></span>
+      <div class="intro-text">
+        <div class="intro-title">Gestión de clientes</div>
+        <div class="intro-desc">Busca, filtra y administra clientes. Crear, ver, editar, activar/inactivar y eliminar clientes desde esta pantalla.</div>
+      </div>
+    </div>
+
+    <div class="intro-action">
+      <app-button variant="primary" size="md" (click)="openClientModal()">
+        <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
+        Nuevo Cliente
+      </app-button>
+    </div>
   </div>
 
   <div class="stats-grid" style="margin-top:1.25rem;margin-bottom:1.5rem">
