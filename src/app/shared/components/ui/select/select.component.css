@@ -22,7 +22,6 @@
   padding: 0 1rem; /* same horizontal padding as app-input */
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  margin-top: 0.5rem !important;
   font-size: clamp(0.875rem, 2.5vh, 1rem);
   background: white;
   color: #1f2937;
@@ -95,7 +94,7 @@
 /* Arrow icon */
 .app-select-arrow {
   position: absolute;
-  right: 0.75rem;
+  right: 2.75rem; /* moved left to make space for optional right icon */
   top: 50%;
   transform: translateY(-50%);
   width: 20px;
@@ -103,6 +102,19 @@
   color: #6b7280;
   pointer-events: none;
   transition: transform 0.2s;
+}
+
+/* Optional icon projected into select (right side) */
+.app-select-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-select-arrow.open {

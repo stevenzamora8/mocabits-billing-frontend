@@ -39,6 +39,8 @@ export class SelectComponent implements ControlValueAccessor {
   @Input() emptyMessage: string = 'No hay opciones disponibles';
   @Input() hint?: string;
   @Input() errorMessage?: string | null | undefined;
+  @Input() leftIcon: string = '';
+  @Input() rightIcon: string = '';
   @Input() clearable: boolean = false;
   @Input() multiple: boolean = false;
   @Input() maxHeight: string = '200px';

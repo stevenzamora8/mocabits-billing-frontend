@@ -19,20 +19,21 @@
   <div class="card-body">
     <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
       <div class="form-row">
-        <div class="form-group">
-          <app-input formControlName="name" label="Cliente" placeholder="Nombre completo" rightIcon="true">
+        <div class="form-group full-width">
+          <app-input formControlName="name" label="Nombre Cliente" placeholder="Nombre completo" rightIcon="true">
             <i slot="right-icon" class="fas fa-user"></i>
           </app-input>
           <div class="help" *ngIf="clientForm.get('name')?.touched && clientForm.get('name')?.invalid">Nombre requerido</div>
         </div>
-
-        <div class="form-group">
-          <app-select formControlName="idType" [options]="idTypeOptions" label="Tipo ID" placeholder="Seleccione tipo" [attr.title]="isEdit ? 'Tipo de identificación no editable' : null">
-          </app-select>
-        </div>
       </div>
 
       <div class="form-row">
+        <div class="form-group">
+          <app-select formControlName="idType" [options]="idTypeOptions" label="Tipo ID" placeholder="Seleccione tipo" [attr.title]="isEdit ? 'Tipo de identificación no editable' : null" rightIcon="true">
+            <i slot="right-icon" class="fas fa-id-card"></i>
+          </app-select>
+        </div>
+
         <div class="form-group">
           <app-input formControlName="identification" label="Identificación" placeholder="Número de identificación" rightIcon="true" [attr.title]="isEdit ? 'Identificación no editable' : null">
             <i slot="right-icon" class="fas fa-hashtag"></i>
@@ -42,23 +43,26 @@
             <span *ngIf="clientForm.get('identification')?.errors?.['identificationExists']">La identificación ya está registrada</span>
           </div>
         </div>
+      </div>
 
+      <div class="form-row">
         <div class="form-group">
           <app-input formControlName="email" label="Correo" placeholder="correo@cliente.com" type="email" rightIcon="true">
             <i slot="right-icon" class="fas fa-envelope"></i>
+          </app-input>
+        </div>
+
+        <div class="form-group">
+          <app-input formControlName="phone" label="Teléfono" placeholder="(555) 555-555" type="tel" rightIcon="true">
+            <i slot="right-icon" class="fas fa-phone"></i>
           </app-input>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <app-input formControlName="phone" label="Teléfono" placeholder="(555) 555-555" type="tel" rightIcon="true">
-            <i slot="right-icon" class="fas fa-phone"></i>
-          </app-input>
-        </div>
-
-        <div class="form-group">
-          <app-select formControlName="status" [options]="statusOptions" label="Estado" placeholder="Seleccione estado">
+          <app-select formControlName="status" [options]="statusOptions" label="Estado" placeholder="Seleccione estado" rightIcon="true">
+            <i slot="right-icon" class="fas fa-flag"></i>
           </app-select>
         </div>
       </div>

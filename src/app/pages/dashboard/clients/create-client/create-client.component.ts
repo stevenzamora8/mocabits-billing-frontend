@@ -30,8 +30,8 @@ export class CreateClientComponent implements OnInit {
   ];
 
   statusOptions = [
-    { value: 'active', label: 'Activo' },
-    { value: 'inactive', label: 'Inactivo' }
+    { value: 'A', label: 'Activo' },
+    { value: 'I', label: 'Inactivo' }
   ];
 
   constructor(
@@ -46,7 +46,7 @@ export class CreateClientComponent implements OnInit {
       identification: ['', [Validators.required], [this.identificationExistsValidator()]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
-      status: ['active', [Validators.required]]
+      status: ['A', [Validators.required]]
     });
   }
 
@@ -102,7 +102,7 @@ export class CreateClientComponent implements OnInit {
           identification: '',
           email: '',
           phone: '',
-          status: 'active'
+          status: 'A'
         });
       }
     });
@@ -123,7 +123,7 @@ export class CreateClientComponent implements OnInit {
           identification: client.identification || '',
           email: client.email || '',
           phone: client.phone || '',
-          status: client.status === 'A' ? 'active' : 'inactive'
+          status: client.status || 'A'
         });
         // When editing, identification and id type should not be editable
         this.clientForm.get('identification')?.disable({ emitEvent: false });
@@ -157,7 +157,7 @@ export class CreateClientComponent implements OnInit {
         typeIdentification: (idTypeVal || '').toString().toUpperCase(),
         email: emailVal,
         phone: phoneVal,
-        status: statusVal === 'active' ? 'A' : 'I'
+        status: statusVal // already 'A' or 'I'
       };
 
       if (this.isEdit && this.editingId) {

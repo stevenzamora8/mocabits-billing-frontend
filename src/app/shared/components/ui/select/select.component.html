@@ -21,6 +21,10 @@
             (blur)="onTouched()">
       <!-- Selected value display -->
       <span class="app-select-text">{{ selectedOption?.label || placeholder }}</span>
+      <!-- Right icon slot (optional) -->
+      <div *ngIf="rightIcon" class="app-select-icon app-select-icon--right">
+        <ng-content select="[slot=right-icon]"></ng-content>
+      </div>
       <!-- Arrow icon -->
       <svg class="app-select-arrow" width="20" height="20" viewBox="0 0 20 20">
         <path d="M7 7l3 3 3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
