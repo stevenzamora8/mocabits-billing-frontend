@@ -20,7 +20,8 @@
     <div class="intro-left">
       <span class="intro-icon" aria-hidden="true"><i class="fas fa-info"></i></span>
       <div class="intro-text">
-    <div class="intro-desc">Gestión de clientes — Busca, filtra y administra clientes. Crear, ver, editar, activar/inactivar y eliminar clientes desde esta pantalla.</div>
+        <div class="intro-title">Gestión de clientes</div>
+        <div class="intro-desc">Busca, filtra y administra clientes. Crea, ve, edita, activa/inactiva y elimina clientes desde esta pantalla.</div>
       </div>
     </div>
 
@@ -75,13 +76,7 @@
   </div>
 
   <!-- Filters and Search (restored inputs) -->
-  <style>
-    /* Ensure select dropdowns appear above the table and other content */
-    .filters-section, .filter-selects, .filter-selects .app-select-panel, .filter-selects .cdk-overlay-pane {
-      z-index: 1002 !important;
-      position: relative;
-    }
-  </style>
+  <!-- NOTE: overlay z-index adjustments are handled in the component stylesheet to avoid forcing overlay panes to be positioned relative to the filters container -->
   <!-- Action buttons separated above the filters card -->
   <div class="action-controls">
     <app-button variant="outline" size="md" class="btn-outline-primary">

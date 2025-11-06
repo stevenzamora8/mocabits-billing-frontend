@@ -21,24 +21,25 @@
       </div>
     </div>
 
+
     <!-- Navigation (exactly like the attached template) -->
     <nav class="sidebar-menu">
       <div class="menu-section">
         <div class="menu-title">Principal</div>
-  <a class="menu-item" (click)="navigateTo('/dashboard'); $event.preventDefault()" [class.active]="isActive('/dashboard')">
+  <a class="menu-item" title="Dashboard" (click)="navigateTo('/dashboard'); $event.preventDefault()" [class.active]="isActive('/dashboard')">
           <i class="fas fa-home"></i>
           <span *ngIf="!isSidebarCollapsed">Dashboard</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/invoices'); $event.preventDefault()" [class.active]="isActive('/dashboard/invoices')">
+  <a class="menu-item" title="Facturas" (click)="navigateTo('/dashboard/invoices'); $event.preventDefault()" [class.active]="isActive('/dashboard/invoices')">
           <i class="fas fa-file-invoice"></i>
           <span *ngIf="!isSidebarCollapsed">Facturas</span>
           <span class="menu-badge" *ngIf="!isSidebarCollapsed">5</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/receipts'); $event.preventDefault()">
+  <a class="menu-item" title="Comprobantes" (click)="navigateTo('/dashboard/receipts'); $event.preventDefault()">
           <i class="fas fa-receipt"></i>
           <span *ngIf="!isSidebarCollapsed">Comprobantes</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/clients'); $event.preventDefault()" [class.active]="isActive('/dashboard/clients')">
+  <a class="menu-item" title="Clientes" (click)="navigateTo('/dashboard/clients'); $event.preventDefault()" [class.active]="isActive('/dashboard/clients')">
           <i class="fas fa-users"></i>
           <span *ngIf="!isSidebarCollapsed">Clientes</span>
         </a>
@@ -46,15 +47,15 @@
 
       <div class="menu-section">
         <div class="menu-title">Gestión</div>
-  <a class="menu-item" (click)="navigateTo('/dashboard/products'); $event.preventDefault()" [class.active]="isActive('/dashboard/products')">
+  <a class="menu-item" title="Productos" (click)="navigateTo('/dashboard/products'); $event.preventDefault()" [class.active]="isActive('/dashboard/products')">
           <i class="fas fa-box"></i>
           <span *ngIf="!isSidebarCollapsed">Productos</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/locations'); $event.preventDefault()">
+  <a class="menu-item" title="Establecimientos" (click)="navigateTo('/dashboard/locations'); $event.preventDefault()">
           <i class="fas fa-store"></i>
           <span *ngIf="!isSidebarCollapsed">Establecimientos</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/sri'); $event.preventDefault()">
+  <a class="menu-item" title="SRI" (click)="navigateTo('/dashboard/sri'); $event.preventDefault()">
           <i class="fas fa-file-alt"></i>
           <span *ngIf="!isSidebarCollapsed">SRI</span>
         </a>
@@ -62,11 +63,11 @@
 
       <div class="menu-section">
         <div class="menu-title">Reportes</div>
-  <a class="menu-item" (click)="navigateTo('/dashboard/stats'); $event.preventDefault()">
+  <a class="menu-item" title="Estadísticas" (click)="navigateTo('/dashboard/stats'); $event.preventDefault()">
           <i class="fas fa-chart-bar"></i>
           <span *ngIf="!isSidebarCollapsed">Estadísticas</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/export'); $event.preventDefault()">
+  <a class="menu-item" title="Exportar" (click)="navigateTo('/dashboard/export'); $event.preventDefault()">
           <i class="fas fa-file-export"></i>
           <span *ngIf="!isSidebarCollapsed">Exportar</span>
         </a>
@@ -74,11 +75,11 @@
 
       <div class="menu-section">
         <div class="menu-title">Sistema</div>
-  <a class="menu-item" (click)="navigateTo('/dashboard/settings'); $event.preventDefault()" [class.active]="isActive('/dashboard/settings')">
+  <a class="menu-item" title="Configuración" (click)="navigateTo('/dashboard/settings'); $event.preventDefault()" [class.active]="isActive('/dashboard/settings')">
           <i class="fas fa-cog"></i>
           <span *ngIf="!isSidebarCollapsed">Configuración</span>
         </a>
-  <a class="menu-item" (click)="navigateTo('/dashboard/help'); $event.preventDefault()">
+  <a class="menu-item" title="Ayuda" (click)="navigateTo('/dashboard/help'); $event.preventDefault()">
           <i class="fas fa-question-circle"></i>
           <span *ngIf="!isSidebarCollapsed">Ayuda</span>
         </a>
@@ -86,29 +87,29 @@
     </nav>
 
     <!-- User Info (match template: sidebar user + dropdown) -->
-    <div class="sidebar-footer">
+        <div class="sidebar-footer">
       <div class="sidebar-user">
         <div class="user-dropdown">
-          <a href="#" class="user-dropdown-item" (click)="navigateTo('/dashboard/company')">
+          <a href="#" class="user-dropdown-item" title="Perfil" (click)="navigateTo('/dashboard/company')">
             <i class="fas fa-user"></i>
             <span>Perfil</span>
           </a>
-          <a href="#" class="user-dropdown-item" (click)="navigateTo('/dashboard/settings')">
+          <a href="#" class="user-dropdown-item" title="Configuración" (click)="navigateTo('/dashboard/settings')">
             <i class="fas fa-cog"></i>
             <span>Configuración</span>
           </a>
-          <a href="#" class="user-dropdown-item" (click)="navigateTo('/dashboard/help')">
+          <a href="#" class="user-dropdown-item" title="Ayuda" (click)="navigateTo('/dashboard/help')">
             <i class="fas fa-question-circle"></i>
             <span>Ayuda</span>
           </a>
           <div class="user-dropdown-divider"></div>
-          <a href="#" class="user-dropdown-item danger" (click)="logout()">
+          <a href="#" class="user-dropdown-item danger" title="Cerrar sesión" (click)="logout()">
             <i class="fas fa-sign-out-alt"></i>
             <span>Cerrar Sesión</span>
           </a>
         </div>
 
-        <div class="user-avatar">{{ userInitials }}</div>
+        <div class="user-avatar" title="{{ userName }}">{{ userInitials }}</div>
         <div class="user-details" *ngIf="!isSidebarCollapsed">
           <div class="user-name">{{ userName }}</div>
           <div class="user-role-small">{{ userRole }}</div>
@@ -122,11 +123,18 @@
   <main class="main-content">
     <header class="top-header">
       <div class="header-left">
-        <h1>Panel de Control</h1>
-        <div class="breadcrumb-nav" *ngIf="breadcrumbs.length">
-          <a *ngIf="breadcrumbs.length>0" [routerLink]="breadcrumbs[0].path"><i class="fas fa-home"></i> {{ breadcrumbs[0].label }}</a>
-          <span>/</span>
-          <span class="current">{{ breadcrumbs[breadcrumbs.length-1].label || 'Resumen' }}</span>
+        <div class="header-top-row">
+          <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Minimizar sidebar">
+            <i class="fas" [ngClass]="isSidebarCollapsed ? 'fa-angle-right' : 'fa-angle-left'"></i>
+          </button>
+
+          <div class="breadcrumb-nav" *ngIf="breadcrumbs.length">
+            <a *ngIf="breadcrumbs.length>0" [routerLink]="breadcrumbs[0].path"><i class="fas fa-home"></i> {{ breadcrumbs[0].label }}</a>
+            <span>/</span>
+            <span class="current">{{ breadcrumbs[breadcrumbs.length-1].label || 'Resumen' }}</span>
+          </div>
+
+          <h1 *ngIf="!(breadcrumbs && breadcrumbs.length > 1 && breadcrumbs[1].label === 'Lista de Clientes')">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
         </div>
       </div>
       <div class="header-right">
