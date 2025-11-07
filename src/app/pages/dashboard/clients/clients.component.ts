@@ -5,7 +5,6 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { Router } from '@angular/router';
-import { ViewportScroller } from '@angular/common';
 import { AlertComponent } from '../../../components/alert/alert.component';
 import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
@@ -99,7 +98,6 @@ export class ClientsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private clientService: ClientService,
     private router: Router
-    ,private viewport: ViewportScroller
   ) {
     this.clientForm = this.createClientForm();
     this.currentClientPage = null;
@@ -121,12 +119,6 @@ export class ClientsComponent implements OnInit {
     }
 
     this.loadClients();
-
-    // Ensure the top of the clients component is visible after navigation (avoid landing at bottom)
-    // small delay so content/layout stabilizes before scrolling
-    setTimeout(() => {
-      try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
-    }, 50);
   }
 
   // Computed properties
@@ -187,10 +179,6 @@ export class ClientsComponent implements OnInit {
           this.inactiveClientsCount = this.clients.filter(c => c.status !== 'A').length;
         }
         this.isLoading = false;
-        // Ensure viewport is at top after loading clients (covers enters and post-save reloads)
-        setTimeout(() => {
-          try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
-        }, 20);
       },
       error: (error) => {
         console.error('Error loading clients:', error);
@@ -203,13 +191,11 @@ export class ClientsComponent implements OnInit {
         this.totalClientsCount = 0;
         this.activeClientsCount = 0;
         this.inactiveClientsCount = 0;
-        // Scroll to top on error too so user sees alerts/messages at the top
-        setTimeout(() => {
-          try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
-        }, 20);
       }
     });
   }
+
+
 
   // Filtering and search
   onSearchChange(): void {

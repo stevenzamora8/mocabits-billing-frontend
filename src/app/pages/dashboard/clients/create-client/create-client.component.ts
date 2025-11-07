@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable, of } from 'rxjs';
@@ -42,8 +42,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
     private router: Router,
     private clientService: ClientService
     ,
-    private cdr: ChangeDetectorRef,
-    private viewport: ViewportScroller
+    private cdr: ChangeDetectorRef
   ) {
     this.clientForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -109,13 +108,6 @@ export class CreateClientComponent implements OnInit, OnDestroy {
           phone: '',
           status: 'A'
         });
-      }
-      // Ensure the viewport is at the top of the page when entering the create/edit route
-      try {
-        // Delay slightly to allow the host view to render before scrolling
-        setTimeout(() => this.viewport.scrollToPosition([0, 0]), 0);
-      } catch (e) {
-        // Fallback: no-op if ViewportScroller isn't available
       }
     });
   }
