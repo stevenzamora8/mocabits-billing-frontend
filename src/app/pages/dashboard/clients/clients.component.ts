@@ -5,7 +5,9 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { Router } from '@angular/router';
+import { ViewportScroller } from '@angular/common';
 import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/ui/select/select.component';
@@ -13,7 +15,7 @@ import { SelectComponent, SelectOption } from '../../../shared/components/ui/sel
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, AlertComponent, UiAlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
@@ -84,7 +86,7 @@ export class ClientsComponent implements OnInit {
 
   // Alert state
   alertMessage: string = '';
-  alertType: AlertType = 'info';
+  alertType: AlertType | UiAlertType = 'info';
   alertVisible: boolean = false;
   alertAutoDismiss: boolean = false;
   alertConfirmMode: boolean = false;
@@ -97,13 +99,34 @@ export class ClientsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private clientService: ClientService,
     private router: Router
+    ,private viewport: ViewportScroller
   ) {
     this.clientForm = this.createClientForm();
     this.currentClientPage = null;
   }
 
   ngOnInit(): void {
+    // If navigated here with alert data in navigation state (from Create/Edit), show it
+    try {
+      const nav = this.router.getCurrentNavigation?.();
+      const state = nav?.extras?.state ?? (history && (history.state as any));
+      if (state && state.alert) {
+        const a = state.alert as { message?: string; type?: string; autoDismiss?: boolean };
+        if (a && a.message) {
+          this.showAlert(a.message, (a.type as AlertType) || 'info', !!a.autoDismiss);
+        }
+      }
+    } catch (e) {
+      // ignore if history access fails
+    }
+
     this.loadClients();
+
+    // Ensure the top of the clients component is visible after navigation (avoid landing at bottom)
+    // small delay so content/layout stabilizes before scrolling
+    setTimeout(() => {
+      try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
+    }, 50);
   }
 
   // Computed properties
@@ -164,6 +187,10 @@ export class ClientsComponent implements OnInit {
           this.inactiveClientsCount = this.clients.filter(c => c.status !== 'A').length;
         }
         this.isLoading = false;
+        // Ensure viewport is at top after loading clients (covers enters and post-save reloads)
+        setTimeout(() => {
+          try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
+        }, 20);
       },
       error: (error) => {
         console.error('Error loading clients:', error);
@@ -176,6 +203,10 @@ export class ClientsComponent implements OnInit {
         this.totalClientsCount = 0;
         this.activeClientsCount = 0;
         this.inactiveClientsCount = 0;
+        // Scroll to top on error too so user sees alerts/messages at the top
+        setTimeout(() => {
+          try { this.viewport.scrollToPosition([0, 0]); } catch (e) { window.scrollTo(0, 0); }
+        }, 20);
       }
     });
   }

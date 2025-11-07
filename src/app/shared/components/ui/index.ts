@@ -2,6 +2,7 @@
 export * from './button/button.component';
 export * from './input/input.component';
 export * from './select/select.component';
+export * from './alert/alert.component';
 
 // Types and interfaces
 export type { ButtonVariant, ButtonSize } from './button/button.component';

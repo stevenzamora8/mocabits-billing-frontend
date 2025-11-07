@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
 
@@ -7,49 +8,75 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
   selector: 'app-alert',
   standalone: true,
   imports: [CommonModule],
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate('300ms cubic-bezier(0.2, 0.8, 0.2, 1)', style({ transform: 'translateX(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ transform: 'translateX(100%)', opacity: 0 }))
+      ])
+    ])
+  ],
   template: `
-    <!-- Alert Normal -->
+    <!-- Modern Toast Alert -->
     <div 
       *ngIf="message && type !== 'confirm'"
-      class="alert"
-      [class]="'alert-' + type"
-      [class.alert-dismissible]="dismissible"
-      [class.alert-auto-dismiss]="autoDismiss"
-      role="alert">
+      class="toast-container"
+      [class.toast-fixed]="fixed"
+      [@slideIn]
+      role="status"
+      aria-live="polite"
+      aria-atomic="true">
       
-      <div class="alert-content">
-        <div class="alert-icon">
-          <svg *ngIf="type === 'success'" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-          </svg>
-          <svg *ngIf="type === 'danger'" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-          </svg>
-          <svg *ngIf="type === 'warning'" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-          </svg>
-          <svg *ngIf="type === 'info'" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-          </svg>
+      <div class="toast" [class]="'toast-' + type">
+        <div class="toast-content">
+          <div class="toast-icon">
+            <svg *ngIf="type === 'success'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <svg *ngIf="type === 'danger'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <svg *ngIf="type === 'warning'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <svg *ngIf="type === 'info'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          
+          <div class="toast-text">
+            <div class="toast-title" [innerHTML]="getTitle()"></div>
+            <div class="toast-message">{{ message }}</div>
+          </div>
+          
+          <button 
+            *ngIf="dismissible"
+            type="button" 
+            class="toast-close" 
+            (click)="close()"
+            aria-label="Cerrar notificación">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
-        <span class="alert-message">{{ message }}</span>
-      </div>
-      
-      <button 
-        *ngIf="dismissible"
-        type="button" 
-        class="alert-close" 
-        (click)="close()"
-        aria-label="Close">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-      
-      <div 
-        *ngIf="autoDismiss" 
-        class="alert-progress"
-        [style.animation-duration.ms]="autoDismissTime">
+        
+        <!-- Progress bar for auto-dismiss -->
+        <div 
+          *ngIf="autoDismiss" 
+          class="toast-progress"
+          [style.animation-duration]="autoDismissTime + 'ms'">
+        </div>
       </div>
     </div>
 
@@ -94,6 +121,189 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
     </div>
   `,
   styles: [`
+    /* Modern Toast Alert - Premium Design */
+    .toast-container {
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    .toast-fixed {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      z-index: 99999 !important;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      width: 380px;
+      max-width: calc(100vw - 40px);
+      background: rgba(255,255,255,0.85);
+      border-radius: 16px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    /* Decorative gradient stripe on top matching project colors */
+    .toast::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #2563eb, #059669);
+    }
+
+    .toast-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 18px;
+      position: relative;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.08);
+      font-size: 18px;
+    }
+
+    .toast-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toast-title {
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .toast-message {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #4b5563;
+      font-weight: 500;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      transition: all 150ms ease;
+      opacity: 0.8;
+    }
+
+    .toast-close:hover {
+      background: rgba(0, 0, 0, 0.08);
+      transform: scale(1.05);
+      opacity: 1;
+    }
+
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      transform-origin: left;
+      animation-name: toast-progress;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes toast-progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    /* Success variant */
+    .toast-success .toast-icon {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .toast-success .toast-title {
+      color: #065f46;
+    }
+    .toast-success .toast-progress {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    /* Error variant */
+    .toast-danger .toast-icon {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+    .toast-danger .toast-title {
+      color: #991b1b;
+    }
+    .toast-danger .toast-progress {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    /* Warning variant */
+    .toast-warning .toast-icon {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    .toast-warning .toast-title {
+      color: #92400e;
+    }
+    .toast-warning .toast-progress {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    /* Info variant */
+    .toast-info .toast-icon {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+    }
+    .toast-info .toast-title {
+      color: #1d4ed8;
+    }
+    .toast-info .toast-progress {
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .toast-fixed {
+        top: 16px !important;
+        right: 16px !important;
+        left: 16px !important;
+      }
+      
+      .toast {
+        width: 100%;
+        max-width: none;
+      }
+    }
     .alert {
       position: relative;
       padding: 0.875rem 1.125rem;
@@ -109,6 +319,75 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
       max-width: 100%;
       width: 100%;
     }
+    
+    /* Project-styled alert to match brand look */
+    .alert {
+      position: relative;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      transition: transform 240ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+      backdrop-filter: blur(6px);
+      overflow: visible;
+      max-width: 720px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(2,6,23,0.04);
+      background: var(--bg-surface, #ffffff);
+      color: var(--text-primary, #0f172a);
+    }
+    
+    .alert-content { display:flex; align-items:center; gap:0.75rem; flex:1; }
+    
+    .alert-icon { flex-shrink:0; width:20px; height:20px; display:flex; align-items:center; justify-content:center; }
+    
+    .alert-message { font-weight:600; font-size:0.98rem; color:var(--text-primary, #0f172a); }
+    
+    .alert-close { position: absolute; right: 10px; top: 8px; background: transparent; border: none; padding:6px; border-radius:6px; cursor:pointer; color: rgba(15,23,42,0.6); }
+    .alert-close:hover { background: rgba(15,23,42,0.04); color: rgba(15,23,42,0.9); }
+    
+    .alert-progress { position: absolute; bottom: -4px; left: 0; height: 4px; border-radius: 0 0 12px 12px; animation: progress-countdown linear; transform-origin: left; }
+    
+    @keyframes progress-countdown { from { width: 100%; } to { width: 0%; } }
+    
+    /* Brand variants */
+    .alert-success { background: linear-gradient(90deg, rgba(var(--logo-primary-rgb, 34,197,94),0.08), rgba(var(--logo-secondary-rgb, 59,130,246),0.04)); border-color: rgba(var(--logo-primary-rgb, 34,197,94),0.18); color: var(--brand-success, #059669); }
+    .alert-success .alert-progress { background: var(--brand-success, #10b981); }
+    
+    .alert-danger { background: linear-gradient(90deg, rgba(239,68,68,0.06), rgba(220,38,38,0.03)); border-color: rgba(239,68,68,0.16); color: var(--brand-danger, #dc2626); }
+    .alert-danger .alert-progress { background: var(--brand-danger, #ef4444); }
+    
+    .alert-warning { background: linear-gradient(90deg, rgba(245,158,11,0.06), rgba(245,158,11,0.03)); border-color: rgba(245,158,11,0.14); color: #b45309; }
+    .alert-warning .alert-progress { background: #f59e0b; }
+    
+    .alert-info { background: linear-gradient(90deg, rgba(59,130,246,0.06), rgba(37,99,235,0.03)); border-color: rgba(59,130,246,0.14); color: #1e40af; }
+    .alert-info .alert-progress { background: #3b82f6; }
+    
+    .alert-auto-dismiss { animation: alert-fade-in 0.28s ease-out; }
+    @keyframes alert-fade-in { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+    
+    /* Fixed overlay variant */
+    .alert-fixed {
+      position: fixed !important;
+      top: 88px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 720px !important;
+      max-width: calc(100% - 32px) !important;
+      z-index: 99999 !important;
+      border-radius: 12px !important;
+    }
+    
+    /* Modal confirm styles kept as-is, but slightly tightened */
+    .modal-backdrop { position: fixed; top:0; left:0; z-index:1050; width:100%; height:100%; background-color: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; }
+    .modal-dialog { max-width:520px; margin:1.5rem; }
+    .modal-content { border-radius:10px; overflow:hidden; }
+    .modal-footer { padding: 0.75rem; display:flex; gap:0.5rem; justify-content:flex-end; }
     
     .alert-content {
       display: flex;
@@ -212,6 +491,18 @@ export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
       animation: alert-fade-in 0.3s ease-out;
     }
     
+    /* Fixed/overlaid alert variant to ensure visibility above app content */
+    .alert-fixed {
+      position: fixed !important;
+      top: 80px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 680px !important;
+      max-width: calc(100% - 32px) !important;
+      z-index: 9999 !important;
+      box-shadow: 0 10px 40px rgba(2,6,23,0.15) !important;
+      border-radius: 12px !important;
+    }
     @keyframes alert-fade-in {
       from {
         opacity: 0;
@@ -473,6 +764,8 @@ export class AlertComponent implements OnInit, OnDestroy, OnChanges {
   @Input() dismissible: boolean = true;
   @Input() autoDismiss: boolean = false;
   @Input() autoDismissTime: number = 5000; // 5 segundos por defecto
+  // When true, position the alert fixed at the top center of the viewport with high z-index
+  @Input() fixed: boolean = false;
   
   // Propiedades para confirmación
   @Input() confirmTitle: string = '';
@@ -534,5 +827,14 @@ export class AlertComponent implements OnInit, OnDestroy, OnChanges {
     this.close();
   }
 
-
+  getTitle(): string {
+    switch (this.type) {
+      case 'success': return '✅ Éxito';
+      case 'danger': return '❌ Error';
+      case 'warning': return '⚠️ Atención';
+      case 'info': return 'ℹ️ Información';
+      case 'confirm': return '⚡ Confirmar';
+      default: return '📝 Notificación';
+    }
+  }
 }

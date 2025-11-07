@@ -1,11 +1,22 @@
 <div class="clients-container">
-  <!-- AlertComponent integration -->
-  <app-alert
-    *ngIf="alertVisible"
+  <!-- Toast (ui-alert) for regular notifications -->
+  <ui-alert
+    *ngIf="alertVisible && !alertConfirmMode"
     [message]="alertMessage"
     [type]="alertType"
     [dismissible]="!alertConfirmMode"
     [autoDismiss]="alertAutoDismiss"
+    [duration]="alertAutoDismiss ? 2200 : 0"
+    (closed)="handleAlertClosed()"
+  ></ui-alert>
+
+  <!-- Confirmation modal uses the existing app-alert (confirm modal) -->
+  <app-alert
+    *ngIf="alertVisible && alertConfirmMode"
+    [message]="alertMessage"
+    [type]="'confirm'"
+    [dismissible]="false"
+    [autoDismiss]="false"
     [confirmTitle]="alertConfirmTitle"
     [confirmText]="alertConfirmText"
     [cancelText]="alertCancelText"

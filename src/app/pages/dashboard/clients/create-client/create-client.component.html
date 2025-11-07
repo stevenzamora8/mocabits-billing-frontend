@@ -17,6 +17,16 @@
   </div>
 
   <div class="card-body">
+    <!-- Fixed overlay toast (ui-alert) -->
+    <ui-alert *ngIf="alertVisible"
+      [fixed]="true"
+      [message]="alertMessage"
+      [type]="alertType"
+      [dismissible]="true"
+      [autoDismiss]="alertAutoDismiss"
+      [duration]="alertAutoDismissTime"
+      (closed)="handleAlertClosed()"></ui-alert>
+
     <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
       <div class="form-row">
         <div class="form-group full-width">

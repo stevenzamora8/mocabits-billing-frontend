@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuestas de Alert - MocaBits</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-muted: #64748b;
+            --bg-card: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--dark);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .proposals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .proposal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .proposal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .proposal-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+        }
+
+        .proposal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .proposal-description {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-preview {
+            margin-bottom: 1rem;
+        }
+
+        /* ==== PROPUESTA 1: TOAST MODERNO ==== */
+        .toast-alert {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            overflow: hidden;
+            min-width: 380px;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .toast-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--success), #34d399);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .toast-close:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--dark);
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 0 0 16px 16px;
+            animation: progressBar 3s linear;
+        }
+
+        /* ==== PROPUESTA 2: BANNER ELEGANTE ==== */
+        .banner-alert {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .banner-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .banner-text {
+            flex: 1;
+        }
+
+        .banner-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .banner-message {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .banner-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .banner-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ==== PROPUESTA 3: CARD PREMIUM ==== */
+        .card-alert {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .card-alert-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .card-alert-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--success), #34d399);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+            position: relative;
+        }
+
+        .card-alert-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 16px;
+        }
+
+        .card-alert-content {
+            flex: 1;
+        }
+
+        .card-alert-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .card-alert-message {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .card-alert-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .card-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .card-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .card-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .card-btn.secondary {
+            background: var(--light);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .card-btn.secondary:hover {
+            background: var(--border);
+            color: var(--dark);
+        }
+
+        /* Animaciones */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes progressBar {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        /* Características */
+        .features {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .features h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .recommendation {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(5, 150, 105, 0.05));
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .recommendation h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recommendation p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .proposals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .toast-alert {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Propuestas de Alert - MocaBits</h1>
+        <p class="subtitle">Tres propuestas de diseño que coinciden perfectamente con tu sistema de facturación</p>
+
+        <div class="proposals-grid">
+            <!-- Propuesta 1: Toast Moderno -->
+            <div class="proposal">
+                <div class="proposal-header">
+                    <div class="proposal-number">1</div>
+                    <div class="proposal-title">Toast Moderno</div>
+                </div>
+                <p class="proposal-description">
+                    Alert tipo toast con glassmorphism, aparesce desde la derecha con animación suave. Ideal para notificaciones rápidas.
+                </p>
+                
+                <div class="alert-preview">
+                    <div class="toast-alert">
+                        <div class="toast-progress"></div>
+                        <div class="toast-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="toast-content">
+                            <div class="toast-title">¡Cliente actualizado!</div>
+                            <div class="toast-message">Los datos del cliente se guardaron correctamente</div>
+                        </div>
+                        <button class="toast-close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <ul style="color: var(--text-muted); font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>Efecto glassmorphism elegante</li>
+                    <li>Barra de progreso automática</li>
+                    <li>Animación desde la derecha</li>
+                    <li>Auto-dismiss en 3 segundos</li>
+                    <li>Posición fixed top-right</li>
+                </ul>
+            </div>
+
+            <!-- Propuesta 2: Banner Elegante -->
+            <div class="proposal">
+                <div class="proposal-header">
+                    <div class="proposal-number">2</div>
+                    <div class="proposal-title">Banner Elegante</div>
+                </div>
+                <p class="proposal-description">
+                    Banner con gradiente que coincide con tu tema. Más prominente y atractivo visualmente, ideal para acciones importantes.
+                </p>
+                
+                <div class="alert-preview">
+                    <div class="banner-alert">
+                        <div class="banner-content">
+                            <div class="banner-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="banner-text">
+                                <div class="banner-title">¡Excelente! Cliente actualizado</div>
+                                <div class="banner-message">Los datos se guardaron correctamente en el sistema</div>
+                            </div>
+                            <button class="banner-close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul style="color: var(--text-muted); font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>Gradiente azul-verde del proyecto</li>
+                    <li>Efecto de luz sutil</li>
+                    <li>Más espacio para contenido</li>
+                    <li>Animación desde arriba</li>
+                    <li>Muy visible y atractivo</li>
+                </ul>
+            </div>
+
+            <!-- Propuesta 3: Card Premium -->
+            <div class="proposal">
+                <div class="proposal-header">
+                    <div class="proposal-number">3</div>
+                    <div class="proposal-title">Card Premium</div>
+                </div>
+                <p class="proposal-description">
+                    Card elegante con borde superior colorido. Incluye botones de acción opcionales. Perfecto para confirmaciones importantes.
+                </p>
+                
+                <div class="alert-preview">
+                    <div class="card-alert">
+                        <div class="card-alert-header">
+                            <div class="card-alert-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="card-alert-content">
+                                <div class="card-alert-title">Cliente actualizado exitosamente</div>
+                                <div class="card-alert-message">Los cambios se han guardado y sincronizado correctamente. El cliente ahora aparecerá con la información actualizada en todo el sistema.</div>
+                            </div>
+                        </div>
+                        <div class="card-alert-actions">
+                            <button class="card-btn primary">Ver cliente</button>
+                            <button class="card-btn secondary">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul style="color: var(--text-muted); font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>Diseño tipo card del proyecto</li>
+                    <li>Borde superior colorido</li>
+                    <li>Botones de acción opcionales</li>
+                    <li>Más información detallada</li>
+                    <li>Animación scale elegante</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Características comunes -->
+        <div class="features">
+            <h3>✨ Características de todas las propuestas</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="feature-text">Totalmente responsivo</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="feature-text">Colores del proyecto</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <div class="feature-text">Animaciones suaves</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="feature-text">Auto-dismiss configurable</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="feature-text">Tipos personalizables</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="feature-text">Botón de cerrar</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recomendación -->
+        <div class="recommendation">
+            <h3>
+                <i class="fas fa-star"></i>
+                Mi Recomendación
+            </h3>
+            <p>
+                Para tu sistema de facturación, recomiendo la <strong>Propuesta 1: Toast Moderno</strong>. 
+                Es elegante, no interrumpe el flujo del usuario, y el efecto glassmorphism se ve muy premium. 
+                Perfecto para notificaciones de éxito como "Cliente actualizado" antes de redirigir a la lista.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
