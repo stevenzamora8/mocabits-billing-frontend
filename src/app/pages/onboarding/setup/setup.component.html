@@ -455,7 +455,7 @@
   </div>
 
   <!-- Alert Component -->
-  <app-alert
+  <ui-alert
     [message]="alertMessage"
     [type]="alertType"
     confirmTitle="Confirmar Acción"
@@ -464,5 +464,5 @@
     (confirmed)="onAlertConfirmed()"
     (cancelled)="onAlertCancelled()"
     (closed)="clearAlert()">
-  </app-alert>
+  </ui-alert>
 </div>

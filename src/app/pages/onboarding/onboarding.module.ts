@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OnboardingRoutingModule } from './onboarding-routing.module';
 import { PlanSelectionComponent } from './plan-selection/plan-selection.component';
 import { SetupComponent } from './setup/setup.component';
-import { AlertComponent } from '../../components/alert/alert.component';
+import { UiAlertComponent } from '../../shared/components/ui/alert/alert.component';
 
 @NgModule({
   declarations: [],
@@ -16,7 +16,7 @@ import { AlertComponent } from '../../components/alert/alert.component';
     OnboardingRoutingModule,
     PlanSelectionComponent,
     SetupComponent,
-    AlertComponent
+    UiAlertComponent
   ]
 })
 export class OnboardingModule { }

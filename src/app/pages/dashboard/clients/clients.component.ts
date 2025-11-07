@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertType } from '../../../components/alert/alert.component';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { Router } from '@angular/router';
-import { AlertComponent } from '../../../components/alert/alert.component';
 import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
+import { UiConfirmComponent, UiConfirmType } from '../../../shared/components/ui/confirm/confirm.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/ui/select/select.component';
@@ -15,7 +14,7 @@ import { ScrollToTopDirective } from '../../../shared/directives/scroll-to-top.d
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, AlertComponent, UiAlertComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css'],
   hostDirectives: [ScrollToTopDirective]
@@ -87,7 +86,7 @@ export class ClientsComponent implements OnInit {
 
   // Alert state
   alertMessage: string = '';
-  alertType: AlertType | UiAlertType = 'info';
+  alertType: UiAlertType = 'info';
   alertVisible: boolean = false;
   alertAutoDismiss: boolean = false;
   alertConfirmMode: boolean = false;
@@ -95,6 +94,13 @@ export class ClientsComponent implements OnInit {
   alertConfirmTitle: string = '';
   alertConfirmText: string = '';
   alertCancelText: string = '';
+
+  // UI Confirm state
+  confirmVisible: boolean = false;
+  confirmMessage: string = '';
+  confirmTitle: string = '';
+  confirmType: UiConfirmType = 'warning';
+  confirmAction: (() => void) | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -113,7 +119,7 @@ export class ClientsComponent implements OnInit {
       if (state && state.alert) {
         const a = state.alert as { message?: string; type?: string; autoDismiss?: boolean };
         if (a && a.message) {
-          this.showAlert(a.message, (a.type as AlertType) || 'info', !!a.autoDismiss);
+          this.showAlert(a.message, (a.type as UiAlertType) || 'info', !!a.autoDismiss);
         }
       }
     } catch (e) {
@@ -426,11 +432,10 @@ export class ClientsComponent implements OnInit {
 
   deleteClient(client: Client): void {
     if (!client.id) return;
-    this.showConfirmAlert(
-      `¿Estás seguro de que deseas eliminar el cliente "${client.name}"? Esta acción no se puede deshacer.`,
+    this.showUiConfirm(
+      `¿Estás seguro de que deseas eliminar el cliente "${client.name}"? Esta acción no se puede deshacer y eliminará permanentemente toda la información del cliente.`,
       'Eliminar Cliente',
-      'Eliminar',
-      'Cancelar',
+      'danger',
       () => {
         this.isLoading = true;
         this.clientService.deleteClient(client.id!).subscribe({
@@ -452,11 +457,12 @@ export class ClientsComponent implements OnInit {
     if (!client.id) return;
     const newStatus = client.status === 'A' ? 'I' : 'A';
     const actionText = newStatus === 'A' ? 'activar' : 'inactivar';
-    this.showConfirmAlert(
-      `¿Estás seguro de que deseas ${actionText} el cliente "${client.name}"?`,
+    const confirmType: UiConfirmType = newStatus === 'I' ? 'warning' : 'info';
+    
+    this.showUiConfirm(
+      `¿Estás seguro de que deseas ${actionText} el cliente "${client.name}"? Esta acción afectará el estado del cliente en el sistema.`,
       `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Cliente`,
-      actionText.charAt(0).toUpperCase() + actionText.slice(1),
-      'Cancelar',
+      confirmType,
       () => {
         this.isLoading = true;
         this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
@@ -474,7 +480,7 @@ export class ClientsComponent implements OnInit {
     );
   }
   // Alert helpers
-  showAlert(message: string, type: AlertType = 'info', autoDismiss: boolean = false) {
+  showAlert(message: string, type: UiAlertType = 'info', autoDismiss: boolean = false) {
     this.alertMessage = message;
     this.alertType = type;
     this.alertVisible = true;
@@ -493,6 +499,15 @@ export class ClientsComponent implements OnInit {
     this.alertCancelText = cancelText;
   }
 
+  // UI Confirm helpers (new toast-style confirmations)
+  showUiConfirm(message: string, title: string, type: UiConfirmType = 'warning', onConfirm: () => void) {
+    this.confirmMessage = message;
+    this.confirmTitle = title;
+    this.confirmType = type;
+    this.confirmAction = onConfirm;
+    this.confirmVisible = true;
+  }
+
   handleAlertClosed() {
     this.alertVisible = false;
     this.alertConfirmMode = false;
@@ -508,6 +523,37 @@ export class ClientsComponent implements OnInit {
 
   handleAlertCancelled() {
     this.handleAlertClosed();
+  }
+
+  // UI Confirm handlers
+  handleUiConfirmConfirmed() {
+    if (this.confirmAction) {
+      this.confirmAction();
+    }
+    this.handleUiConfirmClosed();
+  }
+
+  handleUiConfirmCancelled() {
+    this.handleUiConfirmClosed();
+  }
+
+  handleUiConfirmClosed() {
+    this.confirmVisible = false;
+    this.confirmMessage = '';
+    this.confirmAction = null;
+  }
+
+  getConfirmText(): string {
+    switch (this.confirmType) {
+      case 'danger':
+        return 'Eliminar';
+      case 'warning':
+        return 'Inactivar';
+      case 'info':
+        return 'Activar';
+      default:
+        return 'Confirmar';
+    }
   }
 
   // Utility functions

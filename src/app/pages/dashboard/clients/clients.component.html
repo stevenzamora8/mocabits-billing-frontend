@@ -10,20 +10,20 @@
     (closed)="handleAlertClosed()"
   ></ui-alert>
 
-  <!-- Confirmation modal uses the existing app-alert (confirm modal) -->
-  <app-alert
-    *ngIf="alertVisible && alertConfirmMode"
-    [message]="alertMessage"
-    [type]="'confirm'"
-    [dismissible]="false"
-    [autoDismiss]="false"
-    [confirmTitle]="alertConfirmTitle"
-    [confirmText]="alertConfirmText"
-    [cancelText]="alertCancelText"
-    (closed)="handleAlertClosed()"
-    (confirmed)="handleAlertConfirmed()"
-    (cancelled)="handleAlertCancelled()"
-  ></app-alert>
+  <!-- Old confirmation modal (disabled - using new UiConfirm instead) -->
+
+  <!-- New UI Confirm component (toast-style confirmation) -->
+  <ui-confirm
+    *ngIf="confirmVisible"
+    [message]="confirmMessage"
+    [title]="confirmTitle"
+    [type]="confirmType"
+    [confirmText]="getConfirmText()"
+    [cancelText]="'Cancelar'"
+    (confirmed)="handleUiConfirmConfirmed()"
+    (cancelled)="handleUiConfirmCancelled()"
+    (closed)="handleUiConfirmClosed()"
+  ></ui-confirm>
   <!-- Top actions (moved into the card header below) -->
 
   <!-- Short description explaining the purpose of this component (styled) -->

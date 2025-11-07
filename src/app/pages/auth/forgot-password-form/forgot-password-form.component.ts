@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 
 @Component({
   selector: 'app-forgot-password-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, ReactiveFormsModule, UiAlertComponent, ButtonComponent, InputComponent],
   templateUrl: './forgot-password-form.component.html',
   styleUrls: ['./forgot-password-form.component.css']
 })
@@ -22,7 +22,7 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
 
   // Alert properties
   alertMessage: string = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
+  alertType: UiAlertType = 'info';
   showAlertComponent: boolean = false;
 
   private alertTimeout: any;

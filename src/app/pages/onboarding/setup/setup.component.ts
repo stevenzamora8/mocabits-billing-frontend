@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 import { CompanyService, Company, CompanyResponse } from '../../../services/company.service';
 import { AuthService } from '../../../services/auth.service';
-import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { ButtonComponent, InputComponent, SelectComponent, SelectOption } from '../../../shared/components/ui';
 
 interface CompanyData {
@@ -28,7 +28,7 @@ interface EstablishmentData {
 @Component({
   selector: 'app-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, AlertComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, UiAlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -67,7 +67,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Alert component properties
   alertMessage = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
+  alertType: UiAlertType = 'info';
   pendingAction: (() => void) | null = null;
 
   // Flag to prevent multiple setup submissions

@@ -11,7 +11,7 @@ import { ForgotPasswordFormComponent } from './forgot-password-form/forgot-passw
 import { CreateUserFormComponent } from './create-user-form/create-user-form.component';
 
 // Importar componentes compartidos
-import { AlertComponent } from '../../components/alert/alert.component';
+import { UiAlertComponent } from '../../shared/components/ui/alert/alert.component';
 
 @NgModule({
   declarations: [],
@@ -21,7 +21,7 @@ import { AlertComponent } from '../../components/alert/alert.component';
     ReactiveFormsModule,
     RouterModule,
     AuthRoutingModule,
-    AlertComponent,
+    UiAlertComponent,
     AuthLayoutComponent,
     LoginFormComponent,
     ForgotPasswordFormComponent,

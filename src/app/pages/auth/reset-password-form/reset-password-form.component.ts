@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -33,7 +33,7 @@ const PASSWORD_MIN_LENGTH = 8;
 @Component({
   selector: 'app-reset-password-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, ReactiveFormsModule, UiAlertComponent, ButtonComponent, InputComponent],
   templateUrl: './reset-password-form.component.html',
   styleUrls: ['./reset-password-form.component.css']
 })
@@ -58,7 +58,7 @@ export class ResetPasswordFormComponent implements OnInit {
 
   // Alert properties
   alertMessage: string = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
+  alertType: UiAlertType = 'info';
   showAlertComponent: boolean = false;
 
   // Redirect countdown

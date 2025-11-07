@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+// Re-export from the new UI location for backward compatibilityimport { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
+
+export { UiAlertComponent as AlertComponent, UiAlertType as AlertType } from '../shared/components/ui/alert/alert.component';import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 export type AlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';

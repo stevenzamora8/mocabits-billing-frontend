@@ -8,8 +8,7 @@ import { ClientService, Client } from '../../../../services/client.service';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
 import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
-import { AlertType } from '../../../../components/alert/alert.component';
-import { UiAlertComponent } from '../../../../shared/components/ui/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../../shared/components/ui/alert/alert.component';
 import { ScrollToTopDirective } from '../../../../shared/directives/scroll-to-top.directive';
 
 @Component({
@@ -204,7 +203,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
 
   // Simple alert helper (reuse project's AlertComponent)
   alertMessage: string = '';
-  alertType: AlertType = 'info';
+  alertType: UiAlertType = 'info';
   alertVisible: boolean = false;
   alertAutoDismiss: boolean = true;
   alertAutoDismissTime: number = 1800;
@@ -213,7 +212,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
   // Fallback timer to navigate after alert auto-dismiss in case the alert component's events don't fire
   private navigationTimer?: ReturnType<typeof setTimeout>;
 
-  showAlert(message: string, type: AlertType = 'info', autoDismiss: boolean = true, autoDismissTime: number = 1800) {
+  showAlert(message: string, type: UiAlertType = 'info', autoDismiss: boolean = true, autoDismissTime: number = 1800) {
   // set alert model
     // set alert model
     this.alertMessage = message;

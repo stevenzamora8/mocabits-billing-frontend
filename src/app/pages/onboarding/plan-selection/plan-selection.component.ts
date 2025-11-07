@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PlansService, PlanDisplay } from '../../../services/plans.service';
 import { AuthService } from '../../../services/auth.service';
-import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 
 @Component({
   selector: 'app-plan-selection',
-  imports: [CommonModule, AlertComponent],
+  imports: [CommonModule, UiAlertComponent],
   templateUrl: './plan-selection.component.html',
   styleUrl: './plan-selection.component.css'
 })
@@ -21,7 +21,7 @@ export class PlanSelectionComponent implements OnInit {
 
   // Alert component properties
   alertMessage = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' | 'confirm' = 'info';
+  alertType: UiAlertType = 'info';
   pendingAction: (() => void) | null = null;
 
   constructor(

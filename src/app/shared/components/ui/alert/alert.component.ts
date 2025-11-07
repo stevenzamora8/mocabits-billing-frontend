@@ -1,15 +1,16 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../button/button.component';
 
 export type UiAlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
 
 @Component({
   selector: 'ui-alert',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   // Note: animations removed to avoid requiring global animation providers in app bootstrap.
   template: `
-  <div class="ui-toast" *ngIf="visible" [class.fixed]="fixed" [class.show]="visibleShown" role="status" aria-live="polite">
+  <div class="ui-toast" *ngIf="visible" [class.fixed]="fixed" [class.show]="visibleShown" [class.confirm-mode]="type === 'confirm'" role="status" aria-live="polite">
     <div class="stripe"></div>
     <div class="content">
       <div class="icon" [ngClass]="'icon-' + type">
@@ -17,6 +18,7 @@ export type UiAlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
           <i *ngSwitchCase="'success'" class="fas fa-check"></i>
           <i *ngSwitchCase="'danger'" class="fas fa-times"></i>
           <i *ngSwitchCase="'warning'" class="fas fa-exclamation"></i>
+          <i *ngSwitchCase="'confirm'" class="fas fa-question-circle"></i>
           <i *ngSwitchDefault class="fas fa-info"></i>
         </ng-container>
       </div>
@@ -26,10 +28,26 @@ export type UiAlertType = 'success' | 'danger' | 'warning' | 'info' | 'confirm';
         <div class="message">{{ displayMessage || title || defaultTitle }}</div>
       </div>
 
-      <button aria-label="Cerrar" class="close" *ngIf="dismissible" (click)="close()"><i class="fas fa-times"></i></button>
+      <button aria-label="Cerrar" class="close" *ngIf="dismissible && type !== 'confirm'" (click)="close()"><i class="fas fa-times"></i></button>
     </div>
 
-    <div *ngIf="autoDismiss" class="progress" [style.animation-duration]="duration + 'ms'"></div>
+    <!-- Confirm mode buttons -->
+    <div class="actions" *ngIf="type === 'confirm'">
+      <app-button 
+        variant="outline" 
+        size="sm" 
+        (click)="cancel()">
+        {{ cancelText }}
+      </app-button>
+      <app-button 
+        [variant]="confirmVariant" 
+        size="sm" 
+        (click)="confirm()">
+        {{ confirmText }}
+      </app-button>
+    </div>
+
+    <div *ngIf="autoDismiss && type !== 'confirm'" class="progress" [style.animation-duration]="duration + 'ms'"></div>
   </div>
   `,
   styles: [
@@ -184,8 +202,15 @@ export class UiAlertComponent implements OnInit, OnDestroy {
   @Input() autoDismiss = true;
   @Input() duration = 3000; // ms
   @Input() fixed = true;
+  
+  // Confirm mode properties
+  @Input() confirmText: string = 'Confirmar';
+  @Input() cancelText: string = 'Cancelar';
+  @Input() confirmVariant: 'primary' | 'danger' | 'warning' = 'primary';
 
   @Output() closed = new EventEmitter<void>();
+  @Output() confirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
   visible = false;
   visibleShown = false;
@@ -232,6 +257,24 @@ export class UiAlertComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.visible = false;
       this.closed.emit();
+    }, 240);
+  }
+
+  confirm() {
+    this.clearTimer();
+    this.visibleShown = false;
+    setTimeout(() => {
+      this.visible = false;
+      this.confirmed.emit();
+    }, 240);
+  }
+
+  cancel() {
+    this.clearTimer();
+    this.visibleShown = false;
+    setTimeout(() => {
+      this.visible = false;
+      this.cancelled.emit();
     }, 240);
   }
 }

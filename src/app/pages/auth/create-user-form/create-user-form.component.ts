@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertComponent } from '../../../components/alert/alert.component';
+import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
 import { AuthService } from '../../../services/auth.service';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
@@ -10,7 +10,7 @@ import { InputComponent } from '../../../shared/components/ui/input/input.compon
 @Component({
   selector: 'app-create-user-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AlertComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, ReactiveFormsModule, UiAlertComponent, ButtonComponent, InputComponent],
   templateUrl: './create-user-form.component.html',
   styleUrl: './create-user-form.component.css'
 })
@@ -28,7 +28,7 @@ export class CreateUserFormComponent implements OnInit {
 
   // Alert properties
   alertMessage: string = '';
-  alertType: 'success' | 'danger' | 'warning' | 'info' = 'info';
+  alertType: UiAlertType = 'info';
   showAlertComponent: boolean = false;
 
   constructor(
