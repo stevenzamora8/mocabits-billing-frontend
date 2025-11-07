@@ -10,13 +10,15 @@ import { SelectComponent } from '../../../../shared/components/ui/select/select.
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
 import { AlertType } from '../../../../components/alert/alert.component';
 import { UiAlertComponent } from '../../../../shared/components/ui/alert/alert.component';
+import { ScrollToTopDirective } from '../../../../shared/directives/scroll-to-top.directive';
 
 @Component({
   selector: 'app-create-client',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, InputComponent, SelectComponent, ButtonComponent, UiAlertComponent],
   templateUrl: './create-client.component.html',
-  styleUrls: ['./create-client.component.css']
+  styleUrls: ['./create-client.component.css'],
+  hostDirectives: [ScrollToTopDirective]
 })
 export class CreateClientComponent implements OnInit, OnDestroy {
   clientForm: FormGroup;

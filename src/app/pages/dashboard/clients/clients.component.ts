@@ -10,13 +10,15 @@ import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/ale
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/ui/select/select.component';
+import { ScrollToTopDirective } from '../../../shared/directives/scroll-to-top.directive';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, AlertComponent, UiAlertComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
-  styleUrls: ['./clients.component.css']
+  styleUrls: ['./clients.component.css'],
+  hostDirectives: [ScrollToTopDirective]
 })
 export class ClientsComponent implements OnInit {
   // Properties

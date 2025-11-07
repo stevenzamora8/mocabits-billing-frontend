@@ -99,13 +99,93 @@ export class DashboardService {
 
   // Methods
   loadUserData(): void {
+    // Cargar datos del usuario desde localStorage (guardados al hacer login)
+    const savedUser = localStorage.getItem('user');
     const savedPlan = localStorage.getItem('selectedPlan');
+    
+    let userData: Partial<UserData> = {};
+    
+    if (savedUser) {
+      try {
+        const userInfo = JSON.parse(savedUser);
+        console.log('DashboardService - Loaded user from localStorage:', userInfo);
+        
+        // Mapear datos del usuario desde la respuesta del login
+        userData = {
+          name: this.extractUserName(userInfo),
+          email: userInfo.email || userInfo.username || 'usuario@ejemplo.com',
+          // Mantener valores por defecto para campos no disponibles en el login
+          totalInvoices: 0,
+          totalClients: 0,
+          totalRevenue: 0,
+          memberSince: this.formatMemberSince(userInfo.createdAt || userInfo.created_at),
+          lastActivity: 'Ahora'
+        };
+      } catch (error) {
+        console.warn('DashboardService - Error parsing user data from localStorage:', error);
+      }
+    }
+    
+    // Aplicar plan seleccionado si existe
     if (savedPlan) {
-      const currentUser = this.currentUserSubject.value;
-      this.currentUserSubject.next({
-        ...currentUser,
-        plan: savedPlan
-      });
+      userData.plan = savedPlan;
+    } else {
+      userData.plan = 'Gratis'; // Plan por defecto
+    }
+    
+    // Actualizar el usuario con los datos cargados
+    const currentUser = this.currentUserSubject.value;
+    this.currentUserSubject.next({
+      ...currentUser,
+      ...userData
+    });
+    
+    console.log('DashboardService - User data updated:', this.currentUserSubject.value);
+  }
+
+  /**
+   * Extrae el nombre del usuario desde los datos guardados
+   */
+  private extractUserName(userInfo: any): string {
+    // Intentar diferentes campos para el nombre
+    if (userInfo.firstName && userInfo.lastName) {
+      return `${userInfo.firstName} ${userInfo.lastName}`;
+    }
+    
+    if (userInfo.first_name && userInfo.last_name) {
+      return `${userInfo.first_name} ${userInfo.last_name}`;
+    }
+    
+    if (userInfo.name) {
+      return userInfo.name;
+    }
+    
+    if (userInfo.fullName) {
+      return userInfo.fullName;
+    }
+    
+    // Si no hay nombre disponible, usar parte del email
+    if (userInfo.email) {
+      const emailPart = userInfo.email.split('@')[0];
+      return emailPart.charAt(0).toUpperCase() + emailPart.slice(1);
+    }
+    
+    return 'Usuario';
+  }
+
+  /**
+   * Formatea la fecha de registro del usuario
+   */
+  private formatMemberSince(createdAt?: string): string {
+    if (!createdAt) {
+      return new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    }
+    
+    try {
+      const date = new Date(createdAt);
+      return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    } catch (error) {
+      return new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
     }
   }
 
@@ -122,6 +202,24 @@ export class DashboardService {
     this.currentUserSubject.next({
       ...currentUser,
       ...stats
+    });
+  }
+
+  /**
+   * Actualiza los datos del usuario (llamar después de login exitoso)
+   */
+  refreshUserData(): void {
+    this.loadUserData();
+  }
+
+  /**
+   * Actualiza los datos del usuario con información específica
+   */
+  updateUserData(userData: Partial<UserData>): void {
+    const currentUser = this.currentUserSubject.value;
+    this.currentUserSubject.next({
+      ...currentUser,
+      ...userData
     });
   }
 

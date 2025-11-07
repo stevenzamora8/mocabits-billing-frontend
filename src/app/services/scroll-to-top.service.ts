@@ -19,8 +19,13 @@ export class ScrollToTopService {
   initialize(): void {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
+      .subscribe((event: NavigationEnd) => {
+        // Immediate scroll
         this.scrollToTop();
+        // Also try after a small delay to ensure DOM is rendered
+        setTimeout(() => {
+          this.scrollToTop();
+        }, 50);
       });
   }
 
@@ -28,22 +33,34 @@ export class ScrollToTopService {
    * Scroll both the document viewport and any scrollable containers to the top.
    */
   scrollToTop(): void {
-    // Scroll the main viewport
+    // Multiple approaches to ensure scroll works
+    
+    // Approach 1: ViewportScroller (Angular recommended)
     try {
       this.viewportScroller.scrollToPosition([0, 0]);
     } catch (e) {
-      // Fallback for environments where ViewportScroller might not work
-      try {
-        window.scrollTo(0, 0);
-      } catch (fallbackError) {
-        // Ignore if window is not available (SSR)
-      }
+      // Ignore
+    }
+    
+    // Approach 2: Direct window scroll (most reliable)
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch (e) {
+      // Ignore
+    }
+    
+    // Approach 3: Document scroll fallback
+    try {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    } catch (e) {
+      // Ignore
     }
 
-    // Small delay to ensure DOM is rendered before scrolling containers
+    // Scroll containers after DOM stabilizes
     setTimeout(() => {
       this.scrollContainersToTop();
-    }, 0);
+    }, 10);
   }
 
   /**
@@ -56,21 +73,25 @@ export class ScrollToTopService {
       '.dashboard-container',
       '.main-content',
       '.content-wrapper',
-      // Add more container selectors as needed
+      '.page-content',
+      '[data-scroll-container]'
     ];
 
     containerSelectors.forEach(selector => {
       try {
-        const container = document.querySelector(selector) as HTMLElement | null;
-        if (container) {
-          if (typeof container.scrollTo === 'function') {
-            container.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-          } else {
-            container.scrollTop = 0;
+        const containers = document.querySelectorAll(selector);
+        containers.forEach(container => {
+          const element = container as HTMLElement;
+          if (element) {
+            if (typeof element.scrollTo === 'function') {
+              element.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            } else {
+              element.scrollTop = 0;
+            }
           }
-        }
+        });
       } catch (e) {
-        // Ignore DOM access errors (e.g., during SSR)
+        // Ignore DOM access errors
       }
     });
   }

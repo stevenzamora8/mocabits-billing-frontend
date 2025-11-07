@@ -6,6 +6,7 @@ import { InputComponent } from '../../../shared/components/ui/input/input.compon
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { AuthService } from '../../../services/auth.service';
 import { PlansService } from '../../../services/plans.service';
+import { DashboardService } from '../../../services/dashboard.service';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -36,7 +37,8 @@ export class LoginFormComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private authService: AuthService,
-    private plansService: PlansService
+    private plansService: PlansService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -128,7 +130,10 @@ export class LoginFormComponent implements OnInit {
       .pipe(finalize(() => this.setLoadingState(false)))
       .subscribe({
         next: (resp: any) => {
-          // AuthService persists tokens; navigate to dashboard
+          console.log('Login exitoso, actualizando datos del dashboard');
+          // AuthService persists tokens; actualizar datos del dashboard
+          this.dashboardService.refreshUserData();
+          // Navigate to dashboard
           setTimeout(() => this.router.navigate(['/dashboard']), 250);
         },
         error: (err: any) => {
