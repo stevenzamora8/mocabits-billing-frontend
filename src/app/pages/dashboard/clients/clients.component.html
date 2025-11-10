@@ -27,9 +27,18 @@
   <!-- Top actions (moved into the card header below) -->
 
   <!-- Short description explaining the purpose of this component (styled) -->
+  <!-- Reusable page intro component; action button projected via template -->
+  <ng-template #introAction>
+    <app-button variant="primary" size="md" [routerLink]="['/dashboard','clients','create']">
+      <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
+      Nuevo Cliente
+    </app-button>
+  </ng-template>
+
+  <!-- Inline page intro (moved from reusable component) -->
   <div class="page-intro">
     <div class="intro-left">
-      <span class="intro-icon" aria-hidden="true"><i class="fas fa-info"></i></span>
+      <span class="intro-icon" aria-hidden="true"><i class="fas fa-users"></i></span>
       <div class="intro-text">
         <div class="intro-title">Gestión de clientes</div>
         <div class="intro-desc">Busca, filtra y administra clientes. Crea, ve, edita, activa/inactiva y elimina clientes desde esta pantalla.</div>
@@ -37,10 +46,7 @@
     </div>
 
     <div class="intro-action">
-      <app-button variant="primary" size="md" [routerLink]="['/dashboard','clients','create']">
-        <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
-        Nuevo Cliente
-      </app-button>
+      <ng-container *ngTemplateOutlet="introAction"></ng-container>
     </div>
   </div>
 
@@ -76,25 +82,7 @@
     </div>
   </div>
 
-  <!-- Filters and Search (restored inputs) -->
-  <!-- NOTE: overlay z-index adjustments are handled in the component stylesheet to avoid forcing overlay panes to be positioned relative to the filters container -->
-  <!-- Action buttons separated above the filters card -->
-  <div class="action-controls">
-    <app-button variant="outline" size="md" class="btn-outline-primary">
-      <span class="app-button__icon-html"><i class="fas fa-filter"></i></span>
-      Filtrar
-    </app-button>
-    <!-- 'Nuevo Cliente' moved to top-actions above the stats grid -->
-    <app-button
-      variant="outline"
-      size="md"
-      (click)="clearFilters()"
-      iconPosition="left">
-      <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
-      Limpiar
-    </app-button>
-  </div>
-
+  <!-- Filters and Search Section -->
   <div class="filters-section">
     <div class="filter-selects">
       <div class="filter-field">
@@ -154,7 +142,21 @@
         </div>
       </div>
 
-      <!-- Identificación moved into the Tipo ID group above -->
+      <!-- Clear filters button aligned with inputs: include a hidden label to keep baseline alignment -->
+      <div class="filter-field filter-field-button">
+        <label class="filter-label" aria-hidden="true" style="visibility:hidden">Limpiar</label>
+        <div class="filter-field-row">
+          <app-button
+            variant="outline"
+            size="md"
+            (click)="clearFilters()"
+            title="Limpiar todos los filtros"
+            class="clear-filters-btn">
+            <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
+            Limpiar
+          </app-button>
+        </div>
+      </div>
     </div>
     <div class="filter-buttons">
       <!-- filter inputs area (buttons moved to separate action-controls) -->
@@ -175,49 +177,9 @@
       <p>Cargando clientes...</p>
     </div>
 
-      <!-- Table view (always show when there is at least one client) -->
+      <!-- Table view (uses shared ui-table) -->
       <div class="table-wrapper" *ngIf="!isLoading && totalElements > 0">
-      <table class="clients-table">
-      <thead>
-        <tr>
-          <th>Nombre Cliente</th>
-          <th>Tipo ID</th>
-          <th>Identificación</th>
-          <th><span class="col-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span> Correo</th>
-          <th><span class="col-icon" aria-hidden="true"><i class="fas fa-phone"></i></span> Teléfono</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let client of paginatedClients; trackBy: trackByClientId" class="client-row">
-          <td class="client-info">
-            <div>
-              <div class="client-name">{{ client.name }}</div>
-            </div>
-          </td>
-          <td class="id-type-cell">
-            <div class="id-type">{{ client.typeIdentification }}</div>
-          </td>
-          <td class="identification-cell">
-            <div class="identification">{{ client.identification }}</div>
-          </td>
-          <td class="email-cell">
-            <div class="contact-line">
-              <span class="email">{{ client.email || '-' }}</span>
-            </div>
-          </td>
-          <td class="phone-cell">
-            <div class="contact-line">
-              <span class="phone">{{ client.phone || '-' }}</span>
-            </div>
-          </td>
-          <td>
-            <span class="status-badge" [class.activo]="client.status === 'A'" [class.inactivo]="client.status !== 'A'">
-              {{ client.status === 'A' ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td class="actions">
+          <ng-template #actions let-client>
             <div class="action-buttons">
               <app-button variant="ghost" size="sm" (click)="viewClient(client)" ariaLabel="Ver cliente" class="view-btn" title="Ver cliente">
                 <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-eye"></i></span>
@@ -243,11 +205,22 @@
                 <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-trash"></i></span>
               </app-button>
             </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
+          </ng-template>        <ui-table
+          [columns]="[
+            { field: 'name', label: 'Nombre Cliente', width: '200px' },
+            { field: 'typeIdentification', label: 'Tipo ID', width: '60px' },
+            { field: 'identification', label: 'Identificación', width: '140px' },
+            { field: 'email', label: 'Correo', width: '220px' },
+            { field: 'phone', label: 'Teléfono', width: '120px' },
+            { field: 'status', label: 'Estado', width: '120px', align: 'center' }
+          ]"
+          [data]="paginatedClients"
+          [loading]="isLoading"
+          emptyText="No se encontraron clientes"
+          [actionsTemplate]="actions"
+          >
+        </ui-table>
+      </div>
 
     <!-- Empty State -->
         <!-- Empty State -->

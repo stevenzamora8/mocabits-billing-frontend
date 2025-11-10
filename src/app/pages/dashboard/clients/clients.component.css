@@ -229,7 +229,7 @@
   border: 1px solid #e2e8f0;
   margin-bottom: 1.5rem;
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem; /* slightly tighter overall gap so children can use more width */
   align-items: center;
   position: relative;
   /* Allow dropdown overlays to escape the card; overflow:hidden was clipping CDK overlay panels */
@@ -247,6 +247,26 @@
   border-radius: 20px 20px 0 0;
 }
 
+/* Clear filters button styling - aligned with inputs */
+.filter-field-button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* slightly tighter gap to match reduced spacing */
+  min-width: 120px;
+}
+
+.filter-field-button .filter-field-row {
+  margin-top: 0; /* rely on hidden label height to align */
+}
+
+.clear-filters-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 36px; /* slightly shorter to better match inputs */
+  padding: 6px 10px;
+  font-size: 0.95rem;
+}
+
 .search-box {
   flex: 1;
   position: relative;
@@ -255,22 +275,33 @@
 
 .filter-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .filter-selects {
   display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  gap: 0.5rem; /* tighter spacing between filter columns */
+  /* take all remaining horizontal space so filters expand to full width of the card */
+  flex: 1 1 auto;
+  /* align items to the bottom so labels/inputs and buttons line up visually */
+  align-items: flex-end;
+  flex-wrap: nowrap; /* prefer single row; allow wrapping at very small widths via media query */
 }
 
 .filter-field {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  min-width: 200px;
+  gap: 0.25rem; /* slightly smaller gap between label and input */
+  min-width: 120px; /* allow tighter packing */
+  /* reasonable base so they share available space */
+  flex: 1 1 160px;
+}
+
+.filter-field-button {
+  /* ensure the clear button stays compact and aligns to bottom */
+  align-self: flex-end;
+  flex: 0 0 120px; /* narrower so it better fits on a single row with inputs */
 }
 
 .filter-field-row {
@@ -279,11 +310,43 @@
   align-items: center;
 }
 
+/* When inputs are grouped (two columns inside a single filter-field),
+   make those inner columns share the available space equally and
+   ensure children can shrink without overflowing the card. */
+.filter-field-row > div {
+  flex: 1 1 0 !important;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Give the main 'Nombre' field more space so names don't get truncated.
+   This makes the first .filter-field grow larger than the others (approx 2:1). */
+.filter-selects > .filter-field:nth-child(1) {
+  /* make 'Nombre' a bit smaller: slightly reduce growth and base width */
+  flex: 0.9 1 150px;
+  min-width: 120px;
+}
+
+/* Ensure the grouped Tipo ID + Identificación column has enough room */
+.filter-selects > .filter-field:nth-child(2) {
+  flex: 1.2 1 220px;
+  min-width: 180px;
+}
+
+/* Make the 'Estado' field smaller so it doesn't take excessive space */
+.filter-selects > .filter-field:nth-child(3) {
+  flex: 0.8 1 120px;
+  min-width: 100px;
+}
+
 /* Make the input/select inside filter rows expand to available space */
 .filter-field-row app-input,
 .filter-field-row app-select {
   flex: 1 1 auto;
   min-width: 0; /* allow truncation in narrow containers */
+  width: 100%; /* ensure these components fill their flex column */
 }
 
 .filter-label {
@@ -617,11 +680,16 @@
 }
 
 /* On very small screens, allow action buttons to wrap to multiple lines to avoid overflow */
-@media (max-width: 520px) {
+@media (max-width: 720px) {
   .clients-table thead th:nth-child(7) { width: 1fr; }
   .clients-table tbody td.actions { white-space: normal; }
   .action-buttons { flex-wrap: wrap; gap: 0.35rem; }
   .action-buttons app-button { height: 32px; padding: 0 6px; }
+  /* On very small screens, make filter fields stack and full-width */
+  .filter-selects { align-items: stretch; flex-wrap: wrap; }
+  .filter-field { flex: 1 1 100%; min-width: 0; }
+  .filter-field-button { flex: 1 1 100%; align-self: stretch; }
+
 }
 
 .type-badge, .status-badge {

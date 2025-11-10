@@ -4,17 +4,23 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { Router } from '@angular/router';
-import { UiAlertComponent, UiAlertType } from '../../../shared/components/ui/alert/alert.component';
-import { UiConfirmComponent, UiConfirmType } from '../../../shared/components/ui/confirm/confirm.component';
-import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
-import { InputComponent } from '../../../shared/components/ui/input/input.component';
-import { SelectComponent, SelectOption } from '../../../shared/components/ui/select/select.component';
+import { 
+  UiAlertComponent, 
+  UiAlertType,
+  UiConfirmComponent, 
+  UiConfirmType,
+  UiTableComponent,
+  ButtonComponent,
+  InputComponent,
+  SelectComponent,
+  SelectOption
+} from '../../../shared/components/ui';
 import { ScrollToTopDirective } from '../../../shared/directives/scroll-to-top.directive';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, UiTableComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css'],
   hostDirectives: [ScrollToTopDirective]
@@ -695,6 +701,10 @@ export class ClientsComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  formatStatus(status: string): string {
+    return status === 'A' ? 'Activo' : 'Inactivo';
   }
 
   // Bulk operations
