@@ -464,20 +464,128 @@ export class ClientsComponent implements OnInit {
       `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Cliente`,
       confirmType,
       () => {
-        this.isLoading = true;
-        this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
-          next: (updatedClient) => {
-            this.showAlert(`Cliente ${actionText}do correctamente`, 'success', true);
-            this.loadClients(this.currentPage);
-            this.isLoading = false;
-          },
-          error: (error) => {
-            this.showAlert(`Error al ${actionText} el cliente`, 'danger');
-            this.isLoading = false;
-          }
+        // Prevent double clicks for this client
+        this.loadingClients.add(client.id!);
+
+        // Optimistic update: update UI immediately
+        const previousStatus = client.status;
+        client.status = newStatus;
+
+        // Debug: log intent and payload
+        console.log('toggleClientStatus - request', {
+          id: client.id,
+          previousStatus,
+          newStatus
         });
+
+        try {
+          this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
+            next: (updatedClient) => {
+              console.log('toggleClientStatus - response', updatedClient);
+              // Ensure client in list reflects server response (use returned object if present)
+              if (updatedClient && updatedClient.status) {
+                client.status = updatedClient.status;
+              }
+
+                  this.showAlert(`Cliente ${actionText}do correctamente`, 'success', true);
+                  // Refresh list to keep server state in sync
+                  this.loadClients(this.currentPage);
+                  this.loadingClients.delete(client.id!);
+            },
+            error: (error) => {
+              // Provide detailed logging to help diagnose failures
+              console.error('toggleClientStatus - error', error);
+              // Revert optimistic update
+              client.status = previousStatus;
+              this.showAlert(`Error al ${actionText} el cliente`, 'danger');
+              this.loadingClients.delete(client.id!);
+            }
+          });
+        } catch (ex) {
+          // Catch synchronous exceptions (for example thrown by getHeaders() when token missing)
+          console.error('toggleClientStatus - exception', ex);
+          client.status = previousStatus;
+          this.showAlert(`Error al ${actionText} el cliente: ${(ex as any)?.message || ex}`, 'danger');
+          this.loadingClients.delete(client.id!);
+        }
       }
     );
+  }
+
+  /**
+   * Directly deactivate a client (no confirm). Uses optimistic update and reverts on error.
+   */
+  deactivateClient(client: Client): void {
+    if (!client.id) return;
+    if (this.loadingClients.has(client.id)) return;
+
+    const previousStatus = client.status;
+    const newStatus = 'I';
+    const actionText = 'inactivar';
+
+    this.loadingClients.add(client.id);
+    client.status = newStatus; // optimistic
+
+    try {
+      this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
+        next: (updatedClient) => {
+          console.log('deactivateClient - response', updatedClient);
+          if (updatedClient && updatedClient.status) client.status = updatedClient.status;
+          this.showAlert(`Cliente ${actionText}do correctamente`, 'success', true);
+          this.loadClients(this.currentPage);
+          this.loadingClients.delete(client.id!);
+        },
+        error: (error) => {
+          console.error('deactivateClient - error', error);
+          client.status = previousStatus;
+          this.showAlert(`Error al ${actionText} el cliente`, 'danger');
+          this.loadingClients.delete(client.id!);
+        }
+      });
+    } catch (ex) {
+      console.error('deactivateClient - exception', ex);
+      client.status = previousStatus;
+      this.showAlert(`Error al ${actionText} el cliente: ${(ex as any)?.message || ex}`, 'danger');
+      this.loadingClients.delete(client.id!);
+    }
+  }
+
+  /**
+   * Directly activate a client (no confirm). Uses optimistic update and reverts on error.
+   */
+  activateClient(client: Client): void {
+    if (!client.id) return;
+    if (this.loadingClients.has(client.id)) return;
+
+    const previousStatus = client.status;
+    const newStatus = 'A';
+    const actionText = 'activar';
+
+    this.loadingClients.add(client.id);
+    client.status = newStatus; // optimistic
+
+    try {
+      this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
+        next: (updatedClient) => {
+          console.log('activateClient - response', updatedClient);
+          if (updatedClient && updatedClient.status) client.status = updatedClient.status;
+          this.showAlert(`Cliente ${actionText}do correctamente`, 'success', true);
+          this.loadClients(this.currentPage);
+          this.loadingClients.delete(client.id!);
+        },
+        error: (error) => {
+          console.error('activateClient - error', error);
+          client.status = previousStatus;
+          this.showAlert(`Error al ${actionText} el cliente`, 'danger');
+          this.loadingClients.delete(client.id!);
+        }
+      });
+    } catch (ex) {
+      console.error('activateClient - exception', ex);
+      client.status = previousStatus;
+      this.showAlert(`Error al ${actionText} el cliente: ${(ex as any)?.message || ex}`, 'danger');
+      this.loadingClients.delete(client.id!);
+    }
   }
   // Alert helpers
   showAlert(message: string, type: UiAlertType = 'info', autoDismiss: boolean = false) {
@@ -560,6 +668,9 @@ export class ClientsComponent implements OnInit {
   trackByClientId(index: number, client: Client): string {
     return client.id?.toString() || `client-${index}`;
   }
+
+  // Per-client loading state (prevent double actions)
+  loadingClients: Set<number | undefined> = new Set<number | undefined>();
 
   getFieldError(fieldName: string): string | null {
     const control = this.clientForm.get(fieldName);

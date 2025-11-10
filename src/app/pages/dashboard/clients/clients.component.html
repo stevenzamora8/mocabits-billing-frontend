@@ -50,7 +50,7 @@
         <i class="fas fa-users"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-number">{{ totalElements }}</div>
+        <div class="stat-number">{{ totalClients }}</div>
         <div class="stat-label">Total Clientes</div>
       </div>
     </div>
@@ -67,21 +67,11 @@
 
     <div class="stat-card warning">
       <div class="stat-icon warning">
-        <i class="fas fa-user-plus"></i>
+        <i class="fas fa-user-slash"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-number">0</div>
-        <div class="stat-label">Nuevos del Mes</div>
-      </div>
-    </div>
-
-    <div class="stat-card danger">
-      <div class="stat-icon danger">
-        <i class="fas fa-dollar-sign"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">$0</div>
-        <div class="stat-label">Facturación Total</div>
+        <div class="stat-number">{{ inactiveClients }}</div>
+        <div class="stat-label">Clientes Inactivos</div>
       </div>
     </div>
   </div>
@@ -242,6 +232,7 @@
                 size="sm"
                 (click)="toggleClientStatus(client)"
                 [attr.title]="client.status === 'A' ? 'Inactivar cliente' : 'Activar cliente'"
+                [disabled]="loadingClients.has(client.id)"
                 [ngClass]="{ 'activate-btn': client.status !== 'A', 'deactivate-btn': client.status === 'A' }">
                 <span class="app-button__icon-html">
                   <i class="fas" [ngClass]="client.status === 'A' ? 'fa-user-times' : 'fa-user-check'"></i>

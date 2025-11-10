@@ -223,8 +223,10 @@ export class UiConfirmComponent implements OnInit {
     this.visibleShown = false;
     setTimeout(() => {
       this.visible = false;
-      this.closed.emit();
+      // Emit the action (confirm/cancel) first so parent handlers can run while
+      // the confirm component is still in a valid state. Then emit closed.
       if (callback) callback();
+      this.closed.emit();
     }, 240);
   }
 }
