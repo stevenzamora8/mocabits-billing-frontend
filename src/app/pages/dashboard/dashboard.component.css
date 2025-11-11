@@ -1,7 +1,8 @@
 /* DASHBOARD LAYOUT */
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh; /* ocupar toda la ventana para controlar el scroll dentro de la app */
+  overflow: hidden; /* evitar que el body haga scroll, dejaremos el scroll solo en .content-area */
   background: #f8fafc;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -35,6 +36,13 @@
   flex-shrink: 0; /* never shrink the sidebar when main content changes */
   transition: all 0.3s ease;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  height: 100vh; /* asegurar altura completa para que el menú interno haga scroll */
+  overflow: hidden; /* el scroll lo manejará .sidebar-menu */
+}
+
+.sidebar {
+  height: 100vh; /* Ensure sidebar spans full viewport height */
+  overflow: hidden; /* Keep scroll inside the menu area */
 }
 
 .sidebar.collapsed {
@@ -127,7 +135,14 @@
   flex: 1;
   padding: 1rem 0;
   overflow-y: auto;
+  padding-right: 8px; /* small spacing to avoid content under scrollbar */
 }
+
+/* Custom scrollbar for sidebar menu */
+.sidebar-menu::-webkit-scrollbar { width: 8px; }
+.sidebar-menu::-webkit-scrollbar-track { background: transparent; }
+.sidebar-menu::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.08); border-radius: 8px; }
+.sidebar-menu { scrollbar-width: thin; scrollbar-color: rgba(15,23,42,0.08) transparent; }
 
 .menu-section {
   margin-bottom: 1.5rem;
@@ -402,9 +417,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%; /* ocupar altura disponible dentro de .dashboard-layout */
   min-width: 0; /* Allow main content to shrink when needed */
-  overflow-x: hidden; /* Prevent horizontal page overflow */
+  overflow: hidden; /* evitar que el layout general haga scroll */
 }
 
 /* TOP HEADER (template v2) */
@@ -800,7 +815,9 @@
   flex: 1;
   min-width: 0; /* Essential for preventing overflow in child content */
   overflow-x: hidden; /* Prevent horizontal page overflow */
+  overflow-y: auto; /* El único scroll vertical de la app: moverá solo el contenido hijo */
   padding-top: 84px; /* Espacio para el header fijo (64px altura + 20px margen) */
+  height: calc(100vh - 84px); /* asegurar que el área de contenido ocupe el espacio disponible y pueda scrollear */
 }
 
 /* RESPONSIVE DESIGN */
@@ -1539,3 +1556,42 @@
 }
 
 /* -------------------------------------------------------------------- */
+
+/* Custom scrollbars for better visibility (WebKit + Firefox) */
+.sidebar-menu,
+.content-area {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(37,99,235,0.55) rgba(226,232,240,0.6);
+}
+
+/* WebKit-based browsers (Chrome, Edge, Safari) */
+.sidebar-menu::-webkit-scrollbar,
+.content-area::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track,
+.content-area::-webkit-scrollbar-track {
+  background: rgba(226,232,240,0.6); /* light track for contrast */
+  border-radius: 8px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb,
+.content-area::-webkit-scrollbar-thumb {
+  background: rgba(37,99,235,0.55); /* blue thumb */
+  border-radius: 8px;
+  border: 3px solid rgba(226,232,240,0.6); /* padding effect */
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover,
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(37,99,235,0.75);
+}
+
+/* Make sure the sidebar menu uses its internal scroll area */
+.sidebar-menu {
+  height: calc(100vh - 72px); /* leave space for sidebar-header and footer */
+  overflow-y: auto;
+}

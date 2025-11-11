@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   navigationItems: NavigationItem[] = [];
   currentUser: UserData | null = null;
+  // (headerActiveClient ya estaba declarado como `any` más arriba)
   
   // Breadcrumb navigation
   breadcrumbs: { label: string; path: string; active: boolean }[] = [];
