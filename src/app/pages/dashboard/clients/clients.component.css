@@ -515,44 +515,8 @@
   position: relative;
 }
 
-/* Adapt styles for the shared ui-table used on Clients page */
-.table-container .ui-table {
-  background: transparent; /* keep container background from .table-container */
-}
-.table-container .ui-table__header .ui-table__row{padding:12px 0}
-.table-container .ui-table__cell--head{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  padding: 0.75rem 0.75rem;
-  font-size:0.8rem;
-  font-weight:700;
-  color:#374151;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  min-width:0;
-}
-.table-container .ui-table__cell--head.actions{min-width:220px; justify-self:start}
-.table-container .ui-table__cell{padding:0.95rem 0.75rem; font-size:14px; line-height:1.4; color:#1e293b}
-.table-container .ui-table__cell.actions{min-width:180px; white-space:nowrap}
-
-/* Make status badges and action buttons match Clients styles */
-.table-container .status-badge{padding:6px 10px;font-size:12px}
-.table-container .action-buttons{gap:0.5rem}
-
-.table-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
-  border-radius: 16px 16px 0 0;
-}
+/* Table visuals are provided by the shared UiTable component. Page-level
+   overrides removed to centralize design in the component. */
 
 .clients-table {
   width: 100%;
@@ -1259,9 +1223,7 @@
     padding: 1rem;
   }
 
-  .table-container {
-    border-radius: 12px;
-  }
+  /* Table container styling is centralized in the UiTable component */
 
   .modal-header h2 {
     font-size: 1.25rem;

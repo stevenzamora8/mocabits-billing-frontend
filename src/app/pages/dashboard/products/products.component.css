@@ -1,10 +1,13 @@
 /* PRODUCTS PAGE STYLES - Refactored from Clients for consistency */
 .products-container {
-  padding: 1.5rem 1.25rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  /* Let the dashboard main background control the page background so the products page blends with layout */
+  /* almost full-bleed: keep a tiny gutter so content isn't flush with the viewport */
+  padding: 0.75rem 0.75rem;
+  max-width: 100%;
+  width: calc(100% - 32px); /* leave 16px gutter each side */
+  margin: 0 16px;
   background: transparent;
+  box-sizing: border-box;
+  overflow-x: hidden; /* prevent the page from scrolling horizontally — tables will scroll inside their container */
 }
 
 /* PAGE INTRO CARD (replaces header) */
@@ -67,7 +70,8 @@
 .intro-action {
   display: flex;
   align-items: center;
-  margin-left: 1rem;
+  /* tighter horizontal spacing */
+  margin: 0 0.5rem;
 }
 
 .intro-action app-button {
@@ -274,79 +278,16 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   position: relative;
+  /* reduce right padding gutter so content sits closer to container edge */
+  padding-right: 16px;
+  max-width: 100%;
+  overflow-x: auto; /* allow the table to scroll horizontally without breaking the layout */
+  -webkit-overflow-scrolling: touch;
 }
 
-.table-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
-  border-radius: 16px 16px 0 0;
-}
-
-/* Adapt styles for the shared ui-table used on Products page */
-.table-container .ui-table {
-  background: transparent;
-  width: 100%; /* Ensure table takes full width of container */
-}
-
-.table-container .ui-table__header .ui-table__row {
-  padding: 12px 0;
-}
-
-.table-container .ui-table__cell--head {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0.75rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  min-width: 0;
-}
-
-.table-container .ui-table__cell--head.actions {
-  min-width: 260px;
-  justify-self: start;
-}
-
-.table-container .ui-table__cell {
-  padding: 0.95rem 0.75rem;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #1e293b;
-}
-
-.table-container .ui-table__cell.actions {
-  min-width: 180px;
-  white-space: nowrap;
-}
-
-/* Make status badges and action buttons match Products styles */
-.table-container .status-badge {
-  padding: 6px 10px;
-  font-size: 12px;
-}
-
-.table-container .action-buttons {
-  gap: 0.5rem;
-}
-
-/* Action buttons styling */
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  align-items: center;
-}
+/* Header band for table is provided by the shared UiTable component */
+/* Table visuals are provided by the shared UiTable component. Page-level
+   overrides removed to centralize design in the component. */
 
 .action-buttons app-button {
   width: 32px;
@@ -804,9 +745,8 @@
     align-self: stretch;
   }
 
-  .table-container {
-    padding-right: 12px;
-  }
+  /* Table visuals and gutters are handled by the shared UiTable component */
+  /* Removed per-page .table-container padding to centralize design in component */
 }
 
 @media (max-width: 480px) {
@@ -842,9 +782,7 @@
     padding: 1rem;
   }
 
-  .table-container {
-    border-radius: 12px;
-  }
+  /* Table container radius is managed by the shared UiTable component */
 
   .modal-header h2 {
     font-size: 1.25rem;
