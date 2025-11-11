@@ -1,0 +1,44 @@
+<div class="ui-table">
+  <div class="ui-table__header" *ngIf="columns?.length">
+    <div class="ui-table__row" [style.gridTemplateColumns]="gridTemplate">
+      <div *ngFor="let col of columns" class="ui-table__cell ui-table__cell--head" [style.width]="col.width" [class.text-right]="col.align === 'right'" [class.text-center]="col.align === 'center'">
+        {{ col.label }}
+      </div>
+      <div *ngIf="actionsTemplate" class="ui-table__cell ui-table__cell--head actions">Acciones</div>
+    </div>
+  </div>
+
+  <div class="ui-table__body">
+    <ng-container *ngIf="!loading && data && data.length; else emptyOrLoading">
+      <div *ngFor="let row of data; let i = index; trackBy: trackByFn" class="ui-table__row" [style.gridTemplateColumns]="gridTemplate">
+        <div *ngFor="let col of columns" class="ui-table__cell" [ngClass]="{'nowrap': col.nowrap}" [style.width]="col.width" [class.text-right]="col.align === 'right'" [class.text-center]="col.align === 'center'" [attr.data-label]="col.label" [attr.title]="getCellTitle(row, col)">
+          <ng-container [ngSwitch]="col.field">
+            <ng-container *ngSwitchCase="'status'">
+              <span class="status-badge" [ngClass]="getStatusClass(row[col.field])">
+                {{ formatStatus(row[col.field]) }}
+              </span>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              {{ getCellDisplay(row, col) }}
+            </ng-container>
+          </ng-container>
+        </div>
+
+        <div *ngIf="actionsTemplate" class="ui-table__cell actions" data-label="Acciones">
+          <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: row }"></ng-container>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <ng-template #emptyOrLoading>
+    <div *ngIf="loading" class="ui-table__skeleton">
+      <div class="ui-table__row-skel" *ngFor="let _ of skeletonRows; let i = index">
+        <div class="ui-skel-cell" *ngFor="let col of columns"></div>
+        <div *ngIf="actionsTemplate" class="ui-skel-cell actions"></div>
+      </div>
+    </div>
+<!-- Only render empty text when explicitly provided by the page to avoid duplicate messages -->
+<div *ngIf="!loading && emptyText" class="ui-table__empty">{{ emptyText }}</div>
+  </ng-template>
+</div>
