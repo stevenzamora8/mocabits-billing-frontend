@@ -147,7 +147,8 @@
             </ng-container>
           </div>
 
-          <h1 *ngIf="!(breadcrumbs && breadcrumbs.length > 1 && breadcrumbs[1].path === '/dashboard/clients')">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
+          <!-- Avoid duplicating the page title when breadcrumbs already show the current page. Show H1 only on dashboard root (no additional breadcrumbs). -->
+          <h1 *ngIf="!breadcrumbs || breadcrumbs.length <= 1">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
         </div>
       </div>
       <div class="header-right">

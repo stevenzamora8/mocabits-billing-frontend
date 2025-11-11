@@ -132,8 +132,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const segments = url.split('/').filter(segment => segment !== '');
     this.breadcrumbs = [];
 
-  // Template requires starting label 'Principal'
-  this.breadcrumbs.push({ label: 'Principal', path: '/dashboard', active: false });
+  // Template requires starting label 'Gestión' (previously 'Principal')
+  this.breadcrumbs.push({ label: 'Gestión', path: '/dashboard', active: false });
 
     // If we are on the dashboard root, show Inicio > Resumen
     if (url === '/dashboard' || url === '/dashboard/' || segments.length === 1) {
@@ -148,8 +148,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // For child routes like 'create' or ':id/edit' show 'Clientes' as parent
     // and the action (crear/editar) as the active label.
     if (currentPath === '/dashboard/clients') {
-      // User prefers breadcrumb: Principal / Lista de Clientes
-      this.breadcrumbs.push({ label: 'Lista de Clientes', path: '/dashboard/clients', active: true });
+      // Prefer breadcrumb: Gestión / Clientes (not 'Lista de Clientes')
+      this.breadcrumbs.push({ label: 'Clientes', path: '/dashboard/clients', active: true });
       return;
     }
 

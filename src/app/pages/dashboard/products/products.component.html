@@ -104,50 +104,52 @@
 
   <!-- Products Table (use shared ui-table for consistent standard) -->
   <div class="table-container">
-    <ng-template #actions let-product>
-      <div class="action-buttons">
-        <app-button
-          class="edit-btn btn-icon"
-          variant="ghost"
-          size="sm"
-          (click)="editProduct(product)"
-          title="Editar"
-          aria-label="Editar producto"
-        >
-          <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-edit"></i></span>
-          <span class="sr-only">Editar</span>
-        </app-button>
+    <div class="table-wrapper" *ngIf="isLoading || paginatedProducts.length > 0">
+      <ng-template #actions let-product>
+        <div class="action-buttons">
+          <app-button
+            class="edit-btn btn-icon"
+            variant="ghost"
+            size="sm"
+            (click)="editProduct(product)"
+            title="Editar"
+            aria-label="Editar producto"
+          >
+            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-edit"></i></span>
+            <span class="sr-only">Editar</span>
+          </app-button>
 
-        <app-button
-          class="delete-btn btn-icon"
-          variant="ghost"
-          size="sm"
-          (click)="deleteProduct(product)"
-          title="Eliminar"
-          aria-label="Eliminar producto"
-        >
-          <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-trash"></i></span>
-          <span class="sr-only">Eliminar</span>
-        </app-button>
-      </div>
-    </ng-template>
+          <app-button
+            class="delete-btn btn-icon"
+            variant="ghost"
+            size="sm"
+            (click)="deleteProduct(product)"
+            title="Eliminar"
+            aria-label="Eliminar producto"
+          >
+            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-trash"></i></span>
+            <span class="sr-only">Eliminar</span>
+          </app-button>
+        </div>
+      </ng-template>
 
-    <ui-table
-      [columns]="[
-          { field: 'mainCode', label: 'Código Principal', width: '120px' },
-          { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '100px' },
-          { field: 'name', label: 'Nombre', width: '180px' },
-          { field: 'description', label: 'Descripción', width: '160px' },
-          { field: 'unitPrice', label: 'Precio Unitario', width: '100px', align: 'right' },
-          { field: 'quantity', label: 'Cantidad', width: '80px', align: 'center' },
-          { field: 'discount', label: 'Descuento', width: '90px', align: 'right' },
-          { field: 'vat', label: 'IVA (%)', width: '70px', align: 'center' },
-          { field: 'status', label: 'Estado', width: '100px', align: 'center' }
-      ]"
-      [data]="paginatedProducts"
-      [loading]="isLoading"
-      [actionsTemplate]="actions"
-    ></ui-table>
+      <ui-table
+    [columns]="[
+      { field: 'mainCode', label: 'Código Principal', width: '130px' },
+      { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '110px' },
+      { field: 'name', label: 'Nombre' },
+      { field: 'description', label: 'Descripción' },
+      { field: 'unitPrice', label: 'Precio Unitario', width: '110px', align: 'right' },
+      { field: 'quantity', label: 'Cantidad', width: '90px', align: 'center' },
+      { field: 'discount', label: 'Descuento', width: '100px', align: 'right' },
+      { field: 'vat', label: 'IVA (%)', width: '80px', align: 'center' },
+      { field: 'status', label: 'Estado', width: '110px', align: 'center' }
+    ]"
+        [data]="paginatedProducts"
+        [loading]="isLoading"
+        [actionsTemplate]="actions"
+      ></ui-table>
+    </div>
     
     <!-- Empty State: show a full-width friendly card when there are no products and not loading -->
     <div *ngIf="!isLoading && totalElements === 0" class="empty-state">

@@ -8,6 +8,7 @@
   background: transparent;
   box-sizing: border-box;
   overflow-x: hidden; /* prevent the page from scrolling horizontally — tables will scroll inside their container */
+  min-width: 0; /* Allow the container to shrink below its content width */
 }
 
 /* PAGE INTRO CARD (replaces header) */
@@ -278,11 +279,89 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   position: relative;
-  /* reduce right padding gutter so content sits closer to container edge */
-  padding-right: 16px;
-  max-width: 100%;
-  overflow-x: auto; /* allow the table to scroll horizontally without breaking the layout */
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden; /* Hide overflow on container to let ui-table handle scrolling */
+}
+
+/* Top gradient stripe like other cards (matches clients) */
+.table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  border-radius: 16px 16px 0 0;
+  z-index: 2;
+}
+
+/* TABLE WRAPPER - Let ui-table handle its own scrolling just like in clients */
+.table-wrapper {
+  width: 100%;
+  overflow: visible;
+  display: block;
+  /* Add minimum height to prevent layout collapse */
+  min-height: 200px;
+}
+
+/* Force the table to use full width and proper grid layout */
+.products-container ui-table {
+  width: 100%;
+  display: block;
+}
+
+.products-container ui-table .ui-table {
+  width: 100%;
+}
+
+.products-container ui-table .ui-table__container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.products-container ui-table .ui-table__header {
+  width: 100%;
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.products-container ui-table .ui-table__header .ui-table__row {
+  width: 100%;
+  /* Remove forced min-width - allow columns to be flexible so scroll shows only when needed */
+  min-width: unset;
+  background: #f8fafc;
+}
+
+.products-container ui-table .ui-table__body .ui-table__row {
+  width: 100%;
+  min-width: unset;
+}
+
+/* Make cell paddings, fonts and icon sizes match clients styling */
+.products-container ui-table .ui-table__cell{
+  padding: 1rem 0.75rem;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.products-container ui-table .ui-table__cell--head{
+  padding: 1rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+/* Action buttons / icons sizing to match clients */
+.products-container ui-table .action-buttons app-button{
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.products-container ui-table .action-buttons app-button .app-button__icon-html i,
+.products-container ui-table .action-buttons app-button .app-button__icon-html svg{
+  font-size: 16px;
 }
 
 /* Header band for table is provided by the shared UiTable component */
@@ -745,8 +824,11 @@
     align-self: stretch;
   }
 
-  /* Table visuals and gutters are handled by the shared UiTable component */
-  /* Removed per-page .table-container padding to centralize design in component */
+  /* Ensure table container adapts to mobile */
+  .table-container {
+    border-radius: 12px;
+    margin: 0 -0.25rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -782,7 +864,10 @@
     padding: 1rem;
   }
 
-  /* Table container radius is managed by the shared UiTable component */
+  .table-container {
+    border-radius: 8px;
+    margin: 0;
+  }
 
   .modal-header h2 {
     font-size: 1.25rem;
