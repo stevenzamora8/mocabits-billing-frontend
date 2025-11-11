@@ -27,16 +27,19 @@
 /* SIDEBAR */
 .sidebar {
   width: 280px;
+  min-width: 280px; /* prevent unintended narrowing when child content changes */
   background: white;
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0; /* never shrink the sidebar when main content changes */
   transition: all 0.3s ease;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar.collapsed {
   width: 70px;
+  min-width: 70px; /* keep collapsed width strictly enforced */
 }
 
 /* SIDEBAR HEADER */

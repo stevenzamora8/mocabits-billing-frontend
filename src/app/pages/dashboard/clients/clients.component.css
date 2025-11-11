@@ -515,6 +515,34 @@
   position: relative;
 }
 
+/* Adapt styles for the shared ui-table used on Clients page */
+.table-container .ui-table {
+  background: transparent; /* keep container background from .table-container */
+}
+.table-container .ui-table__header .ui-table__row{padding:12px 0}
+.table-container .ui-table__cell--head{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding: 0.75rem 0.75rem;
+  font-size:0.8rem;
+  font-weight:700;
+  color:#374151;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  min-width:0;
+}
+.table-container .ui-table__cell--head.actions{min-width:220px; justify-self:start}
+.table-container .ui-table__cell{padding:0.95rem 0.75rem; font-size:14px; line-height:1.4; color:#1e293b}
+.table-container .ui-table__cell.actions{min-width:180px; white-space:nowrap}
+
+/* Make status badges and action buttons match Clients styles */
+.table-container .status-badge{padding:6px 10px;font-size:12px}
+.table-container .action-buttons{gap:0.5rem}
+
 .table-container::before {
   content: '';
   position: absolute;
@@ -863,26 +891,26 @@
   box-shadow: 0 3px 12px rgba(239, 68, 68, 0.25);
 }
 
-/* EMPTY STATE */
+/* EMPTY STATE (match Products design) */
 .empty-state {
   text-align: center;
-  padding: 5rem 3rem;
-    background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  padding: 4rem 3rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 20px;
   margin: 2rem 0;
 }
 
 .empty-icon {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto 2rem auto;
-  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.28);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
   animation: float 3s ease-in-out infinite;
 }
 
@@ -894,14 +922,14 @@
 .empty-state h3 {
   margin: 0 0 1rem 0;
   color: #374151;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 
 .empty-state p {
   margin: 0;
   color: #64748b;
-  font-size: 1rem;
+  font-size: 0.9rem;
   max-width: 400px;
   margin: 0 auto;
   line-height: 1.6;

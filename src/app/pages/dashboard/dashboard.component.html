@@ -39,10 +39,7 @@
           <i class="fas fa-receipt"></i>
           <span *ngIf="!isSidebarCollapsed">Comprobantes</span>
         </a>
-  <a class="menu-item" title="Clientes" (click)="navigateTo('/dashboard/clients'); $event.preventDefault()" [class.active]="isActive('/dashboard/clients')">
-          <i class="fas fa-users"></i>
-          <span *ngIf="!isSidebarCollapsed">Clientes</span>
-        </a>
+  
       </div>
 
       <div class="menu-section">
@@ -50,6 +47,10 @@
   <a class="menu-item" title="Productos" (click)="navigateTo('/dashboard/products'); $event.preventDefault()" [class.active]="isActive('/dashboard/products')">
           <i class="fas fa-box"></i>
           <span *ngIf="!isSidebarCollapsed">Productos</span>
+        </a>
+  <a class="menu-item" title="Clientes" (click)="navigateTo('/dashboard/clients'); $event.preventDefault()" [class.active]="isActive('/dashboard/clients')">
+          <i class="fas fa-users"></i>
+          <span *ngIf="!isSidebarCollapsed">Clientes</span>
         </a>
   <a class="menu-item" title="Establecimientos" (click)="navigateTo('/dashboard/locations'); $event.preventDefault()">
           <i class="fas fa-store"></i>

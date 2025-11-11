@@ -49,8 +49,14 @@ export interface UiTableColumn {
     </div>
 
     <ng-template #emptyOrLoading>
-      <div *ngIf="loading" class="ui-table__empty">Cargando...</div>
-      <div *ngIf="!loading" class="ui-table__empty">{{ emptyText || 'No hay elementos' }}</div>
+      <div *ngIf="loading" class="ui-table__skeleton">
+        <div class="ui-table__row-skel" *ngFor="let _ of skeletonRows; let i = index">
+          <div class="ui-skel-cell" *ngFor="let col of columns"></div>
+          <div *ngIf="actionsTemplate" class="ui-skel-cell actions"></div>
+        </div>
+      </div>
+  <!-- Only render empty text when explicitly provided by the page to avoid duplicate messages -->
+  <div *ngIf="!loading && emptyText" class="ui-table__empty">{{ emptyText }}</div>
     </ng-template>
   </div>
   `,
@@ -63,12 +69,20 @@ export interface UiTableColumn {
     .ui-table__header{background:#f8fafc;border-bottom:2px solid #e2e8f0;margin:0}
   .ui-table__header .ui-table__row{background:transparent;border:none;padding:12px 0;display:grid;align-items:center}
   .ui-table__cell--head{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.025em;color:#64748b;padding:0 16px;min-width:0;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-self:start}
-  .ui-table__cell--head.actions{justify-self:start}
+  /* Ensure actions header reserves enough space and never wraps */
+  .ui-table__cell--head.actions{justify-self:start;min-width:220px;white-space:nowrap}
     
     .ui-table__body{}
   .ui-table__row{display:grid;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9;background:#fff;transition:background-color 0.15s ease}
   .ui-table__row:hover{background:#f8fafc}
   .ui-table__row:last-child{border-bottom:none}
+
+  /* Skeleton loading placeholders */
+  .ui-table__skeleton{padding:16px}
+  .ui-table__row-skel{display:grid;grid-auto-flow:column;grid-gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9}
+  .ui-skel-cell{height:16px;border-radius:8px;background:linear-gradient(90deg,#f1f5f9 0%, #e9eef7 50%, #f1f5f9 100%);background-size:200% 100%;animation: shimmer 1.2s linear infinite}
+  .ui-skel-cell.actions{width:220px;height:28px;border-radius:14px}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
     
   /* Allow wrapping by default so long texts are visible; keep min-width to allow grid to shrink correctly */
   .ui-table__cell{min-width:0;padding:0 16px;display:flex;align-items:center;overflow-wrap:anywhere;word-break:break-word;overflow:visible;text-overflow:clip;white-space:normal;color:#1e293b;font-size:14px;line-height:1.5}
@@ -123,11 +137,14 @@ export class UiTableComponent {
     return item && item.id != null ? item.id : index;
   };
 
+  // Number of skeleton rows to show while loading
+  skeletonRows = Array(6).fill(0);
+
   get gridTemplate(): string {
     // Use minmax(0, 1fr) for flexible columns so grid doesn't force horizontal scroll
     const cols = (this.columns || []).map(c => c.width ? c.width : 'minmax(0, 1fr)');
-    // Reserve a sensible max width for the actions column so buttons don't overflow
-    if (this.actionsTemplate) cols.push('minmax(0, 160px)');
+    // Reserve a fixed width for the actions column so buttons and header don't collapse
+    if (this.actionsTemplate) cols.push('220px');
     return cols.join(' ');
   }
 

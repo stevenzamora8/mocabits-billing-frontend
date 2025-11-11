@@ -1,10 +1,15 @@
 /* PRODUCTS PAGE STYLES */
 .products-container {
-  padding: 1rem;
-  max-width: 1400px;
+  /* Match Clients container sizing and centering for visual parity */
+  padding: 1.5rem 1.25rem;
+  /* Adjusted max width slightly smaller to reduce empty horizontal space and avoid wrapping on medium screens */
+  max-width: 1100px;
+  width: 100%; /* ensure container fills available space up to max-width */
+  box-sizing: border-box; /* include padding in width calculations */
+  min-width: 0; /* allow children to shrink properly inside flex/grid parents */
   margin: 0 auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  min-height: 100vh;
+  /* let dashboard background show through like Clients page */
+  background: transparent;
 }
 
 /* PAGE HEADER */
@@ -34,7 +39,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: #1e293b;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -54,7 +59,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 16px 16px 0 0;
 }
 
@@ -63,7 +68,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   color: white;
   border: none;
   border-radius: 16px;
@@ -71,14 +76,14 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   position: relative;
   z-index: 1;
 }
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
 }
 
 .btn-primary:active {
@@ -133,7 +138,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -141,7 +146,7 @@
 .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  border-color: #667eea;
+  border-color: var(--logo-primary-color);
 }
 
 .stat-card:hover::before {
@@ -163,14 +168,14 @@
 .stat-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   transition: all 0.3s ease;
 }
 
@@ -183,6 +188,16 @@
   flex: 1;
   min-width: 0;
 }
+
+/* Per-card icon-only color themes: keep cards white, color the small icon circle (match Clients) */
+.stat-card.primary { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.primary .stat-icon { background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color)); }
+
+.stat-card.success { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.success .stat-icon { background: linear-gradient(135deg, #34d399, #10b981); }
+
+.stat-card.warning { background: white; color: inherit; border: 1px solid #e2e8f0; }
+.stat-card.warning .stat-icon { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
 
 .stat-number {
   font-size: 1.25rem;
@@ -212,10 +227,97 @@
   border: 1px solid #e2e8f0;
   margin-bottom: 1.5rem;
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem; /* tighten outer gap so children can use more width */
   align-items: center;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* allow dropdown overlays */
+}
+
+/* Add clients-style intro card and filter helpers so Products visually matches Clients */
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.intro-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+.intro-left { display:flex; align-items:center; gap:0.75rem; }
+
+.page-intro::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  border-radius: 16px 16px 0 0;
+}
+
+.intro-text .intro-title { font-weight:700; color:#0f172a; font-size:1rem; }
+.intro-text .intro-desc { color:#475569; font-size:0.9rem; margin-top:2px; }
+.intro-action { display:flex; align-items:center; margin-left:1rem; }
+.intro-action app-button { height:40px; }
+
+/* Adopt same filter layout as Clients */
+.filter-selects {
+  display: flex;
+  gap: 0.5rem; /* tighter spacing between filter columns */
+  flex: 1 1 auto;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
+  flex: 1 1 160px;
+}
+
+.filter-field-button { align-self: flex-end; flex: 0 0 120px; }
+
+.filter-field-row { display:flex; gap:0.5rem; align-items:center; }
+
+.filter-field-row > div { flex:1 1 0 !important; min-width:0; display:flex; flex-direction:column; gap:0.375rem; }
+
+.filter-selects > .filter-field:nth-child(1) { flex: 0.9 1 150px; min-width:120px; }
+.filter-selects > .filter-field:nth-child(2) { flex: 1.2 1 220px; min-width:180px; }
+.filter-selects > .filter-field:nth-child(3) { flex: 0.8 1 120px; min-width:100px; }
+
+.filter-field-row app-input,
+.filter-field-row app-select { flex:1 1 auto; min-width:0; width:100%; }
+
+.filter-label { font-size:0.85rem; color:#475569; font-weight:700; }
+
+.clear-filters-btn { width:100%; justify-content:center; min-height:36px; padding:6px 10px; font-size:0.95rem; }
+
+@media (max-width: 720px) {
+  .page-intro { flex-direction: column; align-items:stretch; gap:0.5rem; }
+  .intro-left { display:flex; gap:0.5rem; }
+  .intro-action { justify-content:flex-end; }
+  .filter-selects { align-items:stretch; flex-wrap:wrap; }
+  .filter-field { flex:1 1 100%; min-width:0; }
+  .filter-field-button { flex:1 1 100%; align-self:stretch; }
 }
 
 .filters-section::before {
@@ -225,14 +327,14 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 20px 20px 0 0;
 }
 
 .search-box {
-  flex: 1;
+  flex: 1 1 auto; /* allow search area to stretch to full width */
   position: relative;
-  max-width: 450px;
+  max-width: none;
 }
 
 .search-box svg {
@@ -267,9 +369,32 @@
 }
 
 .filter-buttons {
-  display: flex;
+  border-color: var(--logo-primary-color);
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+/* Make inner filter groups share available space and shrink properly */
+
+.search-box > div .filter-group {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.375rem;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  min-width: 120px;
+}
+
+.search-box .filter-group app-input,
+.search-box .filter-group input,
+.search-box .filter-group app-select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Make the clear button compact so it stays on the same row */
+.search-box .clear-filters-btn {
+  flex: 0 0 120px;
 }
 
 .filter-btn {
@@ -317,8 +442,12 @@
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  /* allow horizontal scroll as a safe fallback if grid can't shrink further */
+  overflow-x: auto;
   position: relative;
+  /* make room for scrollbars so they don't visually overlap content (esp. action buttons) */
+  padding-right: 12px;
+  padding-bottom: 12px;
 }
 
 .table-container::before {
@@ -328,9 +457,80 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 16px 16px 0 0;
 }
+
+/* Reduce UI table header size to match Clients table styling */
+.table-container .ui-table__header .ui-table__row {
+  padding: 0.75rem 0; /* slightly reduced vertical spacing to compact the header */
+}
+.table-container .ui-table__cell--head {
+  /* Header layout: keep everything on one line, ellipsis if it overflows. Use flex so content centers vertically */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5rem 0.6rem; /* slightly tighter vertical padding to compact the header */
+  font-size: 0.72rem; /* reduce font a touch to avoid wrapping */
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0; /* allows grid to shrink without forcing break */
+}
+
+/* Ensure header children can't be rotated/written vertically by other styles */
+.table-container .ui-table__cell--head * {
+  transform: none !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Specifically fix the actions header alignment */
+.table-container .ui-table__cell--head.actions {
+  justify-self: start !important;
+  text-align: left !important;
+}
+.table-container .ui-table__cell {
+  padding: 0.75rem 0.6rem; /* body cells same vertical rhythm as Clients, compact */
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+/* Ensure the actions cell has reserved minimum space so action buttons don't wrap */
+.table-container .ui-table__cell.actions {
+  /* reserve more space for action buttons to avoid wrapping and keep icons visible */
+  min-width: 260px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1rem;
+}
+
+/* Strong overrides to prevent rotated/vertical 'ACCIONES' label and to ensure horizontal layout */
+.table-container .ui-table__cell--head.actions,
+.table-container .ui-table__cell--head.actions *,
+.table-container .ui-table__cell.actions::before {
+  transform: none !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Hide any pseudo-element injected for small viewports so it doesn't appear rotated on desktop */
+.table-container .ui-table__cell.actions::before {
+  display: none !important;
+}
+
+/* Make status badges compact inside products table */
+.table-container .status-badge { padding: 6px 10px; font-size: 12px; }
 
 .products-table {
   width: 100%;
@@ -360,10 +560,6 @@
   transition: all 0.3s ease;
 }
 
-.product-row:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%);
-  transform: scale(1.01);
-}
 
 .product-row:hover td {
   border-bottom-color: #e2e8f0;
@@ -385,7 +581,7 @@
   color: #64748b;
   line-height: 1.5;
   max-width: 300px;
-  overflow: hidden;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -394,7 +590,7 @@
   display: inline-block;
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -405,7 +601,7 @@
   font-family: 'Monaco', 'Menlo', 'SF Mono', monospace;
   font-size: 0.8rem;
   color: #64748b;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   background: #f1f5f9;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
@@ -413,14 +609,13 @@
 
 .price {
   font-weight: 700;
-  color: #059669;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   font-size: 0.9rem;
   background: #d1fae5;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   display: inline-block;
 }
-
 .stock {
   font-weight: 600;
   color: #1e293b;
@@ -430,7 +625,7 @@
 .stock.low-stock {
   color: #dc2626;
   font-weight: 700;
-  background: #fef2f2;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   display: inline-block;
@@ -438,14 +633,13 @@
 
 .status-badge {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
 .status-badge.active {
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
@@ -520,6 +714,99 @@
   box-shadow: 0 3px 12px rgba(220, 38, 38, 0.25);
 }
 
+/* Action buttons container: keep buttons horizontally aligned and centered vertically */
+.action-buttons {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0; /* keep intrinsic size like Clients */
+}
+
+/* Accessibility: visually-hidden helper for screen readers */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Focus styles for keyboard users */
+.action-btn:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.25);
+  outline-offset: 2px;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.12);
+}
+
+/* Action button styles that target app-button components directly */
+.action-buttons app-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Edit button styling */
+.action-buttons app-button.edit-btn {
+  background: #fffbeb !important;
+  border: 1px solid #fed7aa !important;
+  color: #b45309 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.action-buttons app-button.edit-btn:hover {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: white !important;
+  transform: scale(1.05);
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.25);
+}
+
+/* Delete button styling */
+.action-buttons app-button.delete-btn {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #dc2626 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.action-buttons app-button.delete-btn:hover {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  transform: scale(1.05);
+  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.25);
+}
+
+/* Icon styling inside action buttons */
+.action-buttons app-button .app-button__icon-html i {
+  font-size: 14px;
+  transition: all 0.18s ease;
+}
+
+.action-buttons app-button.edit-btn .app-button__icon-html i {
+  color: #b45309;
+}
+
+.action-buttons app-button.edit-btn:hover .app-button__icon-html i {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.action-buttons app-button.delete-btn .app-button__icon-html i {
+  color: #dc2626;
+}
+
+.action-buttons app-button.delete-btn:hover .app-button__icon-html i {
+  color: white;
+  transform: translateY(-1px);
+}
+
 /* EMPTY STATE */
 .empty-state {
   text-align: center;
@@ -589,7 +876,8 @@
   background: white;
   border-radius: 20px;
   width: 90%;
-  max-width: 650px;
+  /* Slightly narrower modal to better fit medium screens and align with products table width */
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
@@ -1049,7 +1337,7 @@
 .pagination-number.active {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  border-color: #667eea;
+  border-color: var(--logo-primary-color);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 

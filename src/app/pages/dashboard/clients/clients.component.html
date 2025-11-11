@@ -35,20 +35,13 @@
     </app-button>
   </ng-template>
 
-  <!-- Inline page intro (moved from reusable component) -->
-  <div class="page-intro">
-    <div class="intro-left">
-      <span class="intro-icon" aria-hidden="true"><i class="fas fa-users"></i></span>
-      <div class="intro-text">
-        <div class="intro-title">Gestión de clientes</div>
-        <div class="intro-desc">Busca, filtra y administra clientes. Crea, ve, edita, activa/inactiva y elimina clientes desde esta pantalla.</div>
-      </div>
-    </div>
-
-    <div class="intro-action">
-      <ng-container *ngTemplateOutlet="introAction"></ng-container>
-    </div>
-  </div>
+  <!-- Reusable page intro component (projects the introAction template) -->
+  <ui-page-intro
+    [title]="'Gestión de clientes'"
+    [description]="'Busca, filtra y administra clientes. Crea, ve, edita, activa/inactiva y elimina clientes desde esta pantalla.'"
+    [iconClass]="'fas fa-users'"
+    [actionTemplate]="introAction">
+  </ui-page-intro>
 
   <div class="stats-grid" style="margin-top:1.25rem;margin-bottom:1.5rem">
     <div class="stat-card primary">
@@ -171,14 +164,8 @@
     <!-- Card header kept minimal (buttons moved to filters) -->
 
     <div class="table-container">
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Cargando clientes...</p>
-    </div>
-
-      <!-- Table view (uses shared ui-table) -->
-      <div class="table-wrapper" *ngIf="!isLoading && totalElements > 0">
+      <!-- Table view (uses shared ui-table). Render table when loading OR when we have elements so the table's built-in skeleton shows while loading -->
+      <div class="table-wrapper" *ngIf="isLoading || totalElements > 0">
           <ng-template #actions let-client>
             <div class="action-buttons">
               <app-button variant="ghost" size="sm" (click)="viewClient(client)" ariaLabel="Ver cliente" class="view-btn" title="Ver cliente">
@@ -223,11 +210,8 @@
       </div>
 
     <!-- Empty State -->
-        <!-- Empty State -->
     <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
-      <svg width="64" height="64" fill="currentColor" viewBox="0 0 20 20" class="empty-icon">
-        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-      </svg>
+      <div class="empty-icon" aria-hidden="true"><i class="fas fa-users"></i></div>
       <h3>No se encontraron clientes</h3>
       <p>Intenta ajustar los filtros de búsqueda o crea un nuevo cliente.</p>
     </div>

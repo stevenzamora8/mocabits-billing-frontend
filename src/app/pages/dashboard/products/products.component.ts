@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { ProductsService } from '../../../services/products.service';
 import { InputComponent } from '../../../shared/components/ui/input/input.component';
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
+import { UiTableComponent } from '../../../shared/components/ui/table/table.component';
+import { UiPageIntroComponent } from '../../../shared/components/ui/page-intro/page-intro.component';
 
 // Nuevo modelo de producto para el formulario
 export interface ProductFormModel {
@@ -17,13 +19,14 @@ export interface ProductFormModel {
   quantity: number;
   discount: number;
   vat: number;
+  status?: string;
   totalWithoutTax: number;
 }
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
@@ -46,7 +49,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Pagination
   currentPage = 1;
-  itemsPerPage = 5; // Mostrar solo 5 registros por página
+  itemsPerPage = 10; // Mostrar 10 registros por página (ajuste para mejor densidad)
   totalPages = 1;
   totalElements = 0;
 
@@ -65,6 +68,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadData();
+  }
+
+  // Map tax rate IDs from the API to percentage values used in the UI
+  private mapTaxRate(taxRateId: any): number {
+    const id = Number(taxRateId);
+    switch (id) {
+      case 1: return 0;   // example: exento
+      case 2: return 8;   // example: 8%
+      case 3: return 12;  // common IVA 12%
+      default: return 0;
+    }
   }
 
   ngOnDestroy() {
@@ -110,11 +124,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
           mainCode: p.mainCode,
           auxiliaryCode: p.auxiliaryCode,
           description: p.description,
-          unitPrice: p.unitPrice,
-          quantity: p.quantity,
-          discount: p.discount,
-          vat: p.vat,
-          totalWithoutTax: p.totalWithoutTax
+          unitPrice: Number(p.unitPrice) || 0,
+          quantity: Number(p.quantity) || 0,
+          discount: Number(p.discount) || 0,
+          // Map taxRateId to a vat percentage when provided, fallback to p.vat
+          vat: p.taxRateId ? this.mapTaxRate(p.taxRateId) : (Number(p.vat) || 0),
+          // Derive status from quantity (simple rule: quantity > 0 => active)
+          status: (Number(p.quantity) || 0) > 0 ? 'A' : 'I',
+          // Compute total without tax if not provided by API
+          totalWithoutTax: (Number(p.unitPrice) || 0) * (Number(p.quantity) || 0) - (Number(p.discount) || 0)
         }));
         this.filteredProducts = [...this.products]; // For server-side pagination, this contains current page
         
