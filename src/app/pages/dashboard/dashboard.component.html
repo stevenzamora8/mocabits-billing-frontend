@@ -33,7 +33,7 @@
   <a class="menu-item" title="Facturas" (click)="navigateTo('/dashboard/invoices'); $event.preventDefault()" [class.active]="isActive('/dashboard/invoices')">
           <i class="fas fa-file-invoice"></i>
           <span *ngIf="!isSidebarCollapsed">Facturas</span>
-          <span class="menu-badge" *ngIf="!isSidebarCollapsed">5</span>
+          <span class="menu-badge" *ngIf="!isSidebarCollapsed">{{ invoiceBadgeCount }}</span>
         </a>
   <a class="menu-item" title="Comprobantes" (click)="navigateTo('/dashboard/receipts'); $event.preventDefault()">
           <i class="fas fa-receipt"></i>
@@ -147,6 +147,12 @@
             </ng-container>
           </div>
 
+          <!-- Compact client info when a client is selected elsewhere in the app -->
+          <div class="header-client-info" *ngIf="headerActiveClient">
+            <div class="client-name">{{ headerActiveClient?.name }}</div>
+            <div class="client-meta">{{ headerActiveClient?.identification }} • {{ headerActiveClient?.typeIdentification }}</div>
+          </div>
+
           <!-- Avoid duplicating the page title when breadcrumbs already show the current page. Show H1 only on dashboard root (no additional breadcrumbs). -->
           <h1 *ngIf="!breadcrumbs || breadcrumbs.length <= 1">{{ (breadcrumbs && breadcrumbs.length > 1) ? (breadcrumbs[1].label || 'Panel de Control') : (breadcrumbs && breadcrumbs.length ? (breadcrumbs[breadcrumbs.length-1].label || 'Panel de Control') : 'Panel de Control') }}</h1>
         </div>
@@ -154,7 +160,7 @@
       <div class="header-right">
         <div class="header-icon" title="Notificaciones">
           <i class="fas fa-bell"></i>
-          <span class="badge">3</span>
+          <span class="badge">{{ notificationCount }}</span>
         </div>
         <div class="header-icon" title="Ajustes Rápidos">
           <i class="fas fa-cog"></i>

@@ -13,10 +13,13 @@ import { DashboardService, NavigationItem, UserData } from '../../services/dashb
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   currentPlan: string = 'Gratis';
-  userName: string = 'José Martínez';
-  userInitials: string = 'JM';
+  userName: string = 'Bryan Zamora';
+  userInitials: string = 'BZ';
   userRole: string = 'Administrador';
-  userEmail: string = 'jose.martinez@mocabits.com';
+  userEmail: string = 'bryan.zamora@mocabits.com';
+  notificationCount: number = 3; // Badge fijo para notificaciones
+  invoiceBadgeCount: number = 5; // Badge fijo para facturas pendientes
+  headerActiveClient: any = null; // Cliente activo en el header (opcional)
   isSidebarCollapsed: boolean = false;
   isUserModalOpen: boolean = false;
   isMobileOrTablet: boolean = false;
@@ -60,18 +63,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.dashboardService.currentUser$.subscribe(user => {
         console.log('DashboardComponent received user:', user);
         this.currentUser = user;
-        this.userName = user.name;
-        // compute initials (first letters of first and last name)
-        const parts = (user.name || '').trim().split(' ').filter(Boolean);
-        this.userInitials = parts.length >= 2 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : (user.name ? user.name.charAt(0).toUpperCase() : 'J');
-  this.userRole = (user as any).role || this.userRole;
-        this.userEmail = user.email;
-        this.currentPlan = user.plan;
-        this.totalInvoices = user.totalInvoices;
-        this.totalClients = user.totalClients;
-        this.totalRevenue = user.totalRevenue;
-        this.memberSince = user.memberSince;
-        this.lastActivity = user.lastActivity;
+        // Mantener valores fijos para el usuario
+        this.userName = 'Bryan Zamora';
+        this.userInitials = 'BZ';
+        this.userRole = 'Administrador';
+        this.userEmail = 'bryan.zamora@mocabits.com';
+        // Actualizar solo los datos dinámicos
+        this.currentPlan = user.plan || this.currentPlan;
+        this.totalInvoices = user.totalInvoices || this.totalInvoices;
+        this.totalClients = user.totalClients || this.totalClients;
+        this.totalRevenue = user.totalRevenue || this.totalRevenue;
+        this.memberSince = user.memberSince || this.memberSince;
+        this.lastActivity = user.lastActivity || this.lastActivity;
       })
     );
 

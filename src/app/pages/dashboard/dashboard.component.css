@@ -416,11 +416,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
+  position: fixed; /* Cambio de sticky a fixed para posición completamente fija */
   top: 0;
+  left: 280px; /* Ajustar según el ancho del sidebar */
+  right: 0;
   z-index: 999;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   min-height: 64px; /* Ensure minimum height for content */
+  transition: left 0.3s ease; /* Transición suave cuando el sidebar se colapsa */
+}
+
+/* Ajustar header cuando sidebar está colapsado */
+.sidebar.collapsed ~ .main-content .top-header {
+  left: 70px; /* Ancho del sidebar colapsado */
 }
 
 .header-left {
@@ -792,6 +800,7 @@
   flex: 1;
   min-width: 0; /* Essential for preventing overflow in child content */
   overflow-x: hidden; /* Prevent horizontal page overflow */
+  padding-top: 84px; /* Espacio para el header fijo (64px altura + 20px margen) */
 }
 
 /* RESPONSIVE DESIGN */
@@ -816,6 +825,16 @@
 
   .main-content {
     margin-left: 0;
+  }
+
+  /* Header fijo para tablets */
+  .top-header {
+    left: 0; /* En tablets, el header ocupa todo el ancho */
+  }
+
+  .sidebar.collapsed ~ .main-content .top-header,
+  .sidebar:not(.collapsed) ~ .main-content .top-header {
+    left: 0; /* En tablets, el header siempre ocupa todo el ancho */
   }
 
   .top-bar {
@@ -844,6 +863,17 @@
 
   .sidebar.collapsed {
     transform: translateX(-100%); /* Mantener oculto cuando esté colapsado */
+  }
+
+  /* Header fijo para móviles */
+  .top-header {
+    left: 0; /* En móviles, el header ocupa todo el ancho */
+    padding: 0.75rem 1rem; /* Reducir padding en móviles */
+  }
+
+  .sidebar.collapsed ~ .main-content .top-header,
+  .sidebar:not(.collapsed) ~ .main-content .top-header {
+    left: 0; /* En móviles, el header siempre ocupa todo el ancho */
   }
 
   .top-bar {
