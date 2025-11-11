@@ -1,16 +1,50 @@
 :host{display:block;font-family:var(--font-family-primary,system-ui)}
 /* Make the table fully responsive and avoid horizontal scrollbars.
   Columns without explicit width use minmax(0, 1fr) so they shrink flexibly. */
-.ui-table{width:100%;overflow:visible;background:#fff;border-radius:8px;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1)}
+.ui-table{width:100%;overflow:hidden;background:#fff;border-radius:8px;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1)}
+
+/* Scrollable container for table content */
+.ui-table__container{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:visible;
+  /* Smooth scrolling behavior */
+  scroll-behavior:smooth;
+  /* Custom scrollbar styling for better appearance */
+  scrollbar-width:thin;
+  scrollbar-color:#cbd5e1 #f1f5f9;
+  /* Ensure the container maintains its shape */
+  display:block;
+}
+
+.ui-table__container::-webkit-scrollbar{
+  height:8px;
+}
+
+.ui-table__container::-webkit-scrollbar-track{
+  background:#f1f5f9;
+  border-radius:4px;
+}
+
+.ui-table__container::-webkit-scrollbar-thumb{
+  background:#cbd5e1;
+  border-radius:4px;
+}
+
+.ui-table__container::-webkit-scrollbar-thumb:hover{
+  background:#94a3b8;
+}
  
  .ui-table__header{background:#f8fafc;border-bottom:2px solid #e2e8f0;margin:0}
 .ui-table__header .ui-table__row{background:transparent;border:none;padding:12px 0;display:grid;align-items:center}
-.ui-table__cell--head{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.025em;color:#64748b;padding:0 16px;min-width:0;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-self:start}
+.ui-table__cell--head{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.025em;color:#64748b;padding:0 16px;min-width:80px;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-self:start}
 /* Ensure actions header reserves enough space and never wraps */
 .ui-table__cell--head.actions{justify-self:start;min-width:260px;white-space:nowrap}
   
- .ui-table__body{}
-.ui-table__row{display:grid;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9;background:#fff;transition:background-color 0.15s ease}
+ .ui-table__body{
+  min-width:fit-content;
+}
+.ui-table__row{display:grid;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9;background:#fff;transition:background-color 0.15s ease;min-width:inherit}
 .ui-table__row:hover{background:#f8fafc}
 .ui-table__row:last-child{border-bottom:none}
 
@@ -22,7 +56,7 @@
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
   
 /* Allow wrapping by default so long texts are visible; keep min-width to allow grid to shrink correctly */
-.ui-table__cell{min-width:0;padding:0 16px;display:flex;align-items:center;overflow-wrap:anywhere;word-break:break-word;overflow:visible;text-overflow:clip;white-space:normal;color:#1e293b;font-size:14px;line-height:1.5}
+.ui-table__cell{min-width:80px;padding:0 16px;display:flex;align-items:center;overflow-wrap:anywhere;word-break:break-word;overflow:visible;text-overflow:clip;white-space:normal;color:#1e293b;font-size:14px;line-height:1.5}
 /* If a column explicitly requests nowrap, revert to single-line ellipsis */
 .ui-table__cell.nowrap{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Actions cell: keep buttons inside the column; allow wrap so they don't overflow */
@@ -46,8 +80,32 @@
 .ui-table :global(.action-buttons) app-button .app-button__icon-html{font-size:12px;line-height:1}
 .ui-table :global(.action-buttons) app-button .app-button__icon-html i{font-size:12px}
 
+/* Set minimum width for table content to ensure horizontal scroll when needed */
+.ui-table__header,
+.ui-table__body{
+  min-width:1200px; /* Minimum width before horizontal scroll triggers - increased for more columns */
+}
+
+/* Ensure the table content preserves the grid layout */
+.ui-table__header .ui-table__row,
+.ui-table__body .ui-table__row{
+  min-width:1200px; /* Match the minimum width */
+}
+
 /* Responsive: stack rows on narrow viewports */
 @media (max-width: 768px) {
+  /* On mobile, disable horizontal scroll and use stacked layout */
+  .ui-table__container{
+    overflow-x:visible;
+  }
+  
+  .ui-table__header,
+  .ui-table__body,
+  .ui-table__header .ui-table__row,
+  .ui-table__body .ui-table__row{
+    min-width:unset;
+  }
+  
   .ui-table__header{display:none}
   .ui-table__row{display:block;border-bottom:1px solid #eef2f7;padding:16px;margin-bottom:8px;border-radius:8px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05)}
   .ui-table__cell{display:flex;padding:8px 0;justify-content:space-between;border-bottom:1px solid #f1f5f9}

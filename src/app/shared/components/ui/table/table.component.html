@@ -1,14 +1,15 @@
 <div class="ui-table">
-  <div class="ui-table__header" *ngIf="columns?.length">
-    <div class="ui-table__row" [style.gridTemplateColumns]="gridTemplate">
-      <div *ngFor="let col of columns" class="ui-table__cell ui-table__cell--head" [style.width]="col.width" [class.text-right]="col.align === 'right'" [class.text-center]="col.align === 'center'">
-        {{ col.label }}
+  <div class="ui-table__container">
+    <div class="ui-table__header" *ngIf="columns?.length">
+      <div class="ui-table__row" [style.gridTemplateColumns]="gridTemplate">
+        <div *ngFor="let col of columns" class="ui-table__cell ui-table__cell--head" [style.width]="col.width" [class.text-right]="col.align === 'right'" [class.text-center]="col.align === 'center'">
+          {{ col.label }}
+        </div>
+        <div *ngIf="actionsTemplate" class="ui-table__cell ui-table__cell--head actions">Acciones</div>
       </div>
-      <div *ngIf="actionsTemplate" class="ui-table__cell ui-table__cell--head actions">Acciones</div>
     </div>
-  </div>
 
-  <div class="ui-table__body">
+    <div class="ui-table__body">
     <ng-container *ngIf="!loading && data && data.length; else emptyOrLoading">
       <div *ngFor="let row of data; let i = index; trackBy: trackByFn" class="ui-table__row" [style.gridTemplateColumns]="gridTemplate">
         <div *ngFor="let col of columns" class="ui-table__cell" [ngClass]="{'nowrap': col.nowrap}" [style.width]="col.width" [class.text-right]="col.align === 'right'" [class.text-center]="col.align === 'center'" [attr.data-label]="col.label" [attr.title]="getCellTitle(row, col)">
@@ -41,4 +42,5 @@
 <!-- Only render empty text when explicitly provided by the page to avoid duplicate messages -->
 <div *ngIf="!loading && emptyText" class="ui-table__empty">{{ emptyText }}</div>
   </ng-template>
+  </div>
 </div>
