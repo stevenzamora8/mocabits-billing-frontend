@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ClientService, Client, ClientPage } from '../../../services/client.service';
 import { Router } from '@angular/router';
 import { 
@@ -22,7 +22,7 @@ import { ScrollToTopDirective } from '../../../shared/directives/scroll-to-top.d
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, UiTableComponent, UiPageIntroComponent, UiPaginatorComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, UiAlertComponent, UiConfirmComponent, UiTableComponent, UiPageIntroComponent, UiPaginatorComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css'],
   hostDirectives: [ScrollToTopDirective]
@@ -62,10 +62,7 @@ export class ClientsComponent implements OnInit {
     { value: 'I', label: 'Inactivo' }
   ];
 
-  // Modal
-  isClientModalOpen: boolean = false;
-  editingClient: Client | null = null;
-  clientForm: FormGroup;
+  // (Creation/edit handled by route component `CreateClientComponent`)
 
   // Pagination - now using API pagination
   currentPage: number = 0; // 0-based for API
@@ -111,11 +108,9 @@ export class ClientsComponent implements OnInit {
   confirmAction: (() => void) | null = null;
 
   constructor(
-    private formBuilder: FormBuilder,
     private clientService: ClientService,
     private router: Router
   ) {
-    this.clientForm = this.createClientForm();
     this.currentClientPage = null;
   }
 
@@ -154,17 +149,7 @@ export class ClientsComponent implements OnInit {
     return this.clients; // Now clients already contains only the current page
   }
 
-  // Form creation
-  private createClientForm(): FormGroup {
-    return this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      identification: ['', [Validators.required]],
-      typeIdentification: ['CEDULA', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: [''],
-      status: ['A', [Validators.required]]
-    });
-  }
+  // client creation/edit moved to CreateClientComponent (route: /dashboard/clients/create and /:id/edit)
 
   // Data loading
   loadClients(page: number = 0): void {
@@ -303,127 +288,7 @@ export class ClientsComponent implements OnInit {
     return pages;
   }
 
-  // Modal management
-  openClientModal(client?: Client): void {
-    this.isClientModalOpen = true;
-    this.editingClient = client || null;
-
-    if (client) {
-      this.clientForm.patchValue({
-        name: client.name,
-        identification: client.identification,
-        typeIdentification: client.typeIdentification,
-        email: client.email,
-        phone: client.phone,
-        status: client.status || 'A'
-      });
-    } else {
-      this.clientForm.reset({
-        name: '',
-        identification: '',
-        typeIdentification: 'CEDULA',
-        email: '',
-        phone: '',
-        status: 'A'
-      });
-    }
-  }
-
-  closeClientModal(): void {
-    this.isClientModalOpen = false;
-    this.editingClient = null;
-    this.clientForm.reset();
-  }
-
-  // CRUD operations
-  saveClient(): void {
-    if (this.clientForm.valid) {
-      const formData = this.clientForm.value;
-      this.isSaving = true;
-
-      // Validar identificación según tipo
-      if (!this.validateIdentification(formData.identification, formData.identificationType)) {
-        this.isSaving = false;
-        return;
-      }
-
-      if (this.editingClient) {
-        // Update existing client
-        const updatedClient: Client = {
-          ...this.editingClient,
-          name: formData.name,
-          identification: formData.identification,
-          typeIdentification: formData.typeIdentification,
-          email: formData.email,
-          phone: formData.phone,
-          status: formData.status
-        };
-
-        this.clientService.updateClient(this.editingClient.id!, updatedClient).subscribe({
-          next: (updatedClientResponse) => {
-            // Reload current page to get updated data
-            this.loadClients(this.currentPage);
-            this.closeClientModal();
-            this.isSaving = false;
-          },
-          error: (error) => {
-            console.error('Error updating client:', error);
-            this.isSaving = false;
-          }
-        });
-      } else {
-        // Create new client
-        const newClient: Client = {
-          name: formData.name,
-          identification: formData.identification,
-          typeIdentification: formData.typeIdentification,
-          email: formData.email,
-          phone: formData.phone
-        };
-
-        this.clientService.createClient(newClient).subscribe({
-          next: (createdClient) => {
-            // Reload current page to get updated data
-            this.loadClients(this.currentPage);
-            this.closeClientModal();
-            this.isSaving = false;
-          },
-          error: (error) => {
-            console.error('Error creating client:', error);
-            this.isSaving = false;
-          }
-        });
-      }
-    } else {
-      this.markFormGroupTouched();
-    }
-  }
-
-  private generateClientId(): string {
-    return 'CLI-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
-  }
-
-  private validateIdentification(identification: string, type: string): boolean {
-    const cleanId = identification.replace(/\s+/g, '');
-
-    switch (type) {
-      case 'CEDULA':
-        return /^\d{10}$/.test(cleanId);
-      case 'RUC':
-        return /^\d{13}$/.test(cleanId);
-      case 'PASAPORTE':
-        return /^[A-Z0-9]{6,12}$/.test(cleanId.toUpperCase());
-      default:
-        return true;
-    }
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.clientForm.controls).forEach(key => {
-      const control = this.clientForm.get(key);
-      control?.markAsTouched();
-    });
-  }
+  // Client creation handled by separate component
 
   editClient(client: Client): void {
     // Navigate to the edit route for the selected client
@@ -680,21 +545,7 @@ export class ClientsComponent implements OnInit {
   // Per-client loading state (prevent double actions)
   loadingClients: Set<number | undefined> = new Set<number | undefined>();
 
-  getFieldError(fieldName: string): string | null {
-    const control = this.clientForm.get(fieldName);
-    if (control && control.invalid && control.touched) {
-      if (control.errors?.['required']) {
-        return 'Este campo es requerido';
-      }
-      if (control.errors?.['email']) {
-        return 'Ingrese un email válido';
-      }
-      if (control.errors?.['minlength']) {
-        return `Debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
-      }
-    }
-    return null;
-  }
+  // Form error helpers were moved to CreateClientComponent
 
 
   formatDate(date: Date): string {

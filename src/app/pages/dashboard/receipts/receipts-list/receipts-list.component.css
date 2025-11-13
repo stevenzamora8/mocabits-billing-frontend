@@ -176,6 +176,39 @@
 .edit-btn { color:#f59e0b; background:#fffbeb; }
 .delete-btn { color:#ef4444; background:#fef2f2; }
 
+/* Action icon color wiring - match Clients visual style: each action has its own icon color */
+.action-buttons .app-button__icon-html i,
+.action-buttons .app-button__icon-html svg {
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.view-btn .app-button__icon-html i { color: #2563eb; }
+.view-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.email-btn .app-button__icon-html i { color: #059669; } /* green */
+.email-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.pdf-btn .app-button__icon-html i { color: #dc2626; } /* red */
+.pdf-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.xml-btn .app-button__icon-html i { color: #7c3aed; } /* purple */
+.xml-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.void-btn .app-button__icon-html i { color: #b45309; } /* amber/orange for anular */
+.void-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.status-btn .app-button__icon-html i { color: #64748b; }
+.status-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+.delete-btn .app-button__icon-html i { color: #dc2626; }
+.delete-btn:hover .app-button__icon-html i { color: #ffffff; }
+
+/* Slight lift on icon hover for subtle feedback */
+.action-buttons .app-button:hover .app-button__icon-html i { transform: translateY(-1px); }
+
 .empty-state { text-align:center; padding:2rem; }
 
 /* Responsive tweaks */

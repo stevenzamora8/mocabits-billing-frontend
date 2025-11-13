@@ -59,6 +59,8 @@ export class UiTableComponent {
     // Fallback formatting: convert objects/arrays to JSON, otherwise toString
     if (val == null) return '';
     if (col.field === 'status') return this.formatStatus(val);
+    // Format totals as USD currency when the column is named 'total' or field is 'total'
+    // table should not impose domain-specific formatting here; pages (components) should provide pre-formatted values when needed
     if (typeof val === 'object') {
       try { return JSON.stringify(val); } catch { return String(val); }
     }

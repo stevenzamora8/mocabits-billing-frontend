@@ -154,53 +154,74 @@
     </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Cargando comprobantes...</p>
-  </div>
-
-  <div *ngIf="error && !isLoading" class="error-state">
+  <div *ngIf="error" class="error-state">
     <div class="error-icon"></div>
     <h3>Error al cargar comprobantes</h3>
     <p>{{ error }}</p>
     <button class="btn-primary" (click)="loadReceipts()">Reintentar</button>
   </div>
 
-  <div class="table-container" *ngIf="!isLoading && !error">
-    <div class="table-wrapper">
+  <div class="table-container" *ngIf="!error">
+    <!-- Render table when loading OR when we have elements so the shared ui-table can show its skeleton -->
+    <div class="table-wrapper" *ngIf="isLoading || totalElements > 0">
       <ng-template #actions let-row>
         <div class="action-buttons">
-          <app-button variant="ghost" size="sm" (click)="viewInvoice(row)" ariaLabel="Ver" class="view-btn">
+          <app-button variant="ghost" size="sm" (click)="viewInvoice(row)" ariaLabel="Ver" class="view-btn" title="Ver comprobante">
             <span class="app-button__icon-html"><i class="fas fa-eye"></i></span>
           </app-button>
-          <app-button variant="ghost" size="sm" (click)="editInvoice(row)" ariaLabel="Editar" class="edit-btn">
-            <span class="app-button__icon-html"><i class="fas fa-edit"></i></span>
+
+          <!-- Edit disabled for comprobantes: editing not allowed -->
+
+          <!-- Send email -->
+          <app-button variant="ghost" size="sm" (click)="sendEmail(row)" ariaLabel="Enviar correo" class="email-btn" title="Enviar por correo">
+            <span class="app-button__icon-html"><i class="fas fa-envelope"></i></span>
           </app-button>
-          <app-button variant="ghost" size="sm" (click)="updateStatus(row)" ariaLabel="Estado" class="status-btn">
+
+          <!-- Download PDF -->
+          <app-button variant="ghost" size="sm" (click)="downloadPdf(row)" ariaLabel="Descargar PDF" class="pdf-btn" title="Descargar PDF">
+            <span class="app-button__icon-html"><i class="fas fa-file-pdf"></i></span>
+          </app-button>
+
+          <!-- Download XML -->
+          <app-button variant="ghost" size="sm" (click)="downloadXml(row)" ariaLabel="Descargar XML" class="xml-btn" title="Descargar XML">
+            <span class="app-button__icon-html"><i class="fas fa-file-code"></i></span>
+          </app-button>
+
+          <!-- Anular (void) -->
+          <app-button variant="ghost" size="sm" (click)="voidReceipt(row)" ariaLabel="Anular" class="void-btn" title="Anular comprobante">
+            <span class="app-button__icon-html"><i class="fas fa-ban"></i></span>
+          </app-button>
+
+          <app-button variant="ghost" size="sm" (click)="updateStatus(row)" ariaLabel="Estado" class="status-btn" title="Actualizar estado">
             <span class="app-button__icon-html"><i class="fas fa-sync-alt"></i></span>
           </app-button>
-          <app-button variant="ghost" size="sm" (click)="deleteInvoice(row)" ariaLabel="Eliminar" class="delete-btn">
-            <span class="app-button__icon-html"><i class="fas fa-trash"></i></span>
-          </app-button>
+
+          <!-- Delete disabled for comprobantes: deletion not allowed -->
         </div>
       </ng-template>
 
       <ui-table
         [columns]="[
-          { field: 'invoiceNumber', label: 'Número', width: '180px' },
+          { field: 'invoiceNumber', label: 'Número', width: '160px' },
           { field: 'clientBusinessName', label: 'Cliente', width: '260px' },
           { field: 'clientIdentification', label: 'ID Cliente', width: '140px' },
-          { field: 'issueDate', label: 'Fecha Emisión', width: '140px' },
-          { field: 'total', label: 'Total', width: '120px', align: 'right' }
+          { field: 'issueDateDisplay', label: 'Fecha Emisión', width: '160px' },
+          { field: 'totalDisplay', label: 'Total', width: '120px', align: 'right' }
         ]"
         [data]="filteredInvoices"
         [loading]="isLoading"
         emptyText="No se encontraron comprobantes"
         [actionsTemplate]="actions">
       </ui-table>
-    </div>
+      </div>
 
+    <!-- Empty State: show when not loading and there are no elements -->
+    <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
+      <div class="empty-icon" aria-hidden="true"><i class="fas fa-file-invoice"></i></div>
+      <h3>No se encontraron comprobantes</h3>
+      <p>Intenta ajustar los filtros de búsqueda o crea un nuevo comprobante.</p>
     </div>
+  </div>
 
   <!-- Pagination (shared ui-paginator) placed outside the table card so spacing and shadow are separate -->
   <ui-paginator

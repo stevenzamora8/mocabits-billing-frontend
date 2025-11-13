@@ -32,6 +32,10 @@ export interface Invoice {
   authorizationNumber?: string;
   issueDate: string;
   authorizationDate?: string;
+  // Optional display field for formatted issue date (date + hour:minute)
+  issueDateDisplay?: string;
+  // Optional display field for formatted total (e.g. "$1,234.56")
+  totalDisplay?: string;
 }
 
 export interface InvoicePagination {

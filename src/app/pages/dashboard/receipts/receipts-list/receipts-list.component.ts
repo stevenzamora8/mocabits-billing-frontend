@@ -95,7 +95,12 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (response: any) => {
-        this.invoices = response.data;
+        // Add display fields for formatted issue date and total (domain-specific formatting kept in this page)
+        this.invoices = (response.data || []).map((inv: any) => ({
+          ...inv,
+          issueDateDisplay: this.formatDate(inv.issueDate),
+          totalDisplay: this.formatCurrency(typeof inv.total === 'number' ? inv.total : Number(inv.total))
+        }));
         this.stats = response.summary;
         this.currentPage = response.pagination.currentPage;
         this.totalPages = response.pagination.totalPages;
@@ -177,8 +182,21 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatCurrency(amount: number): string { return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount); }
-  formatDate(dateString: string): string { return new Date(dateString).toLocaleDateString('es-ES'); }
+  // Format currency with a leading dollar sign and standard en-US formatting, e.g. "$1,234.56"
+  formatCurrency(amount: number): string { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount); }
+  /** Format issue date to 'dd/MM/yyyy HH:mm' (date, hour and minute) */
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return String(dateString);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const day = pad(d.getDate());
+    const month = pad(d.getMonth() + 1);
+    const year = d.getFullYear();
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
 
   getMaxItemsForPage(): number { return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements); }
 
@@ -186,8 +204,50 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
 
   viewInvoice(invoice: Invoice): void { alert(`Ver comprobante ${invoice.invoiceNumber}`); }
   editInvoice(invoice: Invoice): void { alert(`Editar comprobante ${invoice.invoiceNumber}`); }
-  deleteInvoice(invoice: Invoice): void { alert(`Eliminar comprobante ${invoice.invoiceNumber}`); }
-  updateStatus(invoice: Invoice): void { alert(`Cambiar estado comprobante ${invoice.invoiceNumber}`); }
+  deleteInvoice(invoice: Invoice): void {
+    // Deleting receipts is not allowed. Keep a non-destructive handler in case code elsewhere calls it.
+    alert(`No es posible eliminar comprobantes desde la interfaz. Si necesita anular un comprobante, utilice la acción 'Anular'.`);
+    console.log('Delete attempted for invoice (blocked):', invoice?.id);
+  }
+
+  updateStatus(invoice: Invoice): void {
+    // Placeholder for cycling or updating status; real implementation should call API
+    alert(`Actualizar estado del comprobante ${invoice.invoiceNumber} (simulado).`);
+  }
+
+  /**************** Actions requested: enviar correo, anular, PDF, XML ****************/
+  sendEmail(invoice: Invoice): void {
+    if (!invoice) return;
+    const ok = confirm(`Enviar comprobante ${invoice.invoiceNumber} por correo electrónico al cliente ${invoice.clientBusinessName}?`);
+    if (!ok) return;
+    // TODO: call backend API to send email. For now simulate.
+    console.log('Send email for invoice', invoice.id);
+    alert(`Correo enviado para comprobante ${invoice.invoiceNumber} (simulado).`);
+  }
+
+  voidReceipt(invoice: Invoice): void {
+    if (!invoice) return;
+    const ok = confirm(`¿Está seguro que desea anular el comprobante ${invoice.invoiceNumber}?`);
+    if (!ok) return;
+    // TODO: call API to void/anular the receipt; simulate local update
+    invoice.receiptStatus = 'ANULADO' as any;
+    console.log('Voided invoice', invoice.id);
+    alert(`Comprobante ${invoice.invoiceNumber} anulado (simulado).`);
+  }
+
+  downloadPdf(invoice: Invoice): void {
+    if (!invoice) return;
+    // TODO: call API to fetch PDF blob and download. For now simulate.
+    console.log('Download PDF for invoice', invoice.id);
+    alert(`Descargando PDF de ${invoice.invoiceNumber} (simulado).`);
+  }
+
+  downloadXml(invoice: Invoice): void {
+    if (!invoice) return;
+    // TODO: call API to fetch XML and trigger download. For now simulate.
+    console.log('Download XML for invoice', invoice.id);
+    alert(`Descargando XML de ${invoice.invoiceNumber} (simulado).`);
+  }
 
   goToPage(page: number): void {
     if (page >= 0 && page < this.totalPages && page !== this.currentPage) {
@@ -209,8 +269,8 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
 
   private loadSampleData(): void {
     this.invoices = [
-      { id: 1, invoiceNumber: 'RC-0001', accessKey: 'RC-KEY-123', clientIdentification: '1234567890', clientBusinessName: 'Cliente A', issueDate: '2024-01-15', total: 120.5, receiptStatus: 'AUTORIZADO', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' },
-      { id: 2, invoiceNumber: 'RC-0002', accessKey: 'RC-KEY-456', clientIdentification: '0987654321', clientBusinessName: 'Cliente B', issueDate: '2024-02-15', total: 450.75, receiptStatus: 'PENDIENTE', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' }
+      { id: 1, invoiceNumber: 'RC-0001', accessKey: 'RC-KEY-123', clientIdentification: '1234567890', clientBusinessName: 'Cliente A', issueDate: '2024-01-15T09:12:00', issueDateDisplay: this.formatDate('2024-01-15T09:12:00'), total: 120.5, totalDisplay: this.formatCurrency(120.5), receiptStatus: 'AUTORIZADO', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' },
+      { id: 2, invoiceNumber: 'RC-0002', accessKey: 'RC-KEY-456', clientIdentification: '0987654321', clientBusinessName: 'Cliente B', issueDate: '2024-02-15T14:35:00', issueDateDisplay: this.formatDate('2024-02-15T14:35:00'), total: 450.75, totalDisplay: this.formatCurrency(450.75), receiptStatus: 'PENDIENTE', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' }
     ];
 
     this.stats = { total: 2, authorized: 1, pending: 1, rejected: 0 };
