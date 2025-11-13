@@ -121,7 +121,6 @@
 .app-button--spinner-top.app-button--loading .app-button__left-icons {
   position: static;
   transform: none;
-  margin-bottom: 0.5rem;
 }
 .app-button--spinner-top.app-button--loading {
   flex-direction: column;

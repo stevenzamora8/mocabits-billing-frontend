@@ -218,13 +218,6 @@
   .filters-section { flex-direction:column; align-items:stretch; }
 }
 
-/* Fix input sizing: ensure app-input fills available space and text is visible (no clipping) */
-.receipts-list-container .search-box {
-  flex: 1 1 auto;
-  min-width: 0; /* allow shrinking in flex containers */
-  display: flex;
-}
-
 .receipts-list-container .search-box app-input,
 .receipts-list-container .filter-selects app-input,
 .receipts-list-container app-input {
@@ -234,17 +227,17 @@
 }
 
 .receipts-list-container .filter-selects {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
+  display: grid;
+  /* Default layout: put both Estado and Clear on the top row (right side)
+     Row 1: name | id | number | state | clear
+     Row 2: start | end | (spacer) | (spacer) | (spacer) */
+  grid-template-columns: 1fr 220px 220px 160px 140px;
+  grid-template-areas:
+    "name id number state clear"
+    "start end . . .";
+  gap: 0.75rem;
+  align-items: start;
 }
-
-.receipts-list-container .filter-selects .filter-field {
-  flex: 1 1 160px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
 
 /* Labels and input sizing to match Clients look */
 .receipts-list-container .filter-label {
@@ -277,12 +270,17 @@
 
 /* Place clear button aligned to the right in desktop grid */
 .receipts-list-container .filter-field.field-clear { justify-self: end; display:flex; align-items:center; }
-.receipts-list-container .clear-filters-btn { padding: 0.5rem 1rem; }
-
-@media (max-width: 860px) {
-  .receipts-list-container .filter-field.field-clear { justify-self: start; }
+.receipts-list-container .clear-filters-btn {
+  box-sizing: border-box;
+  height: 44px; /* match input control height */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
 }
-  gap: 0.375rem;
+
+.@media (max-width: 860px) {
+  .receipts-list-container .filter-field.field-clear { justify-self: start; }
 }
 
 /* Make native select and inputs expand inside filter fields */
@@ -361,12 +359,14 @@
 
 .receipts-list-container .filter-selects {
   display: grid;
-  /* Default two-row layout: Name | ID | Number | Desde (start)  on row 1
-     Hasta (end) | Estado | spacer | Clear on row 2 */
-  grid-template-columns: 1fr 220px 220px 220px;
+  /* Default layout: place Clear button on the top row (right) next to Number.
+     Row 1: name | id | number | clear
+     Row 2: start | end | state | (spacer) */
+  /* Add an extra column so both Estado and the Clear button can sit on the top row */
+  grid-template-columns: 1fr 220px 220px 140px 140px;
   grid-template-areas:
-    "name id number start"
-    "end state . clear";
+    "name id number state clear"
+    "start end . . .";
   gap: 0.75rem;
   align-items: start;
 }
@@ -378,11 +378,25 @@
   background: white;
   min-width: 140px;
   transition: all 0.3s ease;
+}
+
 .receipts-list-container .filter-selects .filter-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+}
+
+/* Place button containers at the top of their grid cell by default */
+.receipts-list-container .filter-selects .filter-field-button {
+  align-self: start;
+  flex: 0 0 120px;
+}
+
+.receipts-list-container .filter-selects .field-clear {
+  grid-area: clear;
+  justify-self: end;
+  align-self: center;
 }
 
 /* Assign grid areas for each named field */
@@ -393,7 +407,6 @@
 .receipts-list-container .filter-selects .field-start { grid-area: start; }
 .receipts-list-container .filter-selects .field-end { grid-area: end; }
 .receipts-list-container .filter-selects .field-clear { grid-area: clear; }
-}
 
 .filter-buttons { margin-left: 0.5rem; }
 
@@ -402,17 +415,21 @@
 
 @media (min-width: 1200px) {
   /* Slightly wider columns on very large screens */
-  .receipts-list-container .filter-selects { grid-template-columns: 1fr 220px 220px 220px; }
-  .receipts-list-container .filter-selects { grid-template-areas: "name id number start" "end state . clear"; }
+  .receipts-list-container .filter-selects { grid-template-columns: 1fr 260px 240px 180px 160px; }
+  .receipts-list-container .filter-selects { grid-template-areas: "name id number state clear" "start end . . ."; }
 }
 
 @media (max-width: 860px) {
-  .receipts-list-container .filter-selects { grid-template-columns: 1fr 1fr; grid-auto-flow: row; grid-template-areas: "name id" "number start" "end state" "clear clear"; }
+  /* Small screens: Estado on its own row above the date fields, Clear on top-right */
+  .receipts-list-container .filter-selects { grid-template-columns: 1fr 1fr; grid-auto-flow: row; grid-template-areas: "name clear" "id number" "state state" "start end"; gap: 0.5rem; }
+  .receipts-list-container .filter-field.filter-field-button { align-self: start; justify-self: end; }
 }
 
 @media (max-width: 520px) {
-  .receipts-list-container .filter-selects { grid-template-columns: 1fr; grid-template-areas: "name" "id" "number" "start" "end" "state" "clear"; }
+  /* Extra small: show Clear first so it's immediately visible */
+  .receipts-list-container .filter-selects { grid-template-columns: 1fr; grid-template-areas: "clear" "name" "id" "number" "state" "start" "end"; gap: 0.5rem; }
 }
+/* Make native select and inputs expand inside filter fields */
 .receipts-list-container .filter-input:focus {
   outline: none;
   border-color: #667eea;
@@ -499,5 +516,16 @@
   .receipts-list-container .pagination-btn { width: 32px; height: 32px; }
   .receipts-list-container .pagination-number { width: 32px; height: 32px; font-size: 0.8rem; }
   .receipts-list-container .pagination-info { font-size: 0.8rem; }
+}
+
+/* Page-specific override: ensure Clear button exactly matches input height and is vertically centered */
+.receipts-list-container .filter-selects .field-clear { align-self: center !important; }
+.receipts-list-container .clear-filters-btn {
+  box-sizing: border-box !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 1rem !important;
 }
 
