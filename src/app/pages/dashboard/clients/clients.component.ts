@@ -11,6 +11,7 @@ import {
   UiConfirmType,
   UiTableComponent,
   UiPageIntroComponent,
+  UiPaginatorComponent,
   ButtonComponent,
   InputComponent,
   SelectComponent,
@@ -21,7 +22,7 @@ import { ScrollToTopDirective } from '../../../shared/directives/scroll-to-top.d
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, UiTableComponent, UiPageIntroComponent, ButtonComponent, InputComponent, SelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, UiAlertComponent, UiConfirmComponent, UiTableComponent, UiPageIntroComponent, UiPaginatorComponent, ButtonComponent, InputComponent, SelectComponent],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css'],
   hostDirectives: [ScrollToTopDirective]

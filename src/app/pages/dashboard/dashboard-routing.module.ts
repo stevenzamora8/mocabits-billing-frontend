@@ -30,6 +30,11 @@ const routes: Routes = [
         title: 'Dashboard - Facturas'
       },
       {
+        path: 'receipts',
+        loadChildren: () => import('./receipts/receipts-routing.module').then(m => m.ReceiptsRoutingModule),
+        title: 'Dashboard - Comprobantes'
+      },
+      {
         path: 'products',
         loadComponent: () => import('./products/products.component').then(m => m.ProductsComponent),
         title: 'Dashboard - Productos'

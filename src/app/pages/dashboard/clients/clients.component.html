@@ -218,61 +218,13 @@
   </div>
   </div>
 
-  <!-- Pagination -->
-  <div class="pagination-container" *ngIf="totalPages > 1">
-    <div class="pagination-info">
-      Mostrando {{ (currentPage) * itemsPerPage + 1 }} - {{ Math.min((currentPage + 1) * itemsPerPage, totalElements) }} de {{ totalElements }} clientes
-    </div>
-
-    <div class="pagination-controls">
-      <app-button
-        variant="outline"
-        size="sm"
-        [disabled]="currentPage === 0"
-        (click)="goToPage(1)"
-        ariaLabel="Primera página">
-        <span class="app-button__icon-html"><i class="fas fa-angle-double-left"></i></span>
-      </app-button>
-
-      <app-button
-        variant="outline"
-        size="sm"
-        [disabled]="currentPage === 0"
-        (click)="previousPage()"
-        ariaLabel="Página anterior">
-        <span class="app-button__icon-html"><i class="fas fa-angle-left"></i></span>
-      </app-button>
-
-      <div class="pagination-numbers">
-        <app-button
-          *ngFor="let page of getPageNumbers()"
-          variant="outline"
-          size="sm"
-          [class.active]="page === (currentPage + 1)"
-          (click)="goToPage(page)">
-          {{ page }}
-        </app-button>
-      </div>
-
-      <app-button
-        variant="outline"
-        size="sm"
-        [disabled]="currentPage >= totalPages - 1"
-        (click)="nextPage()"
-        ariaLabel="Página siguiente">
-        <span class="app-button__icon-html"><i class="fas fa-angle-right"></i></span>
-      </app-button>
-
-      <app-button
-        variant="outline"
-        size="sm"
-        [disabled]="currentPage >= totalPages - 1"
-        (click)="goToPage(totalPages)"
-        ariaLabel="Última página">
-        <span class="app-button__icon-html"><i class="fas fa-angle-double-right"></i></span>
-      </app-button>
-    </div>
-  </div>
+  <!-- Pagination (shared ui-paginator) -->
+  <ui-paginator
+    [totalElements]="totalElements"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="loadClients($event)">
+  </ui-paginator>
 </div>
 
 <!-- Client Modal -->

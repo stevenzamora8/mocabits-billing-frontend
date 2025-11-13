@@ -1,0 +1,10 @@
+/* Receipts host styles (kept light, page-level styling delegated to child components) */
+.receipts-container {
+  padding: 1.5rem 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: transparent;
+}
+
+/* Ensure child .table-container clipping and top stripe behave same as clients */
+.receipts-container .table-container { overflow: hidden; }

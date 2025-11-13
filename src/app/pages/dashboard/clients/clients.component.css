@@ -511,8 +511,22 @@
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  /* overflow: hidden; */
+  overflow: hidden; /* hide overflow so the top stripe is clipped to container */
   position: relative;
+  margin-bottom: 1.5rem; /* space between table card and paginator */
+}
+
+/* Top gradient stripe to match other cards (blue accent) */
+.table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color, #2563eb), var(--logo-secondary-color, #059669));
+  border-radius: 16px 16px 0 0;
+  z-index: 2;
 }
 
 /* Table visuals are provided by the shared UiTable component. Page-level

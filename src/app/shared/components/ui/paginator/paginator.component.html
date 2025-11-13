@@ -1,0 +1,25 @@
+<div class="pagination-container" *ngIf="totalPages > 1">
+  <div class="pagination-info">Mostrando {{ displayRangeStart() }} - {{ displayRangeEnd() }} de {{ totalElements }}</div>
+
+  <div class="pagination-controls">
+    <app-button variant="outline" size="sm" [disabled]="currentPage === 0" (click)="goTo(0)" ariaLabel="Primera página">
+      <span class="app-button__icon-html"><i class="fas fa-angle-double-left"></i></span>
+    </app-button>
+
+    <app-button variant="outline" size="sm" [disabled]="currentPage === 0" (click)="previous()" ariaLabel="Página anterior">
+      <span class="app-button__icon-html"><i class="fas fa-angle-left"></i></span>
+    </app-button>
+
+    <div class="pagination-numbers">
+      <app-button *ngFor="let page of getPageNumbers()" variant="outline" size="sm" [class.active]="page === currentPage" (click)="goTo(page)">{{ page + 1 }}</app-button>
+    </div>
+
+    <app-button variant="outline" size="sm" [disabled]="currentPage >= totalPages - 1" (click)="next()" ariaLabel="Página siguiente">
+      <span class="app-button__icon-html"><i class="fas fa-angle-right"></i></span>
+    </app-button>
+
+    <app-button variant="outline" size="sm" [disabled]="currentPage >= totalPages - 1" (click)="goTo(totalPages - 1)" ariaLabel="Última página">
+      <span class="app-button__icon-html"><i class="fas fa-angle-double-right"></i></span>
+    </app-button>
+  </div>
+</div>
