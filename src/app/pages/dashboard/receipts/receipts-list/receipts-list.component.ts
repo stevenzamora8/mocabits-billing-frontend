@@ -6,7 +6,10 @@ import { InputComponent } from '../../../../shared/components/ui/input/input.com
 import { UiPageIntroComponent } from '../../../../shared/components/ui/page-intro/page-intro.component';
 import { UiTableComponent } from '../../../../shared/components/ui/table/table.component';
 import { UiPaginatorComponent } from '../../../../shared/components/ui/paginator/paginator.component';
+import { UiFiltersPanelComponent } from '../../../../shared/components/ui/filters-panel/filters-panel.component';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
+import { UiStatCardComponent } from '../../../../shared/components/ui/stat-card/stat-card.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -17,7 +20,7 @@ import { AuthService } from '../../../../services/auth.service';
 @Component({
   selector: 'app-receipts-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, InputComponent, SelectComponent, UiPageIntroComponent, UiTableComponent, UiPaginatorComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, InputComponent, SelectComponent, UiPageIntroComponent, UiTableComponent, UiPaginatorComponent, UiStatCardComponent, UiFiltersPanelComponent],
   templateUrl: './receipts-list.component.html',
   styleUrls: ['./receipts-list.component.css']
 })
@@ -96,10 +99,11 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: any) => {
         // Add display fields for formatted issue date and total (domain-specific formatting kept in this page)
+        const money = new MoneyPipe();
         this.invoices = (response.data || []).map((inv: any) => ({
           ...inv,
           issueDateDisplay: this.formatDate(inv.issueDate),
-          totalDisplay: this.formatCurrency(typeof inv.total === 'number' ? inv.total : Number(inv.total))
+          totalDisplay: money.transform(typeof inv.total === 'number' ? inv.total : Number(inv.total), 'USD', 'en-US')
         }));
         this.stats = response.summary;
         this.currentPage = response.pagination.currentPage;
@@ -268,9 +272,10 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
   }
 
   private loadSampleData(): void {
+    const money = new MoneyPipe();
     this.invoices = [
-      { id: 1, invoiceNumber: 'RC-0001', accessKey: 'RC-KEY-123', clientIdentification: '1234567890', clientBusinessName: 'Cliente A', issueDate: '2024-01-15T09:12:00', issueDateDisplay: this.formatDate('2024-01-15T09:12:00'), total: 120.5, totalDisplay: this.formatCurrency(120.5), receiptStatus: 'AUTORIZADO', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' },
-      { id: 2, invoiceNumber: 'RC-0002', accessKey: 'RC-KEY-456', clientIdentification: '0987654321', clientBusinessName: 'Cliente B', issueDate: '2024-02-15T14:35:00', issueDateDisplay: this.formatDate('2024-02-15T14:35:00'), total: 450.75, totalDisplay: this.formatCurrency(450.75), receiptStatus: 'PENDIENTE', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' }
+      { id: 1, invoiceNumber: 'RC-0001', accessKey: 'RC-KEY-123', clientIdentification: '1234567890', clientBusinessName: 'Cliente A', issueDate: '2024-01-15T09:12:00', issueDateDisplay: this.formatDate('2024-01-15T09:12:00'), total: 120.5, totalDisplay: money.transform(120.5), receiptStatus: 'AUTORIZADO', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' },
+      { id: 2, invoiceNumber: 'RC-0002', accessKey: 'RC-KEY-456', clientIdentification: '0987654321', clientBusinessName: 'Cliente B', issueDate: '2024-02-15T14:35:00', issueDateDisplay: this.formatDate('2024-02-15T14:35:00'), total: 450.75, totalDisplay: money.transform(450.75), receiptStatus: 'PENDIENTE', receiptType: 'COMPROBANTE', issuerRuc: '123', issuerBusinessName: 'Mi Empresa', environment: 'PRUEBAS' }
     ];
 
     this.stats = { total: 2, authorized: 1, pending: 1, rejected: 0 };

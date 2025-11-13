@@ -44,39 +44,15 @@
   </ui-page-intro>
 
   <div class="stats-grid" style="margin-top:1.25rem;margin-bottom:1.5rem">
-    <div class="stat-card primary">
-      <div class="stat-icon primary">
-        <i class="fas fa-users"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ totalClients }}</div>
-        <div class="stat-label">Total Clientes</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-users&quot;&gt;&lt;/i&gt;'" title="Total Clientes" [value]="totalClients" variant="primary"></ui-stat-card>
 
-    <div class="stat-card success">
-      <div class="stat-icon success">
-        <i class="fas fa-user-check"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ activeClients }}</div>
-        <div class="stat-label">Clientes Activos</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-check&quot;&gt;&lt;/i&gt;'" title="Clientes Activos" [value]="activeClients" variant="success"></ui-stat-card>
 
-    <div class="stat-card warning">
-      <div class="stat-icon warning">
-        <i class="fas fa-user-slash"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ inactiveClients }}</div>
-        <div class="stat-label">Clientes Inactivos</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-slash&quot;&gt;&lt;/i&gt;'" title="Clientes Inactivos" [value]="inactiveClients" variant="warning"></ui-stat-card>
   </div>
 
-  <!-- Filters and Search Section -->
-  <div class="filters-section">
+  <!-- Filters and Search Section (now using shared ui-filters-panel) -->
+  <ui-filters-panel>
     <div class="filter-selects">
       <div class="filter-field">
         <label class="filter-label">Nombre</label>
@@ -154,7 +130,7 @@
     <div class="filter-buttons">
       <!-- filter inputs area (buttons moved to separate action-controls) -->
     </div>
-  </div>
+  </ui-filters-panel>
 
   <!-- action-controls moved above inputs inside .filters-section -->
 

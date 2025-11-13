@@ -1,0 +1,49 @@
+.filters-section-wrapper{
+  width:100%;
+  display:block;
+  margin-bottom:1rem;
+}
+
+/* Provide the card visuals so the filters panel looks like the page intro card
+   even when page-level styles are not present. This keeps the shared component
+   visually consistent across pages. */
+.filters-section {
+  background: white;
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: visible;
+}
+
+.filters-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color, #2563eb), var(--logo-secondary-color, #059669));
+  border-radius: 16px 16px 0 0;
+}
+
+/* The inner content will typically include elements with class .filter-selects etc.
+   We provide a responsive helper so pages with old styles keep layout. */
+@media (min-width: 768px){
+  .filters-section-wrapper > .filter-selects{
+    display:flex;
+    gap:1rem;
+    align-items:flex-end;
+  }
+}
+
+/* Fallback simple spacing for mobile */
+.filters-section-wrapper > *{
+  margin-bottom:0.5rem;
+}

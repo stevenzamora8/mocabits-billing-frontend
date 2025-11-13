@@ -7,6 +7,8 @@ export * from './confirm/confirm.component';
 export * from './table/table.component';
 export * from './page-intro/page-intro.component';
 export * from './paginator/paginator.component';
+export * from './stat-card/stat-card.component';
+export * from './filters-panel/filters-panel.component';
 
 // Types and interfaces
 export type { ButtonVariant, ButtonSize } from './button/button.component';

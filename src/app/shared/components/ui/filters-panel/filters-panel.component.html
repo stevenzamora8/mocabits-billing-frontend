@@ -1,0 +1,7 @@
+<!-- Emit the legacy page class `filters-section` so page-level CSS (card + top stripe)
+     continues to apply when pages use this shared wrapper. Keep the helper wrapper
+     class for backward compatibility. -->
+<div class="filters-section filters-section-wrapper">
+  <!-- Project the existing filters HTML inside this wrapper -->
+  <ng-content></ng-content>
+</div>

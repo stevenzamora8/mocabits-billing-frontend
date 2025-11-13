@@ -7,6 +7,9 @@ import { InputComponent } from '../../../shared/components/ui/input/input.compon
 import { ButtonComponent } from '../../../shared/components/ui/button/button.component';
 import { UiTableComponent } from '../../../shared/components/ui/table/table.component';
 import { UiPageIntroComponent } from '../../../shared/components/ui/page-intro/page-intro.component';
+import { UiFiltersPanelComponent } from '../../../shared/components/ui/filters-panel/filters-panel.component';
+import { MoneyPipe } from '../../../shared/pipes/money.pipe';
+import { UiStatCardComponent } from '../../../shared/components/ui/stat-card/stat-card.component';
 
 // Nuevo modelo de producto para el formulario
 export interface ProductFormModel {
@@ -26,7 +29,7 @@ export interface ProductFormModel {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent],
+  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, MoneyPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })

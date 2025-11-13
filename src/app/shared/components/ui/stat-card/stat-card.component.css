@@ -1,0 +1,82 @@
+.stat-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:1rem;
+  border-radius:16px;
+  background:white;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+  border:1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 80px;
+  cursor: pointer;
+}
+
+.stat-card .icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.18);
+  transition: all 0.3s ease;
+}
+
+.stat-card .content{
+  display:flex;
+  flex-direction:column;
+}
+
+.stat-card .title{
+  font-size:0.8rem;
+  color:#64748b;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.stat-card .value{
+  font-weight:700;
+  font-size:1.25rem;
+  color:#1e293b;
+  margin-top:0.25rem;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color, #2563eb), var(--logo-secondary-color, #059669));
+  border-radius: 16px 16px 0 0;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  border-color: var(--logo-primary-color);
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.stat-card:hover .icon {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.22);
+}
+
+/* Variants give icon background/gradient, matching existing stat-card styles */
+.stat-card.primary .icon{ background: linear-gradient(135deg,#3b82f6 0%, #60a5fa 100%); color: #fff }
+.stat-card.success .icon{ background: linear-gradient(135deg,#10b981 0%, #34d399 100%); color: #fff }
+.stat-card.warning .icon{ background: linear-gradient(135deg,#f59e0b 0%, #fbbf24 100%); color: #082032 }
+.stat-card.danger  .icon{ background: linear-gradient(135deg,#ef4444 0%, #fb7185 100%); color: #fff }

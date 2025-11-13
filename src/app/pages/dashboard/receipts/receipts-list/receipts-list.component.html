@@ -15,48 +15,23 @@
   </ui-page-intro>
 
   <div class="stats-grid">
-    <div class="stat-card primary">
-      <div class="stat-icon primary">
-        <i class="fas fa-file-alt"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ stats.total }}</div>
-        <div class="stat-label">Total Comprobantes</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-file-alt&quot;&gt;&lt;/i&gt;'" title="Total Comprobantes" [value]="stats.total" variant="primary"></ui-stat-card>
 
-    <div class="stat-card success">
-      <div class="stat-icon success">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ stats.authorized }}</div>
-        <div class="stat-label">Autorizados</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-check-circle&quot;&gt;&lt;/i&gt;'" title="Autorizados" [value]="stats.authorized" variant="success"></ui-stat-card>
 
-    <div class="stat-card warning">
-      <div class="stat-icon warning">
-        <i class="fas fa-clock"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ stats.pending }}</div>
-        <div class="stat-label">Pendientes</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-clock&quot;&gt;&lt;/i&gt;'" title="Pendientes" [value]="stats.pending" variant="warning"></ui-stat-card>
 
-    <div class="stat-card danger">
-      <div class="stat-icon danger">
-        <i class="fas fa-times-circle"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-number">{{ stats.rejected }}</div>
-        <div class="stat-label">Rechazados</div>
-      </div>
-    </div>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-times-circle&quot;&gt;&lt;/i&gt;'" title="Rechazados" [value]="stats.rejected" variant="danger"></ui-stat-card>
   </div>
 
-  <div class="filters-section">
+  <div *ngIf="error" class="error-state">
+    <div class="error-icon"></div>
+    <h3>Error al cargar comprobantes</h3>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadReceipts()">Reintentar</button>
+  </div>
+
+  <ui-filters-panel>
     <div class="filter-selects">
       <div class="filter-field field-name">
         <label class="filter-label">Cliente</label>
@@ -152,14 +127,9 @@
         </div>
       </div>
     </div>
-  </div>
+  </ui-filters-panel>
 
-  <div *ngIf="error" class="error-state">
-    <div class="error-icon"></div>
-    <h3>Error al cargar comprobantes</h3>
-    <p>{{ error }}</p>
-    <button class="btn-primary" (click)="loadReceipts()">Reintentar</button>
-  </div>
+  
 
   <div class="table-container" *ngIf="!error">
     <!-- Render table when loading OR when we have elements so the shared ui-table can show its skeleton -->
@@ -221,7 +191,7 @@
       <h3>No se encontraron comprobantes</h3>
       <p>Intenta ajustar los filtros de búsqueda o crea un nuevo comprobante.</p>
     </div>
-  </div>
+    </div>
 
   <!-- Pagination (shared ui-paginator) placed outside the table card so spacing and shadow are separate -->
   <ui-paginator

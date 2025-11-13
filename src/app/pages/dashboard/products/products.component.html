@@ -17,28 +17,12 @@
 
   <!-- Stats Cards -->
     <div class="stats-grid">
-      <div class="stat-card primary">
-        <div class="stat-icon primary">
-          <i class="fas fa-boxes"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-number">{{ products.length }}</div>
-          <div class="stat-label">Total Productos</div>
-        </div>
-      </div>
-      <div class="stat-card success">
-        <div class="stat-icon success">
-          <i class="fas fa-dollar-sign"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-number">${{ totalValue | number:'1.2-2' }}</div>
-          <div class="stat-label">Valor Total</div>
-        </div>
-      </div>
+  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="products.length" variant="primary"></ui-stat-card>
+  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Valor Total" [value]="totalValue | money:'USD':'en-US'" variant="success"></ui-stat-card>
     </div>
 
   <!-- Filters and Search (mirrors Clients layout) -->
-  <div class="filters-section">
+  <ui-filters-panel>
     <div class="filter-selects">
       <div class="filter-field">
         <label class="filter-label">Nombre</label>
@@ -100,7 +84,7 @@
     <div class="filter-buttons">
       <!-- reserved for additional controls if needed -->
     </div>
-  </div>
+  </ui-filters-panel>
 
   <!-- Products Table (use shared ui-table for consistent standard) -->
   <div class="table-container">

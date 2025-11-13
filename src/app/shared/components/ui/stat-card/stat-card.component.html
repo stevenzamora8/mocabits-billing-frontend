@@ -1,0 +1,10 @@
+<div class="stat-card" [ngClass]="variant">
+  <!-- keep both legacy class names and new ones so page-level CSS targeting `.stat-icon` / `.stat-number` works -->
+  <div class="icon stat-icon" *ngIf="iconHtml" [innerHTML]="iconHtml"></div>
+
+  <div class="content stat-content">
+    <!-- legacy label/number classes used across pages -->
+    <div class="title stat-label">{{ title }}</div>
+    <div class="value stat-number">{{ value }}</div>
+  </div>
+</div>
