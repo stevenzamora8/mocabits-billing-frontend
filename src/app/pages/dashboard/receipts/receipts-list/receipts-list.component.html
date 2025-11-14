@@ -9,7 +9,7 @@
 
   <ui-page-intro
     [title]="'Gestión de comprobantes'"
-    [description]="'Busca, filtra y administra comprobantes. Crea, ve, edita y elimina comprobantes desde esta pantalla.'"
+    [description]="'Busca, filtra y administra comprobantes. Crea, consulta, envía por correo, emite y anula comprobantes desde esta pantalla.'"
     [iconClass]="'fas fa-file-invoice'"
     [actionTemplate]="introAction">
   </ui-page-intro>
@@ -112,8 +112,8 @@
         </div>
       </div>
 
-      <div class="filter-field filter-field-button field-clear">
-        <label class="filter-label" aria-hidden="true" style="visibility:hidden">Limpiar</label>
+      <div class="filter-field filter-field-button field-clear clear-button-container">
+        <label class="filter-label visually-hidden" aria-hidden="true">Limpiar</label>
         <div class="filter-field-row">
           <app-button
             variant="outline"
