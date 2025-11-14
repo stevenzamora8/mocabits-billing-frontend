@@ -1,0 +1,96 @@
+/* PRODUCTS CREATE COMPONENT STYLES */
+/* Container matching products list layout */
+.products-container {
+  padding: 0.75rem 0.75rem;
+  max-width: 100%;
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  background: transparent;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+/* Form card using table-container style */
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+/* Top gradient stripe like other cards */
+.table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  border-radius: 16px 16px 0 0;
+  z-index: 2;
+}
+
+/* Form wrapper padding */
+.form-wrapper {
+  padding: 2rem;
+}
+
+/* Form styling */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Back button styling */
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-secondary:hover {
+  background: white;
+  border-color: #cbd5e1;
+  color: #334155;
+  text-decoration: none;
+}
+
+.btn-secondary .app-button__icon-html {
+  display: inline-flex;
+  align-items: center;
+}

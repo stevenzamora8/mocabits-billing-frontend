@@ -219,139 +219,139 @@
         </button>
       </div>
 
-      <form class="product-form" (ngSubmit)="saveProduct()" #productForm="ngForm">
+  <form class="product-form" (ngSubmit)="saveProduct()" #productForm="ngForm">
         <div class="form-row">
-          <div class="form-group">
-            <label for="name">Nombre *</label>
-            <input
-              type="text"
-              id="name"
+          <div class="form-group full-width">
+            <app-input
+              class="control-size"
               [(ngModel)]="currentProduct.name"
               name="name"
-              required
+              id="name"
+              label="Nombre *"
               placeholder="Ej: Computadora Lenovo"
-            >
+              required
+            ></app-input>
           </div>
+        </div>
+
+        <div class="form-row">
           <div class="form-group">
-            <label for="mainCode">Código Principal *</label>
-            <input
-              type="text"
-              id="mainCode"
+            <app-input
+              class="control-size"
               [(ngModel)]="currentProduct.mainCode"
               name="mainCode"
-              required
+              id="mainCode"
+              label="Código Principal *"
               placeholder="Ej: PROD-001"
-            >
+              required
+            ></app-input>
           </div>
+
           <div class="form-group">
-            <label for="auxiliaryCode">Código Auxiliar</label>
-            <input
-              type="text"
-              id="auxiliaryCode"
+            <app-input
+              class="control-size"
               [(ngModel)]="currentProduct.auxiliaryCode"
               name="auxiliaryCode"
+              id="auxiliaryCode"
+              label="Código Auxiliar"
               placeholder="Ej: 12345"
-            >
+            ></app-input>
           </div>
         </div>
         <div class="form-group">
-          <label for="description">Descripción *</label>
-          <textarea
-            id="description"
+          <app-input
+            class="control-size"
+            type="textarea"
             [(ngModel)]="currentProduct.description"
             name="description"
-            rows="3"
-            required
+            id="description"
+            label="Descripción *"
             placeholder="Describe el producto o servicio..."
-          ></textarea>
+            required
+          ></app-input>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="unitPrice">Precio Unitario *</label>
-            <div class="input-group">
-              <span class="input-prefix">$</span>
-              <input
-                type="number"
-                id="unitPrice"
-                [(ngModel)]="currentProduct.unitPrice"
-                name="unitPrice"
-                required
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                (input)="onPriceChange()"
-              >
-            </div>
+            <app-input
+              class="control-size"
+              leftIcon="true"
+              type="number"
+              [(ngModel)]="currentProduct.unitPrice"
+              name="unitPrice"
+              id="unitPrice"
+              label="Precio Unitario *"
+              placeholder="0.00"
+              required
+              (inputChange)="onPriceChange()"
+            >
+              <span slot="left-icon">$</span>
+            </app-input>
           </div>
           <div class="form-group">
-            <label for="quantity">Cantidad *</label>
-            <input
+            <app-input
+              class="control-size"
               type="number"
-              id="quantity"
               [(ngModel)]="currentProduct.quantity"
               name="quantity"
-              required
-              min="1"
+              id="quantity"
+              label="Cantidad *"
               placeholder="1"
-              (input)="onQuantityChange()"
-            >
+              required
+              (inputChange)="onQuantityChange()"
+            ></app-input>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="discount">Descuento</label>
-            <div class="input-group">
-              <span class="input-prefix">$</span>
-              <input
-                type="number"
-                id="discount"
-                [(ngModel)]="currentProduct.discount"
-                name="discount"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                (input)="onDiscountChange()"
-              >
-            </div>
+            <app-input
+              class="control-size"
+              leftIcon="true"
+              type="number"
+              [(ngModel)]="currentProduct.discount"
+              name="discount"
+              id="discount"
+              label="Descuento"
+              placeholder="0.00"
+              (inputChange)="onDiscountChange()"
+            >
+              <span slot="left-icon">$</span>
+            </app-input>
           </div>
           <div class="form-group">
-            <label for="vat">IVA (%) *</label>
-            <input
+            <app-input
+              class="control-size"
               type="number"
-              id="vat"
               [(ngModel)]="currentProduct.vat"
               name="vat"
-              required
-              min="0"
-              max="100"
+              id="vat"
+              label="IVA (%) *"
               placeholder="12"
-            >
+              required
+            ></app-input>
           </div>
         </div>
         <div class="form-group">
-          <label for="totalWithoutTax">Total sin Impuesto *</label>
-          <div class="input-group">
-            <span class="input-prefix">$</span>
-            <input
-              type="number"
-              id="totalWithoutTax"
-              [(ngModel)]="currentProduct.totalWithoutTax"
-              name="totalWithoutTax"
-              required
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              readonly
-            >
-          </div>
+          <app-input
+            class="control-size"
+            leftIcon="true"
+            type="number"
+            [(ngModel)]="currentProduct.totalWithoutTax"
+            name="totalWithoutTax"
+            id="totalWithoutTax"
+            label="Total sin Impuesto *"
+            placeholder="0.00"
+            readonly
+          >
+            <span slot="left-icon">$</span>
+          </app-input>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="closeProductModal()">
+          <app-button variant="secondary" size="md" type="button" (click)="closeProductModal()">
             Cancelar
-          </button>
-          <button type="submit" class="btn-primary" [disabled]="!productForm.valid">
+          </app-button>
+          <app-button variant="primary" size="md" type="submit" [disabled]="!productForm.valid">
             {{ isEditing ? 'Actualizar' : 'Crear' }} Producto
-          </button>
+          </app-button>
         </div>
       </form>
     </div>

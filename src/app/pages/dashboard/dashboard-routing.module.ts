@@ -36,7 +36,7 @@ const routes: Routes = [
       },
       {
         path: 'products',
-        loadComponent: () => import('./products/products.component').then(m => m.ProductsComponent),
+        loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),
         title: 'Dashboard - Productos'
       },
       {

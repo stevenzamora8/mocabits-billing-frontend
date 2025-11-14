@@ -1,0 +1,106 @@
+<div class="products-container">
+  <ng-template #introAction>
+      <a class="btn-secondary" [routerLink]="['/dashboard','products']" title="Volver a la lista de productos">
+          <span class="app-button__icon-html"><i class="fas fa-arrow-left"></i></span>
+          Volver a la lista
+      </a>
+  </ng-template>
+
+  <ui-page-intro [title]="'Crear Producto'"
+      [description]="'Llena los datos básicos del producto. Los campos obligatorios están marcados.'"
+      [iconClass]="'fas fa-boxes'" [actionTemplate]="introAction">
+  </ui-page-intro>
+
+  <div class="table-container">
+      <div class="form-wrapper">
+            <ui-alert *ngIf="alertVisible" [fixed]="true" [message]="alertMessage" [type]="alertType"
+                [dismissible]="true" [autoDismiss]="alertAutoDismiss" [duration]="alertAutoDismissTime"
+                (closed)="alertVisible = false"></ui-alert>
+
+            <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <app-input formControlName="name" label="Nombre Producto" placeholder="Ej: Computadora Lenovo"
+                            rightIcon="true">
+                            <i slot="right-icon" class="fas fa-box"></i>
+                        </app-input>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <app-input formControlName="mainCode" label="Código Principal" placeholder="Ej: PROD-001"
+                            rightIcon="true">
+                            <i slot="right-icon" class="fas fa-barcode"></i>
+                        </app-input>
+                    </div>
+
+                    <div class="form-group">
+                        <app-input formControlName="auxiliaryCode" label="Código Auxiliar" placeholder="Ej: 12345"
+                            rightIcon="true">
+                            <i slot="right-icon" class="fas fa-barcode"></i>
+                        </app-input>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <app-input type="textarea" formControlName="description" label="Descripción"
+                        placeholder="Describe el producto o servicio..." rightIcon="true">
+                        <i slot="right-icon" class="fas fa-align-left"></i>
+                    </app-input>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <app-input formControlName="unitPrice" type="number" label="Precio Unitario" placeholder="0.00"
+                            leftIcon="true">
+                            <span slot="left-icon">$</span>
+                        </app-input>
+                    </div>
+
+                    <div class="form-group">
+                        <app-input formControlName="quantity" type="number" label="Cantidad" placeholder="1"
+                            rightIcon="true">
+                            <i slot="right-icon" class="fas fa-hashtag"></i>
+                        </app-input>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <app-input formControlName="discount" type="number" label="Descuento" placeholder="0.00"
+                            leftIcon="true">
+                            <span slot="left-icon">$</span>
+                        </app-input>
+                    </div>
+
+                    <div class="form-group">
+                        <app-input formControlName="vat" type="number" label="IVA (%)" placeholder="12"></app-input>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <app-input formControlName="totalWithoutTax" type="number" label="Total sin Impuesto"
+                        placeholder="0.00" [readonly]="true" leftIcon="true">
+                        <span slot="left-icon">$</span>
+                    </app-input>
+                </div>
+
+                <div class="form-actions">
+                    <app-button variant="ghost" type="button"
+                        (click)="router.navigate(['/dashboard','products'])">Cancelar</app-button>
+
+                    <app-button variant="secondary" type="button" (click)="resetForm()">
+                        <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
+                        Limpiar
+                    </app-button>
+
+                    <app-button variant="primary" type="submit" [loading]="isSaving" iconPosition="left">
+                        <span class="app-button__icon-html"><i class="fas fa-save"></i></span>
+                        {{ isSaving ? 'Guardando...' : 'Crear Producto' }}
+                    </app-button>
+                </div>
+            </form>
+      </div>
+  </div>
+</div>

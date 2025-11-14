@@ -1,3 +1,4 @@
+/* PRODUCTS LIST COMPONENT STYLES - copied from products.component.css for local scoping */
 /* PRODUCTS PAGE STYLES - Refactored from Clients for consistency */
 .products-container {
   /* almost full-bleed: keep a tiny gutter so content isn't flush with the viewport */
@@ -63,25 +64,6 @@
 }
 
 .intro-text .intro-desc {
-  color: #475569;
-  font-size: 0.9rem;
-  margin-top: 2px;
-}
-
-/* Ensure create-card header-text matches the ui-page-intro visual style
-   so headers inside cards and the page intro look consistent. */
-.create-client-card .header-text h2,
-.header-text h2 {
-  font-weight: 700;
-  color: #0f172a;
-  font-size: 1rem;
-  margin: 0;
-}
-
-.create-client-card .header-text .muted,
-.header-text .muted,
-.create-client-card .header-text p,
-.header-text p {
   color: #475569;
   font-size: 0.9rem;
   margin-top: 2px;
@@ -283,9 +265,12 @@
   font-weight: 700;
 }
 
-/* Use the shared `.clear-filters-btn` and `.control-size` helpers from `src/styles.css`
-   to ensure consistent height and spacing across pages. The global definitions
-   provide the form-control height and padding, so we avoid duplicating them here. */
+.clear-filters-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+}
 
 /* PRODUCTS TABLE */
 .table-container {
@@ -629,8 +614,7 @@
 }
 
 .modal-header {
-  /* Reduced padding to align with page intro gutters (1rem / 1.25rem) */
-  padding: 1rem 1.25rem 0.75rem 1.25rem;
+  padding: 2.5rem 2.5rem 1.5rem 2.5rem;
   border-bottom: 2px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
@@ -651,14 +635,13 @@
 
 .modal-header h2 {
   margin: 0;
-  /* Match the page intro / create-card header sizing and color */
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0f172a;
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .close-btn {
@@ -686,8 +669,7 @@
 
 /* FORM STYLES */
 .product-form {
-  /* Use same horizontal gutters as .page-intro for visual alignment */
-  padding: 1rem 1.25rem;
+  padding: 2rem;
 }
 
 .form-row {
