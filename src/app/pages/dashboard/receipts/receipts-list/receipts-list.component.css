@@ -228,10 +228,10 @@
 
 .receipts-list-container .filter-selects {
   display: grid;
-  /* Default layout: put both Estado and Clear on the top row (right side)
-     Row 1: name | id | number | state | clear
+  /* Default layout: Cliente más ancho (1.5fr), Desde/Hasta con más espacio
+     Row 1: name | id | number | state | clear  
      Row 2: start | end | (spacer) | (spacer) | (spacer) */
-  grid-template-columns: 1fr 220px 220px 160px 140px;
+  grid-template-columns: 1.5fr 190px 190px 160px 140px;
   grid-template-areas:
     "name id number state clear"
     "start end . . .";
@@ -262,26 +262,18 @@
   display: block;
 }
 
-/* Make inputs visually consistent height */
+/* Make inputs match button height exactly with same dynamic sizing */
+.receipts-list-container .filter-field-row app-input ::ng-deep .app-input,
+.receipts-list-container .filter-field-row app-select ::ng-deep .app-select,
 .receipts-list-container .filter-field-row app-input ::ng-deep .app-input__control,
 .receipts-list-container .filter-field-row app-select ::ng-deep .app-select__control {
-  min-height: 44px;
+  height: clamp(2.25rem, 5vh, 3rem) !important;
+  min-height: clamp(2.25rem, 5vh, 3rem) !important;
+  max-height: clamp(2.25rem, 5vh, 3rem) !important;
+  box-sizing: border-box !important;
 }
 
-/* Place clear button aligned to the right in desktop grid */
-.receipts-list-container .filter-field.field-clear { justify-self: end; display:flex; align-items:center; }
-.receipts-list-container .clear-filters-btn {
-  box-sizing: border-box;
-  height: 44px; /* match input control height */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1rem;
-}
-
-.@media (max-width: 860px) {
-  .receipts-list-container .filter-field.field-clear { justify-self: start; }
-}
+/* Old rules removed - handled by clean rules below */
 
 /* Make native select and inputs expand inside filter fields */
 .receipts-list-container .filter-select,
@@ -312,14 +304,7 @@
   flex: 1 1 160px;
 }
 
-.receipts-list-container .filter-field-button {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 120px;
-  align-self: flex-end;
-  flex: 0 0 120px;
-}
+/* Old conflicting rules removed - handled by clean rules below */
 
 .receipts-list-container .filter-field-row {
   display: flex;
@@ -359,11 +344,10 @@
 
 .receipts-list-container .filter-selects {
   display: grid;
-  /* Default layout: place Clear button on the top row (right) next to Number.
-     Row 1: name | id | number | clear
-     Row 2: start | end | state | (spacer) */
-  /* Add an extra column so both Estado and the Clear button can sit on the top row */
-  grid-template-columns: 1fr 220px 220px 140px 140px;
+  /* Default layout: Estado and Clear button on top row, dates below
+     Row 1: name | id | number | state | clear
+     Row 2: start | end | (empty) | (empty) | (empty) */
+  grid-template-columns: 1.5fr 190px 190px 160px 140px;
   grid-template-areas:
     "name id number state clear"
     "start end . . .";
@@ -414,8 +398,8 @@
 .receipts-list-container .filter-field.filter-field-button { display:flex; align-items:center; }
 
 @media (min-width: 1200px) {
-  /* Slightly wider columns on very large screens */
-  .receipts-list-container .filter-selects { grid-template-columns: 1fr 260px 240px 180px 160px; }
+  /* Pantallas grandes: Cliente y campos de fecha más anchos */
+  .receipts-list-container .filter-selects { grid-template-columns: 2fr 220px 220px 180px 160px; }
   .receipts-list-container .filter-selects { grid-template-areas: "name id number state clear" "start end . . ."; }
 }
 
@@ -518,14 +502,60 @@
   .receipts-list-container .pagination-info { font-size: 0.8rem; }
 }
 
-/* Page-specific override: ensure Clear button exactly matches input height and is vertically centered */
-.receipts-list-container .filter-selects .field-clear { align-self: center !important; }
+/* DEFINITIVE Clear button alignment fix */
+.receipts-list-container .filter-selects .field-clear {
+  grid-area: clear;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  align-self: center; /* Force vertical center alignment in grid */
+}
+
+.receipts-list-container .filter-field-button {
+  display: flex;
+  flex-direction: row; /* Change to row to avoid column gap issues */
+  align-items: center; /* Center button vertically */
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  height: clamp(2.25rem, 5vh, 3rem); /* Match input height exactly */
+}
+
+.receipts-list-container .filter-field-button .filter-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Match Clear button height exactly to input height for perfect alignment */
 .receipts-list-container .clear-filters-btn {
-  box-sizing: border-box !important;
-  height: 44px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 1rem !important;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  min-width: 40px;
+  /* Use the same dynamic height as app-input components */
+  height: clamp(2.25rem, 5vh, 3rem) !important;
+  min-height: clamp(2.25rem, 5vh, 3rem) !important;
+  box-sizing: border-box;
+}
+
+/* Accessibility: visually-hide labels that should remain available to screen readers
+   but must not take up layout space (fixes the reserved-space causing vertical misalignment).
+   Targets the hidden label used for the Clear button (aria-hidden="true"). */
+.receipts-list-container .filter-field.filter-field-button .filter-label[aria-hidden="true"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 

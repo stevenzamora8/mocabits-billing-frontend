@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  box-sizing: border-box;
   border: none;
   border-radius: 12px;
   font-family: inherit;
@@ -29,8 +30,12 @@
 }
 
 .app-button:focus-visible {
-  outline: 2px solid var(--primary-500, #3b82f6);
-  outline-offset: 2px;
+  /* Use a subtle focus ring via box-shadow instead of outline so outline+borders
+     don't stack and cause a double-border visual. This keeps accessibility while
+     preventing duplicate rings on outline-style buttons. */
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  border-radius: 12px;
 }
 
 /* Button content */
@@ -272,10 +277,14 @@
 }
 
 .app-button--md {
-  min-height: 2.5rem;
+  /* Align medium buttons with page inputs (43px) and use border-box so
+     padding is included in height calculations. This avoids needing page-level
+     overrides for height and prevents double-borders when outline variant is used. */
+  min-height: 43px;
   padding: 0 1rem;
   font-size: 0.875rem;
   gap: 0.5rem;
+  box-sizing: border-box;
 }
 
 .app-button--lg {
