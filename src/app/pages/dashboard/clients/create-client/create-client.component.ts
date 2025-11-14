@@ -9,12 +9,13 @@ import { InputComponent } from '../../../../shared/components/ui/input/input.com
 import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
 import { UiAlertComponent, UiAlertType } from '../../../../shared/components/ui/alert/alert.component';
+import { UiPageIntroComponent } from '../../../../shared/components/ui/page-intro/page-intro.component';
 import { ScrollToTopDirective } from '../../../../shared/directives/scroll-to-top.directive';
 
 @Component({
   selector: 'app-create-client',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, InputComponent, SelectComponent, ButtonComponent, UiAlertComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, InputComponent, SelectComponent, ButtonComponent, UiAlertComponent, UiPageIntroComponent],
   templateUrl: './create-client.component.html',
   styleUrls: ['./create-client.component.css'],
   hostDirectives: [ScrollToTopDirective]

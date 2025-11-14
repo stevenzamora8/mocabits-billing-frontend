@@ -1,22 +1,18 @@
-<div class="create-client-card">
-  <div class="header-content">
-    <div class="header-left">
-      <div class="intro-icon"><i class="fas fa-user-plus"></i></div>
-      <div class="header-text">
-        <h2>{{ pageTitle }}</h2>
-        <p class="muted">Rellena los datos básicos del cliente. Solo los campos obligatorios se validan en esta maqueta.</p>
-      </div>
-    </div>
+<div class="products-container">
+  <ng-template #introAction>
+    <a class="btn-secondary" [routerLink]="['/dashboard','clients']" title="Volver a la lista de clientes">
+      <span class="app-button__icon-html"><i class="fas fa-arrow-left"></i></span>
+      Volver a la lista
+    </a>
+  </ng-template>
 
-    <div class="header-actions">
-      <a class="btn-secondary" [routerLink]="['/dashboard','clients']" title="Volver a la lista de clientes">
-        <span class="app-button__icon-html"><i class="fas fa-arrow-left"></i></span>
-        Volver a la lista
-      </a>
-    </div>
-  </div>
+  <ui-page-intro [title]="pageTitle"
+    [description]="'Rellena los datos básicos del cliente. Solo los campos obligatorios se validan en esta maqueta.'"
+    [iconClass]="'fas fa-user-plus'" [actionTemplate]="introAction">
+  </ui-page-intro>
 
-  <div class="card-body">
+  <div class="table-container">
+    <div class="form-wrapper">
     <!-- Fixed overlay toast (ui-alert) -->
     <ui-alert *ngIf="alertVisible"
       [fixed]="true"
@@ -93,5 +89,6 @@
         </app-button>
       </div>
     </form>
+    </div>
   </div>
 </div>
