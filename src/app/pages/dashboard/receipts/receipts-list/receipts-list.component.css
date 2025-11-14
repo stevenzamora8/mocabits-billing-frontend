@@ -214,7 +214,7 @@
 
 /* Responsive tweaks */
 @media (max-width: 720px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .filters-section { flex-direction:column; align-items:stretch; }
 }
 
@@ -489,6 +489,7 @@
 }
 
 @media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
   .receipts-list-container .pagination-btn { width: 32px; height: 32px; }
   .receipts-list-container .pagination-number { width: 32px; height: 32px; font-size: 0.8rem; }
   .receipts-list-container .pagination-info { font-size: 0.8rem; }

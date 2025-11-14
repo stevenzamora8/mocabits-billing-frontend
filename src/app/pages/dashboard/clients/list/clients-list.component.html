@@ -1,0 +1,153 @@
+<div class="clients-container">
+  <ng-template #introAction>
+    <app-button variant="primary" size="md" [routerLink]="['/dashboard/clients/create']">
+      <span class="app-button__icon-html"><i class="fas fa-plus"></i></span>
+      Nuevo Cliente
+    </app-button>
+  </ng-template>
+
+  <ui-page-intro
+    [title]="'Gestión de Clientes'"
+    [description]="'Administra tu cartera de clientes y sus datos de contacto'"
+    [iconClass]="'fas fa-users'"
+    [actionTemplate]="introAction">
+  </ui-page-intro>
+
+  <!-- Alert -->
+  <ui-alert
+    *ngIf="alertVisible"
+    [message]="alertMessage"
+    [type]="alertType"
+    [autoDismiss]="alertAutoDismiss"
+    [duration]="alertAutoDismissTime"
+    (closed)="handleAlertClosed()">
+  </ui-alert>
+
+  <div class="stats-grid">
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-users&quot;&gt;&lt;/i&gt;'" title="Total Clientes" [value]="totalClients" variant="primary"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-check&quot;&gt;&lt;/i&gt;'" title="Clientes Activos" [value]="activeClients" variant="success"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-times&quot;&gt;&lt;/i&gt;'" title="Clientes Inactivos" [value]="inactiveClients" variant="warning"></ui-stat-card>
+  </div>
+
+  <ui-filters-panel>
+    <div class="filter-selects">
+      <div class="filter-field">
+        <label class="filter-label">Nombre</label>
+        <div class="filter-field-row">
+          <app-input type="text" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm" (input)="onFilterChange()" rightIcon="true">
+            <i slot="right-icon" class="fas fa-user"></i>
+          </app-input>
+        </div>
+      </div>
+
+      <div class="filter-field">
+        <div class="filter-field-row">
+          <div style="flex:1 1 35%; min-width:0; display:flex; flex-direction:column; gap:0.375rem;">
+            <label class="filter-label">Tipo ID</label>
+            <app-select
+              placeholder="Todos los tipos"
+              [options]="typeOptions"
+              [(ngModel)]="selectedType"
+              (ngModelChange)="onFilterChange()"
+              rightIcon="true">
+              <i slot="right-icon" class="fas fa-id-badge"></i>
+            </app-select>
+          </div>
+          <div style="flex:1 1 65%; min-width:0; display:flex; flex-direction:column; gap:0.375rem;">
+            <label class="filter-label">Identificación</label>
+            <app-input placeholder="Buscar identificación..." type="text" [(ngModel)]="selectedIdentification" (input)="onFilterChange()" rightIcon="true">
+              <i slot="right-icon" class="fas fa-id-card"></i>
+            </app-input>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-field" style="flex: 0 0 180px; min-width: 180px;">
+        <label class="filter-label">Estado</label>
+        <div class="filter-field-row">
+          <app-select
+            placeholder="Todos los estados"
+            [options]="statusOptions"
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="onFilterChange()"
+            rightIcon="true">
+            <i slot="right-icon" class="fas fa-toggle-on"></i>
+          </app-select>
+        </div>
+      </div>
+
+      <div class="filter-field filter-field-button">
+        <label class="filter-label visually-hidden" aria-hidden="true">Limpiar</label>
+        <div class="filter-field-row">
+          <app-button variant="outline" size="md" (click)="clearFilters()" title="Limpiar todos los filtros" class="clear-filters-btn control-size">
+            <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
+            Limpiar
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </ui-filters-panel>
+
+  <div class="table-container">
+    <div class="table-wrapper" *ngIf="isLoading || filteredClients.length > 0">
+      <ng-template #actions let-client>
+        <div class="action-buttons">
+          <app-button class="edit-btn btn-icon" variant="ghost" size="sm" (click)="editClient(client)" title="Editar">
+            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-edit"></i></span>
+            <span class="sr-only">Editar</span>
+          </app-button>
+          <app-button 
+            class="delete-btn btn-icon" 
+            variant="ghost" 
+            size="sm" 
+            (click)="deleteClient(client)" 
+            title="Eliminar"
+            [disabled]="loadingClients.has(client.id)">
+            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-trash"></i></span>
+            <span class="sr-only">Eliminar</span>
+          </app-button>
+        </div>
+      </ng-template>
+
+      <ui-table
+        [columns]="[
+          { field: 'name', label: 'Nombre' },
+          { field: 'typeIdentification', label: 'Tipo ID', width: '100px', align: 'center' },
+          { field: 'identification', label: 'Identificación', width: '140px' },
+          { field: 'email', label: 'Email' },
+          { field: 'phone', label: 'Teléfono', width: '130px' },
+          { field: 'status', label: 'Estado', width: '120px', align: 'center', nowrap: true }
+        ]"
+        [data]="filteredClients"
+        [loading]="isLoading"
+        [actionsTemplate]="actions"
+      ></ui-table>
+    </div>
+
+    <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
+      <div class="empty-icon" aria-hidden="true"><i class="fas fa-users"></i></div>
+      <h3>No se encontraron clientes</h3>
+      <p>Intenta ajustar los filtros de búsqueda o crea un nuevo cliente.</p>
+    </div>
+  </div>
+
+  <!-- Pagination (shared ui-paginator) placed outside the table card so spacing and shadow are separate -->
+  <ui-paginator
+    [totalElements]="totalElements"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="goToPage($event)">
+  </ui-paginator>
+</div>
+
+<!-- Confirmation Modal -->
+<ui-confirm
+  *ngIf="confirmVisible"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  [type]="confirmType"
+  [confirmText]="getConfirmText()"
+  (confirmed)="handleUiConfirmConfirmed()"
+  (cancelled)="handleUiConfirmCancelled()"
+  (closed)="handleUiConfirmClosed()">
+</ui-confirm>

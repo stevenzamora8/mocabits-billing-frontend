@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./clients.component').then(m => m.ClientsComponent),
+    loadComponent: () => import('./list/clients-list.component').then(m => m.ClientsListComponent),
     title: 'Dashboard - Lista de Clientes'
   },
   {
