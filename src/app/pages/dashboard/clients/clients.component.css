@@ -259,13 +259,7 @@
   margin-top: 0; /* rely on hidden label height to align */
 }
 
-.clear-filters-btn {
-  width: 100%;
-  justify-content: center;
-  min-height: 36px; /* slightly shorter to better match inputs */
-  padding: 6px 10px;
-  font-size: 0.95rem;
-}
+/* Clear filters button styling now uses global .clear-filters-btn.control-size from src/styles.css */
 
 .search-box {
   flex: 1;

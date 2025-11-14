@@ -527,12 +527,7 @@
   padding: 0;
 }
 
-/* Clean button styling - trust the shared component with height override */
-.receipts-list-container .clear-filters-btn {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  min-width: 40px;
-}
+/* Clear filters button styling now uses global .clear-filters-btn.control-size from src/styles.css */
 
 /* Accessibility: visually-hide labels without taking layout space
   (uses global .visually-hidden from src/styles.css) */

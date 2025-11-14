@@ -265,12 +265,7 @@
   font-weight: 700;
 }
 
-.clear-filters-btn {
-  width: 100%;
-  justify-content: center;
-  padding: 6px 10px;
-  font-size: 0.95rem;
-}
+/* Clear filters button styling now uses global .clear-filters-btn.control-size from src/styles.css */
 
 /* PRODUCTS TABLE */
 .table-container {
