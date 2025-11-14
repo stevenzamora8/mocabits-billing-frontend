@@ -280,13 +280,16 @@
 }
 
 .filter-selects {
-  display: flex;
-  gap: 0.5rem; /* tighter spacing between filter columns */
-  /* take all remaining horizontal space so filters expand to full width of the card */
-  flex: 1 1 auto;
-  /* align items to the bottom so labels/inputs and buttons line up visually */
-  align-items: flex-end;
-  flex-wrap: nowrap; /* prefer single row; allow wrapping at very small widths via media query */
+  display: grid;
+  /* Default layout: Cliente más ancho (1.5fr), Desde/Hasta con más espacio
+     Row 1: name | id | number | state | clear
+     Row 2: start | end | . | . | . */
+  grid-template-columns: 1.5fr 190px 190px 160px 140px;
+  grid-template-areas:
+    "name id number state clear"
+    "start end . . .";
+  gap: 0.75rem;
+  align-items: start;
 }
 
 .filter-field {
@@ -324,21 +327,8 @@
 /* Give the main 'Nombre' field more space so names don't get truncated.
    This makes the first .filter-field grow larger than the others (approx 2:1). */
 .filter-selects > .filter-field:nth-child(1) {
-  /* make 'Nombre' a bit smaller: slightly reduce growth and base width */
   flex: 0.9 1 150px;
   min-width: 120px;
-}
-
-/* Ensure the grouped Tipo ID + Identificación column has enough room */
-.filter-selects > .filter-field:nth-child(2) {
-  flex: 1.2 1 220px;
-  min-width: 180px;
-}
-
-/* Make the 'Estado' field smaller so it doesn't take excessive space */
-.filter-selects > .filter-field:nth-child(3) {
-  flex: 0.8 1 120px;
-  min-width: 100px;
 }
 
 /* Make the input/select inside filter rows expand to available space */
@@ -348,6 +338,8 @@
   min-width: 0; /* allow truncation in narrow containers */
   width: 100%; /* ensure these components fill their flex column */
 }
+
+/* Inputs sizing is provided by shared input component and centralized helpers in src/styles.css */
 
 .filter-label {
   font-size: 0.85rem;
@@ -362,6 +354,30 @@
 .filter-selects .cdk-overlay-pane {
   z-index: 1002 !important;
 }
+
+/* Assign grid areas for each named field to match receipts layout */
+.clients-container .filter-selects .field-name { grid-area: name; }
+.clients-container .filter-selects .field-id { grid-area: id; }
+.clients-container .filter-selects .field-number { grid-area: number; }
+.clients-container .filter-selects .field-state { grid-area: state; }
+.clients-container .filter-selects .field-start { grid-area: start; }
+.clients-container .filter-selects .field-end { grid-area: end; }
+.clients-container .filter-selects .field-clear { grid-area: clear; }
+
+/* ULTIMATE Clear button container fix - force perfect grid alignment (match receipts) */
+.clients-container .filter-selects .field-clear {
+  grid-area: clear !important;
+  justify-self: end !important;
+  align-self: center !important; /* Perfect vertical center in grid */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin: 35px 0 0 0 !important; /* Keep top margin, reset others */
+  padding: 0 !important;
+}
+
+/* Force button md size to match input dynamic height exactly */
+/* Button sizing and content alignment now live in src/styles.css (.control-size / .clear-filters-btn helpers) */
 
 .filter-select {
   padding: 0.75rem;

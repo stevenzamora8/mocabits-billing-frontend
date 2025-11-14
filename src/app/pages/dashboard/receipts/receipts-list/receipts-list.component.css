@@ -263,15 +263,7 @@
 }
 
 /* Make inputs match button height exactly with same dynamic sizing */
-.receipts-list-container .filter-field-row app-input ::ng-deep .app-input,
-.receipts-list-container .filter-field-row app-select ::ng-deep .app-select,
-.receipts-list-container .filter-field-row app-input ::ng-deep .app-input__control,
-.receipts-list-container .filter-field-row app-select ::ng-deep .app-select__control {
-  height: clamp(2.25rem, 5vh, 3rem) !important;
-  min-height: clamp(2.25rem, 5vh, 3rem) !important;
-  max-height: clamp(2.25rem, 5vh, 3rem) !important;
-  box-sizing: border-box !important;
-}
+/* Inputs sizing handled by shared input component and global helpers (moved to src/styles.css) */
 
 /* Old rules removed - handled by clean rules below */
 
@@ -510,7 +502,6 @@
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  height: clamp(2.25rem, 5vh, 3rem) !important; /* Match row height exactly */
   margin: 35px 0 0 0 !important; /* Keep top margin, reset others */
   padding: 0 !important;
 }
@@ -525,7 +516,6 @@
   margin: 0;
   padding: 0;
   gap: 0;
-  height: clamp(2.25rem, 5vh, 3rem); /* Match input height exactly */
 }
 
 .receipts-list-container .filter-field-button .filter-field-row {
@@ -544,22 +534,9 @@
   min-width: 40px;
 }
 
-/* Accessibility: visually-hide labels without taking layout space */
-.receipts-list-container .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* Accessibility: visually-hide labels without taking layout space
+  (uses global .visually-hidden from src/styles.css) */
 
 /* Force button md size to match input dynamic height exactly */
-.receipts-list-container .clear-filters-btn.app-button--md {
-  min-height: clamp(2.25rem, 5vh, 3rem) !important;
-  height: clamp(2.25rem, 5vh, 3rem) !important;
-}
+/* clear filter button sizing delegated to shared helpers in src/styles.css */
 
