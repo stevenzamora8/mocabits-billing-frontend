@@ -253,6 +253,7 @@
   flex-direction: column;
   gap: 0.25rem; /* slightly tighter gap to match reduced spacing */
   min-width: 120px;
+  align-self: flex-end; /* Align button field to bottom like other fields */
 }
 
 .filter-field-button .filter-field-row {
@@ -283,7 +284,7 @@
     "name id number state clear"
     "start end . . .";
   gap: 0.75rem;
-  align-items: start;
+  align-items: flex-end; /* Align all grid items to bottom for consistent baseline */
 }
 
 .filter-field {
@@ -295,11 +296,7 @@
   flex: 1 1 160px;
 }
 
-.filter-field-button {
-  /* ensure the clear button stays compact and aligns to bottom */
-  align-self: flex-end;
-  flex: 0 0 120px; /* narrower so it better fits on a single row with inputs */
-}
+/* .filter-field-button styling moved up to avoid conflicts - see line ~250 */
 
 .filter-field-row {
   display: flex;
@@ -358,15 +355,15 @@
 .clients-container .filter-selects .field-end { grid-area: end; }
 .clients-container .filter-selects .field-clear { grid-area: clear; }
 
-/* ULTIMATE Clear button container fix - force perfect grid alignment (match receipts) */
+/* Clear button container fix - proper grid alignment using global styles */
 .clients-container .filter-selects .field-clear {
   grid-area: clear !important;
   justify-self: end !important;
-  align-self: center !important; /* Perfect vertical center in grid */
+  align-self: flex-end !important; /* Align to bottom like other filter fields */
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-end !important;
   justify-content: flex-end !important;
-  margin: 35px 0 0 0 !important; /* Keep top margin, reset others */
+  margin: 0 !important; /* Remove margin override, let global styles work */
   padding: 0 !important;
 }
 
