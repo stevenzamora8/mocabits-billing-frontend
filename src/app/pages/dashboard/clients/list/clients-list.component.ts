@@ -163,7 +163,9 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     this.selectedType = '';
     this.selectedIdentification = '';
     this.selectedStatus = '';
-    this.applyFilters();
+    // Clear local filters and reload from server so the list reflects the latest data
+    this.currentPage = 0;
+    this.loadClients(1);
   }
 
   private applyFilters(): void {
@@ -248,26 +250,37 @@ export class ClientsListComponent implements OnInit, OnDestroy {
 
   toggleClientStatus(client: Client): void {
     if (!client.id) return;
-    
-    this.loadingClients.add(client.id);
+
+    // Prepare confirmation dialog before toggling status
     const newStatus = client.status === 'A' ? 'I' : 'A';
     const action = newStatus === 'A' ? 'activar' : 'inactivar';
-    
-    const updatedClient = { ...client, status: newStatus };
-    
-    this.clientService.updateClient(client.id, updatedClient).subscribe({
-      next: () => {
-        client.status = newStatus;
-        this.loadingClients.delete(client.id!);
-        this.showAlert(`Cliente ${action === 'activar' ? 'activado' : 'inactivado'} correctamente`, 'success');
-        this.updateStats();
-      },
-      error: (error) => {
-        console.error(`Error al ${action} cliente:`, error);
-        this.loadingClients.delete(client.id!);
-        this.showAlert(`Error al ${action} cliente`, 'danger');
-      }
-    });
+
+    this.confirmTitle = action === 'activar' ? 'Activar Cliente' : 'Inactivar Cliente';
+    this.confirmMessage = `¿Estás seguro de que deseas ${action} al cliente "${client.name}"?`;
+    this.confirmType = 'warning';
+
+    // Set the callback that will run when user confirms
+    this.confirmCallback = () => {
+      // Show per-row loader (disable the button)
+      this.loadingClients.add(client.id!);
+
+      // Use the dedicated endpoint that toggles status
+      this.clientService.toggleClientStatus(client.id!, newStatus).subscribe({
+        next: () => {
+          // Remove per-row loader and reload list from server (loadClients sets isLoading)
+          this.loadingClients.delete(client.id!);
+          this.loadClients(this.currentPage + 1);
+          this.showAlert(`Cliente ${action === 'activar' ? 'activado' : 'inactivado'} correctamente`, 'success');
+        },
+        error: (error) => {
+          console.error(`Error al ${action} cliente:`, error);
+          this.loadingClients.delete(client.id!);
+          this.showAlert(`Error al ${action} cliente`, 'danger');
+        }
+      });
+    };
+
+    this.confirmVisible = true;
   }
 
   deleteClient(client: Client): void {

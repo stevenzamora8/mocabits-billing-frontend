@@ -89,12 +89,29 @@
   </ui-filters-panel>
 
   <div class="table-container">
-    <div class="table-wrapper" *ngIf="isLoading || filteredClients.length > 0">
+    <!-- Table view (uses shared ui-table). Render table when loading OR when we have elements so the table's built-in skeleton shows while loading -->
+  <div class="table-wrapper">
       <ng-template #actions let-client>
         <div class="action-buttons">
+          <app-button class="view-btn btn-icon" variant="ghost" size="sm" (click)="viewClient(client)" title="Ver detalles">
+            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-eye"></i></span>
+            <span class="sr-only">Ver</span>
+          </app-button>
           <app-button class="edit-btn btn-icon" variant="ghost" size="sm" (click)="editClient(client)" title="Editar">
             <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-edit"></i></span>
             <span class="sr-only">Editar</span>
+          </app-button>
+          <app-button 
+            class="status-btn btn-icon" 
+            variant="ghost" 
+            size="sm" 
+            (click)="toggleClientStatus(client)" 
+            [title]="client.status === 'A' ? 'Desactivar cliente' : 'Activar cliente'"
+            [disabled]="loadingClients.has(client.id)">
+            <span class="app-button__icon-html" aria-hidden="true">
+              <i class="fas" [ngClass]="client.status === 'A' ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+            </span>
+            <span class="sr-only">{{client.status === 'A' ? 'Desactivar' : 'Activar'}}</span>
           </app-button>
           <app-button 
             class="delete-btn btn-icon" 

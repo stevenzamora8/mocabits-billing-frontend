@@ -48,6 +48,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
       identification: ['', [Validators.required], [this.identificationExistsValidator()]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
+      address: [''], // Nuevo campo de dirección
       status: ['A', [Validators.required]]
     });
   }
@@ -115,12 +116,16 @@ export class CreateClientComponent implements OnInit, OnDestroy {
     this.clientService.getClient(id).subscribe({
       next: (client: Client) => {
         // Map API fields into form fields
+        // Convert typeIdentificationId to the code that matches our catalog options
+        const idTypeValue = this.mapIdToCode(client.typeIdentificationId) || client.typeIdentification || 'RUC';
+        
         this.clientForm.patchValue({
           name: client.name || '',
-          idType: (client.typeIdentification || '').toUpperCase() || 'RUC',
+          idType: idTypeValue,
           identification: client.identification || '',
           email: client.email || '',
           phone: client.phone || '',
+          address: client.address || '',
           status: client.status || 'A'
         });
         // When editing, identification and id type should not be editable
@@ -152,31 +157,39 @@ export class CreateClientComponent implements OnInit, OnDestroy {
       const payload: Client = {
         name: nameVal,
         identification: identificationVal,
-        typeIdentification: (idTypeVal || '').toString().toUpperCase(),
+        typeIdentification: (idTypeVal || '').toString().toUpperCase(), // Para compatibilidad UI
+        typeIdentificationId: this.mapTypeToId(idTypeVal), // Para el API
         email: emailVal,
         phone: phoneVal,
+        address: this.clientForm.get('address')?.value || '',
         status: statusVal // already 'A' or 'I'
       };
 
       if (this.isEdit && this.editingId) {
+        console.log('Actualizando cliente:', this.editingId, payload);
         this.clientService.updateClient(this.editingId, payload).subscribe({
           next: (updated) => {
+            console.log('Cliente actualizado exitosamente:', updated);
             this.isSaving = false;
-            // Navigate to the clients list and pass an alert via navigation state so the list can show it
-            this.router.navigate(['/dashboard','clients'], { state: { alert: { message: 'Cliente actualizado correctamente', type: 'success', autoDismiss: true } } });
+            // Configurar navegación después de la alerta
+            this.nextRouteAfterAlert = ['/dashboard', 'clients'];
+            // Mostrar alerta de éxito con navegación automática
+            this.showAlert('Cliente actualizado correctamente', 'success', true, 2500);
           },
           error: (err) => {
-            console.error('Error actualizando cliente:', err);
+            console.error('Error actualizando cliente:', err, 'Status:', err.status, 'Message:', err.message);
             this.isSaving = false;
-            alert('❌ Error al actualizar cliente');
+            this.showAlert('Error al actualizar cliente: ' + (err.message || err.error?.message || 'Error desconocido'), 'danger', true, 3000);
           }
         });
       } else {
         this.clientService.createClient(payload).subscribe({
           next: (created) => {
             this.isSaving = false;
-            // Navigate to the clients list and pass an alert via navigation state so the list can show it
-            this.router.navigate(['/dashboard','clients'], { state: { alert: { message: 'Cliente creado correctamente', type: 'success', autoDismiss: true } } });
+            // Configurar navegación después de la alerta
+            this.nextRouteAfterAlert = ['/dashboard', 'clients'];
+            // Mostrar alerta de éxito con navegación automática
+            this.showAlert('Cliente creado correctamente', 'success', true, 2500);
           },
           error: (err) => {
             console.error('Error creando cliente:', err);
@@ -327,9 +340,43 @@ export class CreateClientComponent implements OnInit, OnDestroy {
         identification: '',
         email: '',
         phone: '',
+        address: '',
         status: defaultStatus
       });
     }, 100);
+  }
+
+  /**
+   * Mapea el código de tipo de identificación al ID numérico correspondiente
+   */
+  private mapTypeToId(typeCode: string): number {
+    const typeMap: { [key: string]: number } = {
+      '04': 1, // RUC
+      '05': 2, // Cédula  
+      '06': 3, // Pasaporte
+      'RUC': 1,
+      'CEDULA': 2,
+      'PASAPORTE': 3
+    };
+    
+    console.log('Mapeando tipo:', typeCode, 'a ID:', typeMap[typeCode] || 1);
+    return typeMap[typeCode] || 1; // Default a RUC si no se encuentra
+  }
+
+  /**
+   * Mapea el ID numérico al código de tipo de identificación correspondiente
+   */
+  private mapIdToCode(typeId?: number): string {
+    const idMap: { [key: number]: string } = {
+      1: '04', // RUC
+      2: '05', // Cédula  
+      3: '06'  // Pasaporte
+    };
+    
+    if (!typeId) return '04'; // Default a RUC
+    
+    console.log('Mapeando ID:', typeId, 'a código:', idMap[typeId] || '04');
+    return idMap[typeId] || '04'; // Default a RUC si no se encuentra
   }
 
   ngOnDestroy(): void {

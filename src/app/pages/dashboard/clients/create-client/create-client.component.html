@@ -66,6 +66,14 @@
       </div>
 
       <div class="form-row">
+        <div class="form-group full-width">
+          <app-input formControlName="address" label="Dirección" placeholder="Av. Principal 123, Ciudad" type="text" rightIcon="true">
+            <i slot="right-icon" class="fas fa-map-marker-alt"></i>
+          </app-input>
+        </div>
+      </div>
+
+      <div class="form-row">
         <div class="form-group">
           <app-select formControlName="status" [options]="statusOptions" label="Estado" placeholder="Seleccione estado" rightIcon="true">
             <i slot="right-icon" class="fas fa-flag"></i>
