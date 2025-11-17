@@ -26,26 +26,30 @@
     <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
       <div class="form-row">
         <div class="form-group full-width">
-          <app-input formControlName="name" label="Nombre Cliente" placeholder="Nombre completo" rightIcon="true">
+          <app-input formControlName="name" label="Nombre Cliente" placeholder="Nombre completo" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-user"></i>
           </app-input>
-          <div class="help" *ngIf="clientForm.get('name')?.touched && clientForm.get('name')?.invalid">Nombre requerido</div>
+          <div class="help" *ngIf="clientForm.get('name')?.touched && clientForm.get('name')?.invalid">
+            <span *ngIf="clientForm.get('name')?.errors?.['required']">Nombre requerido</span>
+            <span *ngIf="clientForm.get('name')?.errors?.['maxlength']">Máximo 255 caracteres</span>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <app-select formControlName="idType" [options]="idTypeOptions" label="Tipo ID" placeholder="Seleccione tipo" [attr.title]="isEdit ? 'Tipo de identificación no editable' : null" rightIcon="true">
+          <app-select formControlName="idType" [options]="idTypeOptions" label="Tipo ID" placeholder="Seleccione tipo" [attr.title]="isEdit ? 'Tipo de identificación no editable' : null" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-id-card"></i>
           </app-select>
         </div>
 
         <div class="form-group">
-          <app-input formControlName="identification" label="Identificación" placeholder="Número de identificación" rightIcon="true" [attr.title]="isEdit ? 'Identificación no editable' : null">
+          <app-input formControlName="identification" label="Identificación" placeholder="Número de identificación" rightIcon="true" [attr.title]="isEdit ? 'Identificación no editable' : null" [required]="true">
             <i slot="right-icon" class="fas fa-hashtag"></i>
           </app-input>
           <div class="help" *ngIf="clientForm.get('identification')?.touched && clientForm.get('identification')?.invalid">
             <span *ngIf="clientForm.get('identification')?.errors?.['required']">Identificación requerida</span>
+            <span *ngIf="clientForm.get('identification')?.errors?.['maxlength']">Máximo 255 caracteres</span>
             <span *ngIf="clientForm.get('identification')?.errors?.['identificationExists']">La identificación ya está registrada</span>
           </div>
         </div>
@@ -53,39 +57,48 @@
 
       <div class="form-row">
         <div class="form-group">
-          <app-input formControlName="email" label="Correo" placeholder="correo@cliente.com" type="email" rightIcon="true">
+          <app-input formControlName="email" label="Correo" placeholder="correo@cliente.com" type="email" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-envelope"></i>
           </app-input>
+          <div class="help" *ngIf="clientForm.get('email')?.touched && clientForm.get('email')?.invalid">
+            <span *ngIf="clientForm.get('email')?.errors?.['required']">Correo requerido</span>
+            <span *ngIf="clientForm.get('email')?.errors?.['email']">Formato de correo inválido</span>
+            <span *ngIf="clientForm.get('email')?.errors?.['maxlength']">Máximo 255 caracteres</span>
+          </div>
         </div>
 
         <div class="form-group">
-          <app-input formControlName="phone" label="Teléfono" placeholder="(555) 555-555" type="tel" rightIcon="true">
+          <app-input formControlName="phone" label="Teléfono" placeholder="(555) 555-555" type="tel" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-phone"></i>
           </app-input>
+          <div class="help" *ngIf="clientForm.get('phone')?.touched && clientForm.get('phone')?.invalid">
+            <span *ngIf="clientForm.get('phone')?.errors?.['required']">Teléfono requerido</span>
+            <span *ngIf="clientForm.get('phone')?.errors?.['maxlength']">Máximo 20 caracteres</span>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group full-width">
-          <app-input formControlName="address" label="Dirección" placeholder="Av. Principal 123, Ciudad" type="text" rightIcon="true">
+          <app-input formControlName="address" label="Dirección" placeholder="Av. Principal 123, Ciudad" type="text" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-map-marker-alt"></i>
           </app-input>
+          <div class="help" *ngIf="clientForm.get('address')?.touched && clientForm.get('address')?.invalid">
+            <span *ngIf="clientForm.get('address')?.errors?.['required']">Dirección requerida</span>
+            <span *ngIf="clientForm.get('address')?.errors?.['maxlength']">Máximo 255 caracteres</span>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <app-select formControlName="status" [options]="statusOptions" label="Estado" placeholder="Seleccione estado" rightIcon="true">
+          <app-select formControlName="status" [options]="statusOptions" label="Estado" placeholder="Seleccione estado" rightIcon="true" [required]="true">
             <i slot="right-icon" class="fas fa-flag"></i>
           </app-select>
         </div>
       </div>
 
       <div class="form-actions">
-        <app-button variant="ghost" type="button" (click)="clientForm.reset()">
-          Cancelar
-        </app-button>
-
         <app-button variant="secondary" type="reset">
           <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
           Limpiar

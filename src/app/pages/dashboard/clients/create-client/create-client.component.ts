@@ -43,12 +43,21 @@ export class CreateClientComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {
     this.clientForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      idType: ['RUC', [Validators.required]],
-      identification: ['', [Validators.required], [this.identificationExistsValidator()]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: [''],
-      address: [''], // Nuevo campo de dirección
+      // Validation rules aligned with backend constraints
+      // @NotBlank @Size(max = 255)    private String name;
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+  // @NotNull                      private Long typeIdentificationId;
+  // Leave empty - user must select explicitly
+  idType: ['', [Validators.required]],
+      // @NotBlank @Size(max = 255)    private String identification;
+      identification: ['', [Validators.required, Validators.maxLength(255)], [this.identificationExistsValidator()]],
+      // @NotBlank @Email @Size(max=255) private String email;
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      // @NotBlank @Size(max = 20)     private String phone;
+      phone: ['', [Validators.required, Validators.maxLength(20)]],
+  // @Size(max = 255)              private String address;
+  // ahora requerido también según petición
+  address: ['', [Validators.required, Validators.maxLength(255)]], // Nuevo campo de dirección (requerido)
       status: ['A', [Validators.required]]
     });
   }
@@ -102,7 +111,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
         // Enable identification and idType in case they were disabled previously
         this.clientForm.get('identification')?.enable({ emitEvent: false });
         this.clientForm.get('idType')?.enable({ emitEvent: false });
-        this.resetFormWithDefaults();
+        // Don't call resetFormWithDefaults() - let user choose explicitly
       }
     });
   }
@@ -146,11 +155,12 @@ export class CreateClientComponent implements OnInit, OnDestroy {
     if (this.clientForm.valid) {
       this.isSaving = true;
       // Read values directly from controls so disabled controls still provide values
-      const nameVal = this.clientForm.get('name')?.value;
-      const identificationVal = this.clientForm.get('identification')?.value;
+      // Trim string values to avoid sending only-whitespace inputs
+      const nameVal = (this.clientForm.get('name')?.value || '').toString().trim();
+      const identificationVal = (this.clientForm.get('identification')?.value || '').toString().trim();
       const idTypeVal = this.clientForm.get('idType')?.value;
-      const emailVal = this.clientForm.get('email')?.value;
-      const phoneVal = this.clientForm.get('phone')?.value;
+      const emailVal = (this.clientForm.get('email')?.value || '').toString().trim();
+      const phoneVal = (this.clientForm.get('phone')?.value || '').toString().trim();
       const statusVal = this.clientForm.get('status')?.value;
 
       // Map form to API shape
@@ -161,7 +171,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
         typeIdentificationId: this.mapTypeToId(idTypeVal), // Para el API
         email: emailVal,
         phone: phoneVal,
-        address: this.clientForm.get('address')?.value || '',
+  address: (this.clientForm.get('address')?.value || '').toString().trim(),
         status: statusVal // already 'A' or 'I'
       };
 
@@ -324,19 +334,13 @@ export class CreateClientComponent implements OnInit, OnDestroy {
   private resetFormWithDefaults(): void {
     // Wait for catalogs to load before setting defaults
     setTimeout(() => {
-      // idTypeOptions now uses catalog code as value (e.g. '04') and label '04 - RUC'
-      // Try to find RUC by matching the label, fallback to first option or 'RUC' if nothing
-      const rucOption = this.idTypeOptions.find(opt => /RUC/i.test(String(opt.label)));
-      const defaultIdType = this.idTypeOptions.length > 0 ?
-        (rucOption ? rucOption.value : this.idTypeOptions[0]?.value) : 'RUC';
-      
       const defaultStatus = this.statusOptions.length > 0 ? 
         this.statusOptions.find(opt => opt.value === 'A')?.value || this.statusOptions[0]?.value || 'A' : 
         'A';
 
       this.clientForm.reset({
         name: '',
-        idType: defaultIdType,
+        idType: '', // No default selection - user must choose
         identification: '',
         email: '',
         phone: '',
