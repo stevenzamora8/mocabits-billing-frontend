@@ -1,3 +1,6 @@
+/* Importar variables de marca primero */
+@import './app/shared/styles/brand-variables.css';
+
 /* Reset y estilos globales */
 * {
   margin: 0;

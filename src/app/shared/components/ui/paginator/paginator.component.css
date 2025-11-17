@@ -77,6 +77,85 @@
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
+/* Estilos para los botones activos de paginación */
+::ng-deep .pagination-numbers app-button.active .app-button {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+::ng-deep .pagination-numbers app-button.active .app-button:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  transform: none !important;
+}
+
+/* Estilos específicos para el contenido del botón activo */
+::ng-deep .pagination-numbers app-button.active .app-button__content {
+  color: white !important;
+}
+
+/* Alternativa: aplicar estilos directamente al elemento app-button cuando tiene clase active */
+::ng-deep app-button.active button {
+  background: #3b82f6 !important;
+  color: white !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+::ng-deep app-button.active button:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  transform: none !important;
+}
+
+/* Más específico: anular la variante outline y aplicar fondo/contraste al botón interno */
+::ng-deep app-button.active .app-button.app-button--outline {
+  background: #3b82f6 !important;
+  color: white !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+::ng-deep app-button.active .app-button.app-button--outline:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+/* Asegurar que el contenido interno (texto/número) quede en blanco */
+::ng-deep app-button.active .app-button.app-button--outline .app-button__content,
+::ng-deep app-button.active .app-button.app-button--outline .app-button__icon-html {
+  color: white !important;
+}
+
+/* Si el componente aplica la clase 'active' al host, también forzamos sobre el host */
+::ng-deep app-button.active {
+  --primary-600: #3b82f6;
+}
+
+/* También cubrir el caso en que la clase 'active' se añade al <button> interno en lugar del host */
+::ng-deep app-button .app-button.active,
+::ng-deep app-button .app-button.app-button--outline.active,
+::ng-deep .pagination-numbers app-button .app-button.active {
+  background: #3b82f6 !important;
+  color: white !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+::ng-deep app-button .app-button.active:hover,
+::ng-deep app-button .app-button.app-button--outline.active:hover,
+::ng-deep .pagination-numbers app-button .app-button.active:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+::ng-deep app-button .app-button.active .app-button__content,
+::ng-deep app-button .app-button.active .app-button__icon-html {
+  color: white !important;
+}
+
 @media (max-width: 768px) {
   .pagination-container {
     flex-direction: column;

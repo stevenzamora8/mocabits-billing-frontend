@@ -11,7 +11,13 @@
     </app-button>
 
     <div class="pagination-numbers">
-      <app-button *ngFor="let page of getPageNumbers()" variant="outline" size="sm" [class.active]="page === currentPage" (click)="goTo(page)">{{ page + 1 }}</app-button>
+      <!-- Pasamos la clase al input 'class' del componente para que el inner <button>
+           reciba la clase 'active' vía buttonClasses en ButtonComponent -->
+      <app-button *ngFor="let page of getPageNumbers()"
+                  variant="outline"
+                  size="sm"
+                  [class]="page === currentPage ? 'active' : ''"
+                  (click)="goTo(page)">{{ page + 1 }}</app-button>
     </div>
 
     <app-button variant="outline" size="sm" [disabled]="currentPage >= totalPages - 1" (click)="next()" ariaLabel="Página siguiente">
