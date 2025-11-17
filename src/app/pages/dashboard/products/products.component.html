@@ -11,18 +11,18 @@
   <ui-page-intro
     [title]="'Gestión de Productos'"
     [description]="'Administra tu catálogo de productos y servicios'"
-    [iconClass]="'fas fa-boxes'"
+    [iconClass]="'fas fa-cube'"
     [actionTemplate]="introAction">
   </ui-page-intro>
 
-  <!-- Stats Cards -->
-    <div class="stats-grid">
-  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="products.length" variant="primary"></ui-stat-card>
-  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Valor Total" [value]="totalValue | money:'USD':'en-US'" variant="success"></ui-stat-card>
-    </div>
+  <!-- Solo mostrar estadísticas si hay datos -->
+  <div class="stats-grid" *ngIf="totalElements > 0">
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="totalElements" variant="primary"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Valor Total" [value]="totalValue | money:'USD':'en-US'" variant="success"></ui-stat-card>
+  </div>
 
-  <!-- Filters and Search (mirrors Clients layout) -->
-  <ui-filters-panel>
+  <!-- Solo mostrar filtros si hay datos -->
+  <ui-filters-panel *ngIf="totalElements > 0">
     <div class="filter-selects">
       <div class="filter-field">
         <label class="filter-label">Nombre</label>
@@ -31,7 +31,7 @@
             type="text"
             placeholder="Buscar por nombre..."
             [(ngModel)]="filterName"
-            (input)="filterProducts()"
+            (inputChange)="filterProducts()"
             rightIcon="true">
             <i slot="right-icon" class="fas fa-box"></i>
           </app-input>
@@ -47,7 +47,7 @@
               placeholder="Ej: PROD-001"
               type="text"
               [(ngModel)]="filterMainCode"
-              (input)="filterProducts()"
+              (inputChange)="filterProducts()"
               rightIcon="true">
             </app-input>
           </div>
@@ -58,23 +58,17 @@
               placeholder="Ej: 12345"
               type="text"
               [(ngModel)]="filterAuxiliaryCode"
-              (input)="filterProducts()"
+              (inputChange)="filterProducts()"
               rightIcon="true">
             </app-input>
           </div>
         </div>
       </div>
 
-      <!-- Clear filters button aligned with inputs: include a hidden label to keep baseline alignment -->
       <div class="filter-field filter-field-button">
-        <label class="filter-label" aria-hidden="true" style="visibility:hidden">Limpiar</label>
+        <label class="filter-label visually-hidden" aria-hidden="true">Limpiar</label>
         <div class="filter-field-row">
-          <app-button
-            variant="outline"
-            size="md"
-            (click)="clearProductFilters()"
-            title="Limpiar todos los filtros"
-            class="clear-filters-btn">
+          <app-button variant="outline" size="md" (click)="clearProductFilters()" title="Limpiar todos los filtros" class="clear-filters-btn control-size">
             <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
             Limpiar
           </app-button>
@@ -87,8 +81,8 @@
   </ui-filters-panel>
 
   <!-- Products Table (use shared ui-table for consistent standard) -->
-  <div class="table-container">
-    <div class="table-wrapper" *ngIf="isLoading || paginatedProducts.length > 0">
+  <div class="table-container" *ngIf="totalElements > 0">
+    <div class="table-wrapper">
       <ng-template #actions let-product>
         <div class="action-buttons">
           <app-button
@@ -135,77 +129,24 @@
       ></ui-table>
     </div>
     
-    <!-- Empty State: show a full-width friendly card when there are no products and not loading -->
-    <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
-      <div class="empty-icon" aria-hidden="true"><i class="fas fa-box-open"></i></div>
-      <h3>No se encontraron productos</h3>
-      <p>Intenta ajustar los filtros de búsqueda o crea un nuevo producto.</p>
-    </div>
   </div>
 
-  <!-- Pagination -->
-  <div class="pagination-container" *ngIf="totalPages > 1">
-    <div class="pagination-info">
-      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, totalElements) }} de {{ totalElements }} productos
-    </div>
+  <!-- Estado vacío - usando componente UI reutilizable -->
+  <ui-empty-state 
+    *ngIf="!isLoading && totalElements === 0"
+    iconClass="fas fa-boxes"
+    title="No se encontraron productos"
+    description="Intenta ajustar los filtros de búsqueda o crea un nuevo producto.">
+  </ui-empty-state>
 
-    <div class="pagination-controls">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="goToPage(1)"
-        title="Primera página"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/>
-        </svg>
-      </button>
-
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-        title="Página anterior"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/>
-        </svg>
-      </button>
-
-      <div class="pagination-numbers">
-        <button
-          *ngFor="let page of getPageNumbers()"
-          class="pagination-number"
-          [class.active]="page === currentPage"
-          (click)="goToPage(page)"
-        >
-          {{ page }}
-        </button>
-      </div>
-
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-        title="Página siguiente"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
-
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="goToPage(totalPages)"
-        title="Última página"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
-        </svg>
-      </button>
-    </div>
-  </div>
+  <!-- Pagination - solo mostrar cuando hay elementos para paginar -->
+  <ui-paginator
+    *ngIf="!isLoading && totalElements > 0"
+    [totalElements]="totalElements"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="goToPage($event)">
+  </ui-paginator>
 
   <!-- Product Modal -->
   <div class="modal-overlay" *ngIf="showProductModal" (click)="closeProductModal()">

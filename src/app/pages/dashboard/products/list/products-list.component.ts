@@ -11,11 +11,12 @@ import { UiPageIntroComponent } from '../../../../shared/components/ui/page-intr
 import { UiFiltersPanelComponent } from '../../../../shared/components/ui/filters-panel/filters-panel.component';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { UiStatCardComponent } from '../../../../shared/components/ui/stat-card/stat-card.component';
+import { UiEmptyStateComponent } from '../../../../shared/components/ui/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-products-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, RouterModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiEmptyStateComponent, MoneyPipe],
   templateUrl: './products-list.component.html',
   styleUrls: ['./products-list.component.css']
 })
@@ -80,8 +81,9 @@ export class ProductsListComponent implements OnInit, OnDestroy {
           vat: Number(p.vat) || 0
         }));
         this.filteredProducts = [...this.products];
-        this.totalPages = response.totalPages || 1;
-        this.totalElements = response.totalElements || this.products.length;
+  this.totalPages = response.totalPages || 1;
+  // Use nullish coalescing to accept 0 from the server instead of falling back to previous data
+  this.totalElements = response.totalElements ?? 0;
         this.isLoading = false;
       },
       error: (err) => {
@@ -92,21 +94,14 @@ export class ProductsListComponent implements OnInit, OnDestroy {
   }
 
   filterProducts() {
-    // simple client-side filters for quick UX while server supports search
-    let filtered = this.products;
-    if (this.filterName.trim()) {
-      const term = this.filterName.toLowerCase();
-      filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(term));
-    }
-    if (this.filterMainCode.trim()) {
-      const term = this.filterMainCode.toLowerCase();
-      filtered = filtered.filter(p => (p.mainCode || '').toLowerCase().includes(term));
-    }
-    if (this.filterAuxiliaryCode.trim()) {
-      const term = this.filterAuxiliaryCode.toLowerCase();
-      filtered = filtered.filter(p => (p.auxiliaryCode || '').toLowerCase().includes(term));
-    }
-    this.filteredProducts = filtered;
+    // Move to server-side filtering to avoid stale in-memory data
+    this.currentFilters = {};
+    if (this.filterName.trim()) this.currentFilters.name = this.filterName.trim();
+    if (this.filterMainCode.trim()) this.currentFilters.mainCode = this.filterMainCode.trim();
+    if (this.filterAuxiliaryCode.trim()) this.currentFilters.auxiliaryCode = this.filterAuxiliaryCode.trim();
+
+    this.currentPage = 1;
+    this.loadDataWithPage(0);
   }
 
   clearProductFilters() {

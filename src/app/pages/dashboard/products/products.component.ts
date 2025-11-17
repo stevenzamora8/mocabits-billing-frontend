@@ -10,6 +10,8 @@ import { UiPageIntroComponent } from '../../../shared/components/ui/page-intro/p
 import { UiFiltersPanelComponent } from '../../../shared/components/ui/filters-panel/filters-panel.component';
 import { MoneyPipe } from '../../../shared/pipes/money.pipe';
 import { UiStatCardComponent } from '../../../shared/components/ui/stat-card/stat-card.component';
+import { UiPaginatorComponent } from '../../../shared/components/ui/paginator/paginator.component';
+import { UiEmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state.component';
 
 // Nuevo modelo de producto para el formulario
 export interface ProductFormModel {
@@ -29,7 +31,7 @@ export interface ProductFormModel {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiPaginatorComponent, UiEmptyStateComponent, MoneyPipe],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
@@ -52,7 +54,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Pagination
   currentPage = 1;
-  itemsPerPage = 10; // Mostrar 10 registros por página (ajuste para mejor densidad)
+  itemsPerPage = 5; // Solo 5 filas por página (igual que clientes)
   totalPages = 1;
   totalElements = 0;
 
@@ -101,7 +103,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.loadDataWithPage(0); // Load first page by default
   }
 
-  private loadDataWithPage(page: number = 0, filters: any = {}) {
+  private loadDataWithPage(page: number = 0) {
     this.isLoading = true;
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -114,8 +116,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const params = { 
       page, 
       size: this.itemsPerPage,
-      ...this.currentFilters,
-      ...filters 
+      ...this.currentFilters
     };
 
     this.productsService.getProductsApi(params, token).subscribe({
@@ -141,7 +142,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         
         // Update pagination info from API response
         this.totalPages = response.totalPages || 1;
-        this.totalElements = response.totalElements || this.products.length;
+        this.totalElements = response.totalElements ?? 0;
         
         this.isLoading = false;
       },
@@ -309,43 +310,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Filter and search methods
   filterProducts() {
-    // If filtering by name, make API call
-    if (this.filterName.trim()) {
-      this.loadProductsWithFilters();
-      return;
-    }
-
-    // For other filters, use client-side filtering
-    let filtered = this.products;
-
-    // Filtrar por código principal
-    if (this.filterMainCode.trim()) {
-      const mainCodeTerm = this.filterMainCode.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.mainCode && product.mainCode.toLowerCase().includes(mainCodeTerm)
-      );
-    }
-
-    // Filtrar por código auxiliar
-    if (this.filterAuxiliaryCode.trim()) {
-      const auxiliaryCodeTerm = this.filterAuxiliaryCode.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.auxiliaryCode && product.auxiliaryCode.toLowerCase().includes(auxiliaryCodeTerm)
-      );
-    }
-
-    // Filtrar por término de búsqueda general (si existe)
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(product =>
-        (product.mainCode && product.mainCode.toLowerCase().includes(term)) ||
-        (product.auxiliaryCode && product.auxiliaryCode.toLowerCase().includes(term)) ||
-        (product.description && product.description.toLowerCase().includes(term))
-      );
-    }
-
-    this.filteredProducts = filtered;
-    this.currentPage = 1;
+    // Always use server-side filtering for consistency
+    this.loadProductsWithFilters();
   }
 
   private loadProductsWithFilters() {
@@ -354,9 +320,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.filterName.trim()) {
       this.currentFilters.name = this.filterName.trim();
     }
+    if (this.filterMainCode.trim()) {
+      this.currentFilters.mainCode = this.filterMainCode.trim();
+    }
+    if (this.filterAuxiliaryCode.trim()) {
+      this.currentFilters.auxiliaryCode = this.filterAuxiliaryCode.trim();
+    }
 
-    // Load data with filters applied
-    this.loadDataWithPage(0, this.currentFilters);
+    // Reset to first page when filtering
+    this.currentPage = 1;
+    
+    // Load data with filters applied - don't pass filters again, they're in currentFilters
+    this.loadDataWithPage(0);
   }
 
   // El filtrado por categoría ya no aplica
@@ -365,7 +340,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.loadDataWithPage(page - 1); // API uses 0-based indexing
+      this.loadDataWithPage(page - 1); // API uses 0-based indexing, currentFilters already applied
     }
   }
 

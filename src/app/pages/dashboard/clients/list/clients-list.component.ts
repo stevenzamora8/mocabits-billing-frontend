@@ -17,11 +17,12 @@ import { UiStatCardComponent } from '../../../../shared/components/ui/stat-card/
 import { UiAlertComponent, UiAlertType } from '../../../../shared/components/ui/alert/alert.component';
 import { UiConfirmComponent } from '../../../../shared/components/ui/confirm/confirm.component';
 import { UiPaginatorComponent } from '../../../../shared/components/ui/paginator/paginator.component';
+import { UiEmptyStateComponent } from '../../../../shared/components/ui/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-clients-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, InputComponent, SelectComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiAlertComponent, UiConfirmComponent, UiPaginatorComponent],
+  imports: [CommonModule, FormsModule, RouterModule, InputComponent, SelectComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiAlertComponent, UiConfirmComponent, UiPaginatorComponent, UiEmptyStateComponent],
   templateUrl: './clients-list.component.html',
   styleUrls: ['./clients-list.component.css']
 })
