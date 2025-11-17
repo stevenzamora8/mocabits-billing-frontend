@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ClientService, Client } from '../../../../services/client.service';
 import { CatalogService } from '../../../../services/catalog.service';
 import { FilterOption } from '../../../../shared/interfaces/filter-config.interface';
@@ -37,7 +38,7 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   
   // Pagination
   currentPage = 0;
-  itemsPerPage = 5;
+  itemsPerPage = 5; // Solo 5 filas por página
   totalPages = 0;
   totalElements = 0;
   
@@ -46,6 +47,11 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   selectedType = '';
   selectedIdentification = '';
   selectedStatus = '';
+  
+  // Filter validation errors
+  nameError = '';
+  identificationError = '';
+  statusError = '';
   
   // UI State
   isLoading = false;
@@ -78,6 +84,7 @@ export class ClientsListComponent implements OnInit, OnDestroy {
 
   // Subscriptions
   private subscriptions = new Subscription();
+  private searchSubject = new Subject<void>();
 
 
   constructor(
@@ -128,14 +135,20 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     // Keep currentPage as 0-based consistently
     this.currentPage = page - 1;
     
+    // Validar size (1-200 según especificación)
+    const validatedSize = Math.min(Math.max(this.itemsPerPage, 1), 200);
+    
     const filters = {
-      name: this.searchTerm || undefined,
-      typeIdentification: this.selectedType || undefined,
-      identification: this.selectedIdentification || undefined,
+      name: this.searchTerm && this.searchTerm.trim() ? this.searchTerm.trim() : undefined,
+      idTypeIdentification: this.selectedType ? this.mapTypeToId(this.selectedType).toString() : undefined,
+      identification: this.selectedIdentification && this.selectedIdentification.trim() ? this.selectedIdentification.trim() : undefined,
       status: this.selectedStatus || undefined
     };
     
-    this.clientService.getClients(page - 1, this.itemsPerPage, filters).subscribe({
+    console.log('ClientsListComponent - Filtros aplicados:', filters);
+    console.log('Size validado:', validatedSize);
+    
+    this.clientService.getClients(page - 1, validatedSize, filters).subscribe({
       next: (response) => {
         this.clients = response.content || [];
         this.filteredClients = [...this.clients];
@@ -156,7 +169,39 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange(): void {
-    this.applyFilters();
+    // Validar filtros antes de hacer la búsqueda
+    if (this.validateFilters()) {
+      // Reiniciar a la primera página cuando se cambian los filtros
+      this.currentPage = 0;
+      this.loadClients(1); // Cargar desde el servidor con los nuevos filtros
+    }
+  }
+
+  private validateFilters(): boolean {
+    let isValid = true;
+    
+    // Validar name: máximo 255 caracteres
+    this.nameError = '';
+    if (this.searchTerm && this.searchTerm.length > 255) {
+      this.nameError = 'El nombre no puede exceder 255 caracteres';
+      isValid = false;
+    }
+    
+    // Validar identification: máximo 255 caracteres, match exacto
+    this.identificationError = '';
+    if (this.selectedIdentification && this.selectedIdentification.length > 255) {
+      this.identificationError = 'La identificación no puede exceder 255 caracteres';
+      isValid = false;
+    }
+    
+    // Validar status: solo 'A' o 'I'
+    this.statusError = '';
+    if (this.selectedStatus && !['A', 'I'].includes(this.selectedStatus)) {
+      this.statusError = 'El estado debe ser A (Activo) o I (Inactivo)';
+      isValid = false;
+    }
+    
+    return isValid;
   }
 
   clearFilters(): void {
@@ -164,49 +209,21 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     this.selectedType = '';
     this.selectedIdentification = '';
     this.selectedStatus = '';
-    // Clear local filters and reload from server so the list reflects the latest data
+    // Limpiar errores de validación
+    this.nameError = '';
+    this.identificationError = '';
+    this.statusError = '';
+    // Reiniciar a la primera página y recargar desde el servidor
     this.currentPage = 0;
     this.loadClients(1);
   }
 
-  private applyFilters(): void {
-    let filtered = [...this.clients];
-
-    if (this.searchTerm) {
-      filtered = filtered.filter(client => 
-        client.name?.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-
-    if (this.selectedIdentification) {
-      filtered = filtered.filter(client => 
-        client.identification?.includes(this.selectedIdentification)
-      );
-    }
-
-    if (this.selectedType) {
-      filtered = filtered.filter(client => 
-        client.typeIdentification === this.selectedType
-      );
-    }
-
-    if (this.selectedStatus) {
-      filtered = filtered.filter(client => 
-        client.status === this.selectedStatus
-      );
-    }
-
-    this.filteredClients = filtered;
-    this.totalElements = filtered.length;
-    this.totalPages = Math.ceil(this.totalElements / this.itemsPerPage);
-    this.currentPage = 0; // Reset to first page (0-based)
-    this.updatePaginatedClients();
-  }
+  // Eliminar applyFilters() - ya no es necesario el filtrado local
+  // La búsqueda se hace en el servidor usando los parámetros de consulta
 
   private updatePaginatedClients(): void {
-    const startIndex = this.currentPage * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedClients = this.filteredClients.slice(startIndex, endIndex);
+    // Los datos ya vienen paginados del servidor, no necesitamos slice local
+    this.paginatedClients = [...this.filteredClients];
   }
 
   private updateStats(summary?: { total: number; active: number; inactive: number }): void {
@@ -337,5 +354,24 @@ export class ClientsListComponent implements OnInit, OnDestroy {
 
   getConfirmText(): string {
     return this.confirmType === 'danger' ? 'Eliminar' : 'Confirmar';
+  }
+
+  /**
+   * Mapea el código de tipo de identificación al ID numérico correspondiente
+   * Basado en el ejemplo del curl: idTypeIdentification=2 para cédula
+   */
+  private mapTypeToId(typeCode: string): number {
+    const typeMap: { [key: string]: number } = {
+      '04': 1, // RUC 
+      '05': 2, // Cédula
+      '06': 3, // Pasaporte
+      // Fallbacks para nombres completos si vienen así del catálogo
+      'RUC': 1,
+      'CEDULA': 2,
+      'CEDULA DE IDENTIDAD': 2,
+      'PASAPORTE': 3
+    };
+    
+    return typeMap[typeCode] || 1; // Default a RUC si no se encuentra
   }
 }

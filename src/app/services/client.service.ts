@@ -193,27 +193,37 @@ export class ClientService {
 
   getClients(page: number = 0, size: number = 10, filters?: {
     name?: string;
-    typeIdentification?: string;
+    idTypeIdentification?: string;
     identification?: string;
     status?: string;
   }): Observable<ClientPage> {
-    let url = `${this.apiUrl}/billing/v1/clients?page=${page}&size=${size}`;
+    // Validar parámetros antes de hacer la petición
+    const validatedPage = Math.max(page, 0);
+    const validatedSize = Math.min(Math.max(size, 1), 200);
+    
+    // Usar HttpParams para construcción más limpia de URL con parámetros de consulta
+    const params = new URLSearchParams();
+    params.append('page', validatedPage.toString());
+    params.append('size', validatedSize.toString());
     
     if (filters) {
-      if (filters.name && filters.name.trim()) {
-        url += `&name=${encodeURIComponent(filters.name.trim())}`;
-      }
-      // filter by typeIdentification to match the Client model field
-      if ((filters as any).typeIdentification && (filters as any).typeIdentification.trim()) {
-        url += `&typeIdentification=${encodeURIComponent((filters as any).typeIdentification.trim())}`;
-      }
+      // Solo agregar parámetros que tengan valor
       if (filters.identification && filters.identification.trim()) {
-        url += `&identification=${encodeURIComponent(filters.identification.trim())}`;
+        params.append('identification', filters.identification.trim());
+      }
+      if (filters.name && filters.name.trim()) {
+        params.append('name', filters.name.trim());
+      }
+      if (filters.idTypeIdentification && filters.idTypeIdentification.trim()) {
+        params.append('idTypeIdentification', filters.idTypeIdentification.trim());
       }
       if (filters.status && filters.status.trim()) {
-        url += `&status=${encodeURIComponent(filters.status.trim())}`;
+        params.append('status', filters.status.trim());
       }
     }
+
+    const url = `${this.apiUrl}/billing/v1/clients?${params.toString()}`;
+    console.log('ClientService - URL de búsqueda:', url);
 
     return this.http.get<NewClientResponse>(url, { headers: this.getHeaders() }).pipe(
       map(response => ({

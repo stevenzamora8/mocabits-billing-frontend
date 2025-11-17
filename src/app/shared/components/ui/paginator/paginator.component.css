@@ -3,11 +3,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  background: white;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
   margin-top: 2rem;
+}
+
+/* Forzar fondo blanco con mayor especificidad */
+ui-paginator .pagination-container,
+.pagination-container,
+::ng-deep .pagination-container,
+::ng-deep ui-paginator .pagination-container,
+body .pagination-container,
+html body .pagination-container {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
 }
 
 .pagination-info {

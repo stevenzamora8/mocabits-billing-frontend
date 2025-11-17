@@ -492,24 +492,41 @@
 /* EMPTY STATE */
 .empty-state {
   text-align: center;
-  padding: 4rem 3rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 20px;
-  margin: 2rem 0;
+  padding: 3rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top gradient stripe like other cards */
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--logo-primary-color), var(--logo-secondary-color));
+  border-radius: 16px 16px 0 0;
+  z-index: 2;
 }
 
 .empty-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 2rem auto;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem auto;
+  background: linear-gradient(135deg, var(--logo-primary-color), var(--logo-secondary-color));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
-  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+  font-size: 1.5rem;
 }
 
 @keyframes float {
@@ -518,19 +535,19 @@
 }
 
 .empty-state h3 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: 1.25rem;
-  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: #1e293b;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .empty-state p {
   margin: 0;
   color: #64748b;
-  font-size: 0.9rem;
-  max-width: 400px;
+  font-size: 0.875rem;
+  max-width: 360px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 
@@ -647,6 +664,24 @@
 .action-buttons app-button.status-btn,
 .action-buttons app-button.delete-btn {
   padding: 0 !important;
+}
+
+/* FORCE WHITE BACKGROUND FOR PAGINATOR */
+::ng-deep ui-paginator,
+::ng-deep ui-paginator .pagination-container,
+.clients-container ui-paginator,
+.clients-container ui-paginator .pagination-container {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* FILTER VALIDATION ERRORS */
+.help {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.2;
 }
 
 

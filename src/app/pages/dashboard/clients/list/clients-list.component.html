@@ -23,13 +23,15 @@
     (closed)="handleAlertClosed()">
   </ui-alert>
 
-  <div class="stats-grid">
+  <!-- Solo mostrar estadísticas si hay datos o si está cargando -->
+  <div class="stats-grid" *ngIf="isLoading || totalClients > 0">
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-users&quot;&gt;&lt;/i&gt;'" title="Total Clientes" [value]="totalClients" variant="primary"></ui-stat-card>
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-check&quot;&gt;&lt;/i&gt;'" title="Clientes Activos" [value]="activeClients" variant="success"></ui-stat-card>
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-user-times&quot;&gt;&lt;/i&gt;'" title="Clientes Inactivos" [value]="inactiveClients" variant="warning"></ui-stat-card>
   </div>
 
-  <ui-filters-panel>
+  <!-- Solo mostrar filtros si hay datos o si está cargando -->
+  <ui-filters-panel *ngIf="isLoading || totalClients > 0">
     <div class="filter-selects">
       <div class="filter-field">
         <label class="filter-label">Nombre</label>
@@ -37,6 +39,9 @@
           <app-input type="text" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm" (input)="onFilterChange()" rightIcon="true">
             <i slot="right-icon" class="fas fa-user"></i>
           </app-input>
+        </div>
+        <div class="help" *ngIf="nameError">
+          <span>{{ nameError }}</span>
         </div>
       </div>
 
@@ -58,6 +63,9 @@
             <app-input placeholder="Buscar identificación..." type="text" [(ngModel)]="selectedIdentification" (input)="onFilterChange()" rightIcon="true">
               <i slot="right-icon" class="fas fa-id-card"></i>
             </app-input>
+            <div class="help" *ngIf="identificationError">
+              <span>{{ identificationError }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -74,6 +82,9 @@
             <i slot="right-icon" class="fas fa-toggle-on"></i>
           </app-select>
         </div>
+        <div class="help" *ngIf="statusError">
+          <span>{{ statusError }}</span>
+        </div>
       </div>
 
       <div class="filter-field filter-field-button">
@@ -88,9 +99,9 @@
     </div>
   </ui-filters-panel>
 
-  <div class="table-container">
-    <!-- Table view (uses shared ui-table). Render table when loading OR when we have elements so the table's built-in skeleton shows while loading -->
-  <div class="table-wrapper">
+  <!-- Mostrar tabla solo cuando hay datos o está cargando -->
+  <div class="table-container" *ngIf="isLoading || totalElements > 0">
+    <div class="table-wrapper">
       <ng-template #actions let-client>
         <div class="action-buttons">
           <app-button class="edit-btn btn-icon" variant="ghost" size="sm" (click)="editClient(client)" title="Editar">
@@ -137,16 +148,18 @@
         [actionsTemplate]="actions"
       ></ui-table>
     </div>
-
-    <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
-      <div class="empty-icon" aria-hidden="true"><i class="fas fa-users"></i></div>
-      <h3>No se encontraron clientes</h3>
-      <p>Intenta ajustar los filtros de búsqueda o crea un nuevo cliente.</p>
-    </div>
   </div>
 
-  <!-- Pagination (shared ui-paginator) placed outside the table card so spacing and shadow are separate -->
+  <!-- Estado vacío - solo mostrar cuando no está cargando y no hay elementos -->
+  <div *ngIf="!isLoading && totalElements === 0" class="empty-state">
+    <div class="empty-icon" aria-hidden="true"><i class="fas fa-users"></i></div>
+    <h3>No se encontraron clientes</h3>
+    <p>Intenta ajustar los filtros de búsqueda o crea un nuevo cliente.</p>
+  </div>
+
+  <!-- Pagination - solo mostrar cuando hay elementos para paginar -->
   <ui-paginator
+    *ngIf="!isLoading && totalElements > 0"
     [totalElements]="totalElements"
     [itemsPerPage]="itemsPerPage"
     [currentPage]="currentPage"
