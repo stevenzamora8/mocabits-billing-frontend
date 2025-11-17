@@ -93,10 +93,6 @@
   <div class="table-wrapper">
       <ng-template #actions let-client>
         <div class="action-buttons">
-          <app-button class="view-btn btn-icon" variant="ghost" size="sm" (click)="viewClient(client)" title="Ver detalles">
-            <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-eye"></i></span>
-            <span class="sr-only">Ver</span>
-          </app-button>
           <app-button class="edit-btn btn-icon" variant="ghost" size="sm" (click)="editClient(client)" title="Editar">
             <span class="app-button__icon-html" aria-hidden="true"><i class="fas fa-edit"></i></span>
             <span class="sr-only">Editar</span>
@@ -131,6 +127,7 @@
           { field: 'name', label: 'Nombre' },
           { field: 'typeIdentification', label: 'Tipo ID', width: '100px', align: 'center' },
           { field: 'identification', label: 'Identificación', width: '140px' },
+          { field: 'address', label: 'Dirección' },
           { field: 'email', label: 'Email' },
           { field: 'phone', label: 'Teléfono', width: '130px' },
           { field: 'status', label: 'Estado', width: '120px', align: 'center', nowrap: true }
@@ -168,3 +165,4 @@
   (cancelled)="handleUiConfirmCancelled()"
   (closed)="handleUiConfirmClosed()">
 </ui-confirm>
+ 

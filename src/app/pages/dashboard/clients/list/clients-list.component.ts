@@ -79,6 +79,7 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   // Subscriptions
   private subscriptions = new Subscription();
 
+
   constructor(
     private clientService: ClientService,
     private catalogService: CatalogService,
@@ -124,7 +125,8 @@ export class ClientsListComponent implements OnInit, OnDestroy {
 
   loadClients(page: number = 1): void {
     this.isLoading = true;
-    this.currentPage = page;
+    // Keep currentPage as 0-based consistently
+    this.currentPage = page - 1;
     
     const filters = {
       name: this.searchTerm || undefined,
@@ -140,8 +142,7 @@ export class ClientsListComponent implements OnInit, OnDestroy {
         // Use server pagination data
         this.totalElements = response.totalElements;
         this.totalPages = response.totalPages;
-        // Update currentPage to 0-based system
-        this.currentPage = page - 1;
+        // currentPage is already set above as 0-based
         this.updatePaginatedClients();
         this.updateStats(response.summary);
         this.isLoading = false;
@@ -198,12 +199,12 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     this.filteredClients = filtered;
     this.totalElements = filtered.length;
     this.totalPages = Math.ceil(this.totalElements / this.itemsPerPage);
-    this.currentPage = 1; // Reset to first page
+    this.currentPage = 0; // Reset to first page (0-based)
     this.updatePaginatedClients();
   }
 
   private updatePaginatedClients(): void {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const startIndex = this.currentPage * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedClients = this.filteredClients.slice(startIndex, endIndex);
   }
@@ -239,10 +240,6 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   }
 
   // Client actions
-  viewClient(client: Client): void {
-    // Implement view logic or navigate to detail view
-    console.log('View client:', client);
-  }
 
   editClient(client: Client): void {
     this.router.navigate(['/dashboard', 'clients', client.id, 'edit']);
