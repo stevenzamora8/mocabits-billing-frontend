@@ -1,0 +1,108 @@
+<ui-filters-panel>
+  <div class="filter-selects">
+    
+    <!-- Filtros individuales -->
+    <div 
+      *ngFor="let config of configs" 
+      class="filter-field"
+      [style.flex]="getFilterWidth(config)"
+      [ngClass]="{
+        'filter-field-combined': config.type === 'combined',
+        'filter-field-button': false
+      }">
+
+      <!-- Filtro simple (text, select, date) -->
+      <ng-container *ngIf="config.type !== 'combined'">
+        <label class="filter-label">{{ config.label }}</label>
+        <div class="filter-field-row">
+          
+          <!-- Input de texto -->
+          <app-input 
+            *ngIf="config.type === 'text'"
+            [type]="'text'"
+            [placeholder]="config.placeholder || ''"
+            [(ngModel)]="filters[config.key]"
+            (input)="onFilterChange()"
+            [rightIcon]="config.icon ? 'true' : 'false'">
+            <i *ngIf="config.icon" slot="right-icon" [class]="config.icon"></i>
+          </app-input>
+
+          <!-- Select -->
+          <app-select 
+            *ngIf="config.type === 'select'"
+            [placeholder]="config.placeholder || ''"
+            [options]="getOptionsForField(config)"
+            [(ngModel)]="filters[config.key]"
+            (ngModelChange)="onFilterChange()"
+            [rightIcon]="config.icon ? 'true' : 'false'">
+            <i *ngIf="config.icon" slot="right-icon" [class]="config.icon"></i>
+          </app-select>
+
+          <!-- Input de fecha -->
+          <app-input 
+            *ngIf="config.type === 'date'"
+            [type]="'date'"
+            [(ngModel)]="filters[config.key]"
+            (change)="onFilterChange()"
+            [rightIcon]="config.icon ? 'true' : 'false'">
+            <i *ngIf="config.icon" slot="right-icon" [class]="config.icon"></i>
+          </app-input>
+
+        </div>
+      </ng-container>
+
+      <!-- Filtro combinado (como Tipo ID + Identificación) -->
+      <ng-container *ngIf="config.type === 'combined' && config.combinedFields">
+        <div class="filter-field-row">
+          <div 
+            *ngFor="let field of config.combinedFields"
+            [style]="'flex:1 1 ' + field.width + '; min-width:0; display:flex; flex-direction:column; gap:0.375rem;'">
+            
+            <label class="filter-label">{{ field.label }}</label>
+            
+            <!-- Input de texto en campo combinado -->
+            <app-input 
+              *ngIf="field.type === 'text'"
+              [placeholder]="field.placeholder || ''"
+              [type]="'text'"
+              [(ngModel)]="filters[field.key]"
+              (input)="onFilterChange()"
+              [rightIcon]="field.icon ? 'true' : 'false'">
+              <i *ngIf="field.icon" slot="right-icon" [class]="field.icon"></i>
+            </app-input>
+
+            <!-- Select en campo combinado -->
+            <app-select 
+              *ngIf="field.type === 'select'"
+              [placeholder]="field.placeholder || ''"
+              [options]="getOptionsForCombinedField(field)"
+              [(ngModel)]="filters[field.key]"
+              (ngModelChange)="onFilterChange()"
+              [rightIcon]="field.icon ? 'true' : 'false'">
+              <i *ngIf="field.icon" slot="right-icon" [class]="field.icon"></i>
+            </app-select>
+
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- Botón de limpiar filtros -->
+    <div class="filter-field filter-field-button">
+      <label class="filter-label visually-hidden" aria-hidden="true">Limpiar</label>
+      <div class="filter-field-row">
+        <app-button 
+          variant="outline" 
+          size="md" 
+          (click)="clearFilters()" 
+          title="Limpiar todos los filtros"
+          class="clear-filters-btn control-size">
+          <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
+          Limpiar
+        </app-button>
+      </div>
+    </div>
+
+  </div>
+</ui-filters-panel>

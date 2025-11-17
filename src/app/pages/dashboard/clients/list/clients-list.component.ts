@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ClientService, Client } from '../../../../services/client.service';
+import { CatalogService } from '../../../../services/catalog.service';
+import { FilterOption } from '../../../../shared/interfaces/filter-config.interface';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
 import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
@@ -63,27 +65,29 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   confirmType: 'warning' | 'danger' = 'warning';
   private confirmCallback: (() => void) | null = null;
   
-  // Filter options
-  typeOptions = [
-    { value: '', label: 'Todos los tipos' },
-    { value: 'RUC', label: 'RUC' },
-    { value: 'CEDULA', label: 'Cédula' },
-    { value: 'PASAPORTE', label: 'Pasaporte' }
+  // Filter options - cargadas dinámicamente
+  typeOptions: FilterOption[] = [
+    { value: '', label: 'Todos los tipos' }
   ];
   
-  statusOptions = [
+  statusOptions: FilterOption[] = [
     { value: '', label: 'Todos los estados' },
     { value: 'A', label: 'Activo' },
     { value: 'I', label: 'Inactivo' }
   ];
 
+  // Subscriptions
+  private subscriptions = new Subscription();
+
   constructor(
     private clientService: ClientService,
+    private catalogService: CatalogService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.loadCatalogs();
     this.loadClients();
     
     // Check if there's an alert to show from navigation state
@@ -92,6 +96,30 @@ export class ClientsListComponent implements OnInit, OnDestroy {
       const alertData = navigation.extras.state['alert'];
       this.showAlert(alertData.message, alertData.type, alertData.autoDismiss);
     }
+  }
+
+  private loadCatalogs(): void {
+    // Suscribirse a los catálogos dinámicos
+    this.subscriptions.add(
+      this.catalogService.identifications$.subscribe(options => {
+        this.typeOptions = options;
+        this.cdr.detectChanges();
+      })
+    );
+
+    // Cargar catálogos si no están cargados
+    this.catalogService.loadIdentificationsCatalog().subscribe({
+      error: (error) => {
+        console.error('Error loading identification types:', error);
+        // Fallback a opciones estáticas si falla la carga dinámica
+        this.typeOptions = [
+          { value: '', label: 'Todos los tipos' },
+          { value: 'RUC', label: 'RUC' },
+          { value: 'CEDULA', label: 'Cédula' },
+          { value: 'PASAPORTE', label: 'Pasaporte' }
+        ];
+      }
+    });
   }
 
   loadClients(page: number = 1): void {
@@ -205,7 +233,7 @@ export class ClientsListComponent implements OnInit, OnDestroy {
   Math = Math;
 
   ngOnDestroy(): void {
-    // Clean up any subscriptions if needed
+    this.subscriptions.unsubscribe();
   }
 
   // Client actions

@@ -1,0 +1,14 @@
+/* Dynamic Filters Component Styles */
+/* Los estilos principales se heredan del sistema UI existente */
+
+/* Responsividad para filtros combinados */
+@media (max-width: 768px) {
+  .filter-field-combined .filter-field-row > div {
+    flex: 1 1 100% !important;
+    margin-bottom: 0.75rem;
+  }
+  
+  .filter-field-combined .filter-field-row > div:last-child {
+    margin-bottom: 0;
+  }
+}

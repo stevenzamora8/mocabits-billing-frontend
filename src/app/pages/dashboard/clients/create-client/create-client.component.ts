@@ -2,9 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { map, catchError, takeUntil } from 'rxjs/operators';
 import { ClientService, Client } from '../../../../services/client.service';
+import { CatalogService } from '../../../../services/catalog.service';
+import { FilterOption } from '../../../../shared/interfaces/filter-config.interface';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
 import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
@@ -26,24 +28,18 @@ export class CreateClientComponent implements OnInit, OnDestroy {
   isEdit = false;
   pageTitle = 'Crear Cliente';
   private editingId: number | null = null;
-  // Options for selects
-  idTypeOptions = [
-    { value: 'RUC', label: 'RUC' },
-    { value: 'CEDULA', label: 'Cédula' },
-    { value: 'PASAPORTE', label: 'Pasaporte' }
-  ];
-
-  statusOptions = [
-    { value: 'A', label: 'Activo' },
-    { value: 'I', label: 'Inactivo' }
-  ];
+  private destroy$ = new Subject<void>();
+  
+  // Options for selects (will be loaded dynamically)
+  idTypeOptions: FilterOption[] = [];
+  statusOptions: FilterOption[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private clientService: ClientService
-    ,
+    private clientService: ClientService,
+    private catalogService: CatalogService,
     private cdr: ChangeDetectorRef
   ) {
     this.clientForm = this.fb.group({
@@ -86,6 +82,9 @@ export class CreateClientComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Load catalogs first
+    this.loadCatalogs();
+
     // Detect route param 'id' to switch between create and edit
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
@@ -102,14 +101,7 @@ export class CreateClientComponent implements OnInit, OnDestroy {
         // Enable identification and idType in case they were disabled previously
         this.clientForm.get('identification')?.enable({ emitEvent: false });
         this.clientForm.get('idType')?.enable({ emitEvent: false });
-        this.clientForm.reset({
-          name: '',
-          idType: 'RUC',
-          identification: '',
-          email: '',
-          phone: '',
-          status: 'A'
-        });
+        this.resetFormWithDefaults();
       }
     });
   }
@@ -269,7 +261,81 @@ export class CreateClientComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Load catalogs for form options
+   */
+  private loadCatalogs(): void {
+    // Load identification types
+    this.catalogService.loadIdentificationsCatalog()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (options) => {
+          // Remove "Todos los tipos" option and keep only the individual types
+          this.idTypeOptions = options.filter(option => option.value !== '');
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading identification types:', error);
+          // Fallback to static options
+          this.idTypeOptions = [
+            { value: 'RUC', label: 'RUC' },
+            { value: 'CEDULA', label: 'Cédula' },
+            { value: 'PASAPORTE', label: 'Pasaporte' }
+          ];
+        }
+      });
+
+    // Load status options
+    this.catalogService.loadStatusCatalog()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (options) => {
+          // Remove "Todos los estados" option and keep only the individual statuses
+          this.statusOptions = options.filter(option => option.value !== '');
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading status options:', error);
+          // Fallback to static options
+          this.statusOptions = [
+            { value: 'A', label: 'Activo' },
+            { value: 'I', label: 'Inactivo' }
+          ];
+        }
+      });
+  }
+
+  /**
+   * Reset form with default values
+   */
+  private resetFormWithDefaults(): void {
+    // Wait for catalogs to load before setting defaults
+    setTimeout(() => {
+      // idTypeOptions now uses catalog code as value (e.g. '04') and label '04 - RUC'
+      // Try to find RUC by matching the label, fallback to first option or 'RUC' if nothing
+      const rucOption = this.idTypeOptions.find(opt => /RUC/i.test(String(opt.label)));
+      const defaultIdType = this.idTypeOptions.length > 0 ?
+        (rucOption ? rucOption.value : this.idTypeOptions[0]?.value) : 'RUC';
+      
+      const defaultStatus = this.statusOptions.length > 0 ? 
+        this.statusOptions.find(opt => opt.value === 'A')?.value || this.statusOptions[0]?.value || 'A' : 
+        'A';
+
+      this.clientForm.reset({
+        name: '',
+        idType: defaultIdType,
+        identification: '',
+        email: '',
+        phone: '',
+        status: defaultStatus
+      });
+    }, 100);
+  }
+
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    
     if (this.navigationTimer) {
       clearTimeout(this.navigationTimer);
       this.navigationTimer = undefined;
