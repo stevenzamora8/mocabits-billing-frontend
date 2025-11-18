@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, takeUntil } from 'rxjs/operators';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ProductsService } from '../../../../services/products.service';
 import { environment } from '../../../../../environments/environment';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
@@ -28,6 +28,11 @@ export class ProductsCreateComponent implements OnInit {
   loadingEstablishments = false;
   productForm: FormGroup;
   isSaving = false;
+  isEditMode = false;
+  productId: number | null = null;
+  isLoading = false;
+  originalMainCode = '';
+  originalAuxiliaryCode = '';
 
   // Alert model (re-using project's UiAlert)
   alertVisible = false;
@@ -39,7 +44,8 @@ export class ProductsCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private productsService: ProductsService,
-      public router: Router
+    public router: Router,
+    private route: ActivatedRoute
   ) {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(255)]],
@@ -71,6 +77,12 @@ export class ProductsCreateComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((val: string) => {
           if (!val || String(val).trim().length === 0) return of({ exists: false });
+          
+          // In edit mode, don't validate if the value hasn't changed from original
+          if (this.isEditMode && String(val).trim() === this.originalMainCode.trim()) {
+            return of({ exists: false });
+          }
+          
           const token = localStorage.getItem('accessToken') || undefined;
           return this.productsService.checkMainCodeExists(String(val).trim(), token).pipe(
             catchError(() => of({ exists: false }))
@@ -97,6 +109,12 @@ export class ProductsCreateComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((val: string) => {
           if (!val || String(val).trim().length === 0) return of({ exists: false });
+          
+          // In edit mode, don't validate if the value hasn't changed from original
+          if (this.isEditMode && String(val).trim() === this.originalAuxiliaryCode.trim()) {
+            return of({ exists: false });
+          }
+          
           const token = localStorage.getItem('accessToken') || undefined;
           return this.productsService.checkAuxiliaryCodeExists(String(val).trim(), token).pipe(
             catchError(() => of({ exists: false }))
@@ -182,17 +200,43 @@ export class ProductsCreateComponent implements OnInit {
     };
 
     this.isSaving = true;
-    this.productsService.createProductApi(payload, token).subscribe({
-      next: () => {
-        this.isSaving = false;
-        this.router.navigate(['/dashboard', 'products'], { state: { alert: { message: 'Producto creado correctamente', type: 'success', autoDismiss: true } } });
-      },
-      error: (err) => {
-        console.error('Error creando producto', err);
-        this.setAlert('Error al crear producto', 'danger', true, 3000);
-        this.isSaving = false;
-      }
-    });
+    
+    if (this.isEditMode && this.productId) {
+      // Update existing product
+      this.productsService.updateProductApi(String(this.productId), payload, token).subscribe({
+        next: () => {
+            this.isSaving = false;
+            try {
+              // Persist alert in sessionStorage as a fallback in case the list component is reused
+              sessionStorage.setItem('productAlert', JSON.stringify({ message: 'Producto actualizado correctamente', type: 'success', autoDismiss: true }));
+            } catch (e) {
+              // ignore storage errors
+            }
+            this.router.navigate(['/dashboard', 'products'], { state: { alert: { message: 'Producto actualizado correctamente', type: 'success', autoDismiss: true } } });
+          },
+        error: (err: any) => {
+          console.error('Error actualizando producto', err);
+          this.setAlert('Error al actualizar producto', 'danger', true, 3000);
+          this.isSaving = false;
+        }
+      });
+    } else {
+      // Create new product
+      this.productsService.createProductApi(payload, token).subscribe({
+        next: () => {
+          this.isSaving = false;
+          try {
+            sessionStorage.setItem('productAlert', JSON.stringify({ message: 'Producto creado correctamente', type: 'success', autoDismiss: true }));
+          } catch (e) {}
+          this.router.navigate(['/dashboard', 'products'], { state: { alert: { message: 'Producto creado correctamente', type: 'success', autoDismiss: true } } });
+        },
+        error: (err: any) => {
+          console.error('Error creando producto', err);
+          this.setAlert('Error al crear producto', 'danger', true, 3000);
+          this.isSaving = false;
+        }
+      });
+    }
 
     // Attach establishment existence validator (establishmentId is nullable; validate only when present)
     const estabCtrl = this.productForm.get('establishmentId');
@@ -235,6 +279,15 @@ export class ProductsCreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if we're in edit mode
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.isEditMode = true;
+        this.productId = Number(params['id']);
+        this.loadProductForEdit();
+      }
+    });
+    
     this.loadTaxRates();
     this.loadEstablishments();
     // Ensure computed fields are initialized
@@ -331,6 +384,46 @@ export class ProductsCreateComponent implements OnInit {
       subtotal: 0,
       taxAmount: 0,
       total: 0
+    });
+  }
+
+  private loadProductForEdit(): void {
+    if (!this.productId) return;
+    
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      this.setAlert('No se encontró token de autenticación.', 'danger');
+      return;
+    }
+
+    this.isLoading = true;
+    this.productsService.getProductByIdApi(String(this.productId), token).subscribe({
+      next: (product: any) => {
+        // Store original codes for validation
+        this.originalMainCode = product.mainCode || '';
+        this.originalAuxiliaryCode = product.auxiliaryCode || '';
+        
+        // Populate form with product data
+        this.productForm.patchValue({
+          name: product.name || '',
+          mainCode: product.mainCode || '',
+          auxiliaryCode: product.auxiliaryCode || '',
+          establishmentId: product.establishmentId || null,
+          description: product.description || '',
+          unitPrice: Number(product.unitPrice) || 0,
+          quantity: Number(product.quantity) || 0,
+          taxRateId: product.taxRateId || null
+        });
+        
+        // Recalculate totals after loading data
+        this.calculateTotals();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading product:', err);
+        this.setAlert('Error al cargar el producto', 'danger');
+        this.isLoading = false;
+      }
     });
   }
 }

@@ -326,7 +326,8 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  justify-content: center;
+  /* Left align client action buttons as requested */
+  justify-content: flex-start;
   padding: 0.25rem;
   min-width: 180px;
   width: 180px;
@@ -338,6 +339,8 @@
   width: 180px;
   min-width: 180px;
   max-width: 180px;
+  /* Ensure left alignment of actions column (override general centering rules) */
+  text-align: left !important;
 }
 
 /* Base button styling is handled by ui-table component */

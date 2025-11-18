@@ -339,6 +339,13 @@
   line-height: 1.5;
 }
 
+/* Center the actions column */
+.products-container ui-table .ui-table__cell:last-child {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.5rem;
+}
+
 .products-container ui-table .ui-table__cell--head{
   padding: 1rem 0.75rem;
   font-weight: 700;
@@ -347,13 +354,60 @@
   color: #374151;
 }
 
-/* Action buttons - rely on base ui-table styles for sizing and positioning */
+/* Action buttons - ensure icons are square and properly centered */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+}
 
-/* Header band for table is provided by the shared UiTable component */
-/* Table visuals are provided by the shared UiTable component. Page-level
-   overrides removed to centralize design in the component. */
+.action-buttons app-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+}
 
-/* Base button styling is handled by ui-table component */
+.action-buttons app-button .app-button__icon-html {
+  width: 16px !important;
+  height: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.action-buttons app-button .app-button__icon-html i {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure the icon is perfectly centered inside the square button (fix baseline offsets from icon fonts) */
+.action-buttons app-button .app-button__icon-html,
+.action-buttons app-button .app-button__icon-html i {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
 
 /* Edit button styling */
 .action-buttons app-button.edit-btn {
@@ -541,10 +595,11 @@
 }
 
 .pagination-number.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  /* Use brand colors so paginator matches UI theme */
+  background: linear-gradient(135deg, var(--logo-primary-color, #3b82f6), var(--logo-secondary-color, #1d4ed8));
   color: white;
   border-color: var(--logo-primary-color);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* MODAL STYLES */

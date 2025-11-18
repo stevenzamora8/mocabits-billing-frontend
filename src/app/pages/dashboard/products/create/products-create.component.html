@@ -1,13 +1,13 @@
 <div class="products-container">
   <ng-template #introAction>
-      <a class="btn-secondary" [routerLink]="['/dashboard','products']" title="Volver a la lista de productos">
+      <a class="btn-secondary" [routerLink]="['/dashboard','products']" [title]="isEditMode ? 'Volver a la lista de productos' : 'Volver a la lista'">
           <span class="app-button__icon-html"><i class="fas fa-arrow-left"></i></span>
           Volver a la lista
       </a>
   </ng-template>
 
-  <ui-page-intro [title]="'Crear Producto'"
-      [description]="'Llena los datos básicos del producto. Los campos obligatorios están marcados.'"
+  <ui-page-intro [title]="isEditMode ? 'Editar Producto' : 'Crear Producto'"
+      [description]="isEditMode ? 'Modifica los datos del producto. Los campos obligatorios están marcados.' : 'Llena los datos básicos del producto. Los campos obligatorios están marcados.'"
       [iconClass]="'fas fa-boxes'" [actionTemplate]="introAction">
   </ui-page-intro>
 
@@ -17,7 +17,11 @@
                 [dismissible]="true" [autoDismiss]="alertAutoDismiss" [duration]="alertAutoDismissTime"
                 (closed)="alertVisible = false"></ui-alert>
 
-            <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+            <div *ngIf="isLoading" class="loading-container">
+                <p>Cargando producto...</p>
+            </div>
+
+            <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form" [class.disabled]="isLoading">
                 <div class="form-row">
                     <div class="form-group full-width">
                         <app-input formControlName="name" label="Nombre Producto" placeholder="Ej: Computadora Lenovo" required
@@ -107,17 +111,14 @@
                 </div>
 
                 <div class="form-actions">
-                    <app-button variant="ghost" type="button"
-                        (click)="router.navigate(['/dashboard','products'])">Cancelar</app-button>
-
                     <app-button variant="secondary" type="button" (click)="resetForm()">
                         <span class="app-button__icon-html"><i class="fas fa-broom"></i></span>
                         Limpiar
                     </app-button>
 
-                    <app-button variant="primary" type="submit" [loading]="isSaving" [disabled]="productForm.invalid || isSaving" iconPosition="left">
+                    <app-button variant="primary" type="submit" [loading]="isSaving" [showIconWhenLoading]="true" [disabled]="productForm.invalid || isSaving" iconPosition="left">
                         <span class="app-button__icon-html"><i class="fas fa-save"></i></span>
-                        {{ isSaving ? 'Guardando...' : 'Crear Producto' }}
+                        {{ isSaving ? (isEditMode ? 'Actualizando...' : 'Guardando...') : (isEditMode ? 'Actualizar Producto' : 'Crear Producto') }}
                     </app-button>
                 </div>
             </form>

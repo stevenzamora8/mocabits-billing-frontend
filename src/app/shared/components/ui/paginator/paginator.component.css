@@ -84,23 +84,25 @@ html body .pagination-container {
 }
 
 .pagination-number.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  /* Use brand colors from variables so paginator matches UI theme */
+  background: linear-gradient(135deg, var(--logo-primary-color, #3b82f6), var(--logo-secondary-color, #1d4ed8));
   color: white;
   border-color: var(--logo-primary-color);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Estilos para los botones activos de paginación */
 ::ng-deep .pagination-numbers app-button.active .app-button {
-  background: #3b82f6 !important;
+  /* Use brand primary color for the active app-button inside paginator */
+  background: var(--logo-primary-color, #3b82f6) !important;
   color: white !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+  border-color: var(--logo-primary-color, #3b82f6) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 ::ng-deep .pagination-numbers app-button.active .app-button:hover {
-  background: #2563eb !important;
-  border-color: #2563eb !important;
+  background: var(--logo-primary-color, #2563eb) !important;
+  border-color: var(--logo-primary-color, #2563eb) !important;
   transform: none !important;
 }
 
@@ -111,15 +113,15 @@ html body .pagination-container {
 
 /* Alternativa: aplicar estilos directamente al elemento app-button cuando tiene clase active */
 ::ng-deep app-button.active button {
-  background: #3b82f6 !important;
+  background: var(--logo-primary-color, #3b82f6) !important;
   color: white !important;
-  border: 2px solid #3b82f6 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+  border: 2px solid var(--logo-primary-color, #3b82f6) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 ::ng-deep app-button.active button:hover {
-  background: #2563eb !important;
-  border-color: #2563eb !important;
+  background: var(--logo-primary-color, #2563eb) !important;
+  border-color: var(--logo-primary-color, #2563eb) !important;
   transform: none !important;
 }
 
@@ -151,17 +153,17 @@ html body .pagination-container {
 ::ng-deep app-button .app-button.active,
 ::ng-deep app-button .app-button.app-button--outline.active,
 ::ng-deep .pagination-numbers app-button .app-button.active {
-  background: #3b82f6 !important;
+  background: var(--logo-primary-color, #3b82f6) !important;
   color: white !important;
-  border: 2px solid #3b82f6 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+  border: 2px solid var(--logo-primary-color, #3b82f6) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 ::ng-deep app-button .app-button.active:hover,
 ::ng-deep app-button .app-button.app-button--outline.active:hover,
 ::ng-deep .pagination-numbers app-button .app-button.active:hover {
-  background: #2563eb !important;
-  border-color: #2563eb !important;
+  background: var(--logo-primary-color, #2563eb) !important;
+  border-color: var(--logo-primary-color, #2563eb) !important;
 }
 
 ::ng-deep app-button .app-button.active .app-button__content,

@@ -32,7 +32,8 @@ export class ProductsListComponent implements OnInit, OnDestroy {
 
   // Pagination
   currentPage = 1;
-  itemsPerPage = 10;
+  // show a maximum of 5 records per page as requested
+  itemsPerPage = 5;
   totalPages = 1;
   totalElements = 0;
 
@@ -68,6 +69,21 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     if (navigation?.extras?.state?.['alert']) {
       const alertData = navigation.extras.state['alert'];
       this.showAlert(alertData.message, alertData.type, alertData.autoDismiss);
+    }
+    else {
+      // Fallback: check sessionStorage for alerts (useful when component is reused and navigation state is not preserved)
+      try {
+        const raw = sessionStorage.getItem('productAlert');
+        if (raw) {
+          const alertData = JSON.parse(raw);
+          if (alertData && alertData.message) {
+            this.showAlert(alertData.message, alertData.type || 'info', alertData.autoDismiss !== false);
+            sessionStorage.removeItem('productAlert');
+          }
+        }
+      } catch (e) {
+        // ignore parsing/storage errors
+      }
     }
     this.loadData();
   }

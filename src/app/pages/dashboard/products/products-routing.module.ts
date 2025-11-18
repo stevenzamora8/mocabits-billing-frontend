@@ -11,6 +11,11 @@ const routes: Routes = [
     path: 'create',
     loadComponent: () => import('./create/products-create.component').then(m => m.ProductsCreateComponent),
     title: 'Dashboard - Crear Producto'
+  },
+  {
+    path: ':id/edit',
+    loadComponent: () => import('./create/products-create.component').then(m => m.ProductsCreateComponent),
+    title: 'Dashboard - Editar Producto'
   }
 ];
 
