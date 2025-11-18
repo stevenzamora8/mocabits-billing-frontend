@@ -42,16 +42,16 @@ export class ProductsCreateComponent implements OnInit {
       public router: Router
   ) {
     this.productForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      mainCode: ['', [Validators.required]],
-  auxiliaryCode: ['', [Validators.required]],
-      establishmentId: [null, [Validators.required]],
-      description: ['', [Validators.required]],
-      unitPrice: [0, [Validators.required, Validators.min(0)]],
-      quantity: [1, [Validators.required, Validators.min(1)]],
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+      mainCode: ['', [Validators.required, Validators.maxLength(50)]],
+      auxiliaryCode: ['', [Validators.required, Validators.maxLength(50)]],
+      establishmentId: [null, []], // nullable; we'll validate existence when provided
+      description: ['', [Validators.required, Validators.maxLength(500)]],
+      unitPrice: [0, [Validators.required, Validators.min(0), this.decimalScaleValidator(2)]],
+      quantity: [0, [Validators.required, Validators.min(0)]],
       // discount removed: backend does not expect discount, compute totals from price/qty and taxRate
       // taxRateId refers to the catalog tax rate identifier (e.g. 1 for IVA 12%)
-      taxRateId: [null, [Validators.required]],
+      taxRateId: [null, [Validators.required, this.existsInTaxOptionsValidator.bind(this)]],
       // Computed fields (readonly)
       subtotal: [{ value: 0, disabled: true }],
       taxAmount: [{ value: 0, disabled: true }],
@@ -193,6 +193,45 @@ export class ProductsCreateComponent implements OnInit {
         this.isSaving = false;
       }
     });
+
+    // Attach establishment existence validator (establishmentId is nullable; validate only when present)
+    const estabCtrl = this.productForm.get('establishmentId');
+    if (estabCtrl) {
+      estabCtrl.setValidators([this.existsInEstablishmentOptionsValidator()]);
+      estabCtrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    }
+  }
+
+  // Validator: enforce decimal scale (number of decimal places)
+  decimalScaleValidator(maxScale: number) {
+    return (control: any) => {
+      const val = control.value;
+      if (val === null || val === undefined || val === '') return null;
+      const str = String(val);
+      const m = str.match(/^[+-]?\d+(?:\.(\d+))?$/);
+      if (!m) return { invalidNumber: true };
+      const frac = m[1] || '';
+      if (frac.length > maxScale) return { scaleExceeded: { maxScale } };
+      return null;
+    };
+  }
+
+  // Validator: taxRateId should exist in loaded taxOptions
+  existsInTaxOptionsValidator(control: any) {
+    const val = control.value;
+    if (val === null || val === undefined) return { required: true };
+    const found = (this.taxOptions || []).some((o: any) => o.value === val);
+    return found ? null : { notFound: true };
+  }
+
+  // Validator factory: establishment must exist in establishmentOptions if provided
+  existsInEstablishmentOptionsValidator() {
+    return (control: any) => {
+      const val = control.value;
+      if (val === null || val === undefined || val === '') return null; // nullable
+      const found = (this.establishmentOptions || []).some((o: any) => o.value === val);
+      return found ? null : { establishmentNotFound: true };
+    };
   }
 
   ngOnInit(): void {

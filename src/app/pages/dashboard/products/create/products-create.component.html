@@ -21,7 +21,7 @@
                 <div class="form-row">
                     <div class="form-group full-width">
                         <app-input formControlName="name" label="Nombre Producto" placeholder="Ej: Computadora Lenovo" required
-                            [errorMessage]="productForm.get('name')?.touched && productForm.get('name')?.hasError('required') ? 'Requerido' : null"
+                            [errorMessage]="productForm.get('name')?.touched ? (productForm.get('name')?.hasError('required') ? 'Requerido' : (productForm.get('name')?.hasError('maxlength') ? 'Máximo 255 caracteres' : null)) : null"
                             rightIcon="true">
                             <i slot="right-icon" class="fas fa-box"></i>
                         </app-input>
@@ -31,7 +31,7 @@
                 <div class="form-row">
                     <div class="form-group">
                                                 <app-input formControlName="mainCode" label="Código Principal" placeholder="Ej: PROD-001" required
-                                                        [errorMessage]="productForm.get('mainCode')?.touched && productForm.get('mainCode')?.hasError('required') ? 'Requerido' : (productForm.get('mainCode')?.hasError('mainCodeExists') ? 'El código principal ya existe' : null)"
+                                                        [errorMessage]="productForm.get('mainCode')?.touched ? (productForm.get('mainCode')?.hasError('required') ? 'Requerido' : (productForm.get('mainCode')?.hasError('maxlength') ? 'Máximo 50 caracteres' : (productForm.get('mainCode')?.hasError('mainCodeExists') ? 'El código principal ya existe' : null))) : null"
                                                         rightIcon="true">
                             <i slot="right-icon" class="fas fa-barcode"></i>
                         </app-input>
@@ -40,7 +40,7 @@
 
                     <div class="form-group">
                                                 <app-input formControlName="auxiliaryCode" label="Código Auxiliar" placeholder="Ej: 12345" required
-                                                        [errorMessage]="productForm.get('auxiliaryCode')?.touched && productForm.get('auxiliaryCode')?.hasError('required') ? 'Requerido' : (productForm.get('auxiliaryCode')?.hasError('auxiliaryCodeExists') ? 'El código auxiliar ya existe' : null)"
+                                                        [errorMessage]="productForm.get('auxiliaryCode')?.touched ? (productForm.get('auxiliaryCode')?.hasError('required') ? 'Requerido' : (productForm.get('auxiliaryCode')?.hasError('maxlength') ? 'Máximo 50 caracteres' : (productForm.get('auxiliaryCode')?.hasError('auxiliaryCodeExists') ? 'El código auxiliar ya existe' : null))) : null"
                                                         rightIcon="true">
                             <i slot="right-icon" class="fas fa-barcode"></i>
                         </app-input>
@@ -50,14 +50,14 @@
 
                 <div class="form-row">
                     <div class="form-group full-width">
-                                                <app-select formControlName="establishmentId" [options]="establishmentOptions" [loading]="loadingEstablishments" label="Establecimiento" placeholder="Seleccionar establecimiento" [required]="true"
-                                                    [errorMessage]="productForm.get('establishmentId')?.touched && productForm.get('establishmentId')?.hasError('required') ? 'Requerido' : null"></app-select>
+                                                <app-select formControlName="establishmentId" [options]="establishmentOptions" [loading]="loadingEstablishments" label="Establecimiento" placeholder="Seleccionar establecimiento"
+                                                    [errorMessage]="productForm.get('establishmentId')?.touched ? (productForm.get('establishmentId')?.hasError('establishmentNotFound') ? 'Establecimiento inválido' : null) : null"></app-select>
                     </div>
                 </div>
 
                 <div class="form-group">
                         <app-input type="textarea" formControlName="description" label="Descripción" required
-                        [errorMessage]="productForm.get('description')?.touched && productForm.get('description')?.hasError('required') ? 'Requerido' : null"
+                        [errorMessage]="productForm.get('description')?.touched ? (productForm.get('description')?.hasError('required') ? 'Requerido' : (productForm.get('description')?.hasError('maxlength') ? 'Máximo 500 caracteres' : null)) : null"
                         placeholder="Describe el producto o servicio..." rightIcon="true">
                         <i slot="right-icon" class="fas fa-align-left"></i>
                     </app-input>
@@ -66,7 +66,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <app-input formControlName="unitPrice" type="number" label="Precio Unitario" placeholder="0.00" required
-                            [errorMessage]="productForm.get('unitPrice')?.touched && productForm.get('unitPrice')?.hasError('required') ? 'Requerido' : (productForm.get('unitPrice')?.hasError('min') ? 'Debe ser >= 0' : null)"
+                            [errorMessage]="productForm.get('unitPrice')?.touched ? (productForm.get('unitPrice')?.hasError('required') ? 'Requerido' : (productForm.get('unitPrice')?.hasError('min') ? 'Debe ser >= 0' : (productForm.get('unitPrice')?.hasError('scaleExceeded') ? 'Máximo 2 decimales' : (productForm.get('unitPrice')?.hasError('invalidNumber') ? 'Número inválido' : null)))) : null"
                             leftIcon="true">
                             <span slot="left-icon">$</span>
                         </app-input>
@@ -74,7 +74,7 @@
 
                     <div class="form-group">
                         <app-input formControlName="quantity" type="number" label="Cantidad" placeholder="1" required
-                            [errorMessage]="productForm.get('quantity')?.touched && productForm.get('quantity')?.hasError('required') ? 'Requerido' : (productForm.get('quantity')?.hasError('min') ? 'Debe ser >= 1' : null)"
+                            [errorMessage]="productForm.get('quantity')?.touched ? (productForm.get('quantity')?.hasError('required') ? 'Requerido' : (productForm.get('quantity')?.hasError('min') ? 'Debe ser >= 0' : null)) : null"
                             rightIcon="true">
                             <i slot="right-icon" class="fas fa-hashtag"></i>
                         </app-input>
@@ -84,7 +84,7 @@
                 <div class="form-row">
                     <div class="form-group">
                                                 <app-select formControlName="taxRateId" [options]="taxOptions" [loading]="loadingTaxOptions" label="IVA" placeholder="Seleccionar tasa de IVA" [required]="true"
-                                                    [errorMessage]="productForm.get('taxRateId')?.touched && productForm.get('taxRateId')?.hasError('required') ? 'Requerido' : null"></app-select>
+                                                    [errorMessage]="productForm.get('taxRateId')?.touched ? (productForm.get('taxRateId')?.hasError('required') ? 'Requerido' : (productForm.get('taxRateId')?.hasError('notFound') ? 'Tasa de IVA inválida' : null)) : null"></app-select>
                     </div>
                 </div>
 

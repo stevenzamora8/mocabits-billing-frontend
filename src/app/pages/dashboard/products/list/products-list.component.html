@@ -18,7 +18,9 @@
 
   <div class="stats-grid">
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="products.length" variant="primary"></ui-stat-card>
-  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Valor Total" [value]="totalValue | money:'USD':'en-US'" variant="success"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-calculator&quot;&gt;&lt;/i&gt;'" title="Subtotal" [value]="grandSubtotal | money:'USD':'en-US'" variant="primary"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-percentage&quot;&gt;&lt;/i&gt;'" title="IVA" [value]="grandIva | money:'USD':'en-US'" variant="warning"></ui-stat-card>
+    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Total" [value]="grandTotal | money:'USD':'en-US'" variant="success"></ui-stat-card>
   </div>
 
   <ui-filters-panel>
@@ -74,17 +76,16 @@
 
       <ui-table
         [columns]="[
-          { field: 'mainCode', label: 'Código Principal', width: '130px' },
-          { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '110px' },
-          { field: 'name', label: 'Nombre', width: '220px' },
-          { field: 'description', label: 'Descripción', width: '360px' },
-          { field: 'unitPrice', label: 'Precio Unitario', width: '130px', align: 'right', pipe: 'money' },
-          { field: 'quantity', label: 'Cantidad', width: '90px', align: 'center' },
-          { field: 'subtotal', label: 'Subtotal', width: '130px', align: 'right', pipe: 'money' },
-          { field: 'taxRateRate', label: 'IVA (%)', width: '80px', align: 'center' },
-          { field: 'taxAmount', label: 'IVA', width: '120px', align: 'right', pipe: 'money' },
-          { field: 'total', label: 'Total', width: '130px', align: 'right', pipe: 'money' },
-          { field: 'status', label: 'Estado', width: '120px', align: 'center', nowrap: true }
+          { field: 'mainCode', label: 'Código Principal', width: '100px' },
+          { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '100px' },
+          { field: 'name', label: 'Nombre', width: '120px' },
+          { field: 'description', label: 'Descripción', width: '140px' },
+          { field: 'unitPrice', label: 'Precio Unitario', width: '100px', align: 'right', pipe: 'money' },
+          { field: 'quantity', label: 'Cantidad', width: '70px', align: 'center' },
+          { field: 'subtotal', label: 'Subtotal', width: '90px', align: 'right', pipe: 'money' },
+          { field: 'taxRateRate', label: 'IVA (%)', width: '60px', align: 'center' },
+          { field: 'taxAmount', label: 'IVA', width: '80px', align: 'right', pipe: 'money' },
+          { field: 'total', label: 'Total', width: '90px', align: 'right', pipe: 'money' }
         ]"
         [data]="filteredProducts"
         [loading]="isLoading"

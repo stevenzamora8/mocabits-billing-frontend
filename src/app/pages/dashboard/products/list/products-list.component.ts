@@ -52,6 +52,11 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
+  // Grand totals (may come from API response or be computed as fallback)
+  grandSubtotal: number = 0;
+  grandIva: number = 0;
+  grandTotal: number = 0;
+
   private currentFilters: any = {};
   private subscriptions = new Subscription();
 
@@ -94,7 +99,12 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     const params = { page, size: this.itemsPerPage, ...this.currentFilters, ...filters };
     this.productsService.getProductsApi(params, token).subscribe({
       next: (response: any) => {
-        const productsData = Array.isArray(response.content) ? response.content : [];
+        // Support responses where the payload is either at the root or under a `page` key
+        const page = response.page ?? response;
+        const productsData = Array.isArray(response.content)
+          ? response.content
+          : (Array.isArray(page.content) ? page.content : []);
+
         this.products = productsData.map((p: any) => {
           const unitPrice = Number(p.unitPrice) || 0;
           const quantity = Number(p.quantity) || 0;
@@ -105,12 +115,12 @@ export class ProductsListComponent implements OnInit, OnDestroy {
           // If backend returns a precise total field, prefer it; otherwise compute
           const computedTotal = +(subtotal + taxAmount);
 
-          return {
+          const product = {
             id: p.id,
             name: p.name || '',
-            mainCode: p.mainCode,
-            auxiliaryCode: p.auxiliaryCode,
-            description: p.description,
+            mainCode: p.mainCode || '',
+            auxiliaryCode: p.auxiliaryCode || '',
+            description: p.description || '',
             unitPrice,
             quantity,
             taxRateRate: taxRateValue,
@@ -121,11 +131,39 @@ export class ProductsListComponent implements OnInit, OnDestroy {
             total: p.total !== undefined && p.total !== null ? Number(p.total) : computedTotal,
             status: quantity > 0 ? 'Activo' : 'Inactivo'
           };
+          
+          return product;
         });
         this.filteredProducts = [...this.products];
-  this.totalPages = response.totalPages || 1;
-  // Use nullish coalescing to accept 0 from the server instead of falling back to previous data
-  this.totalElements = response.totalElements ?? 0;
+        // totalPages/totalElements may live on either the root response or inside page
+        this.totalPages = (page.totalPages ?? response.totalPages) || 1;
+        // Use nullish coalescing to accept 0 from the server instead of falling back to previous data
+        this.totalElements = (page.totalElements ?? response.totalElements) ?? 0;
+
+        // Grand totals: prefer root-level server-provided values, then page-level, otherwise compute
+        if (response.grandSubtotal !== undefined && response.grandSubtotal !== null) {
+          this.grandSubtotal = Number(response.grandSubtotal);
+        } else if (page.grandSubtotal !== undefined && page.grandSubtotal !== null) {
+          this.grandSubtotal = Number(page.grandSubtotal);
+        } else {
+          this.grandSubtotal = this.products.reduce((s, r) => s + (Number(r.subtotal) || 0), 0);
+        }
+
+        if (response.grandIva !== undefined && response.grandIva !== null) {
+          this.grandIva = Number(response.grandIva);
+        } else if (page.grandIva !== undefined && page.grandIva !== null) {
+          this.grandIva = Number(page.grandIva);
+        } else {
+          this.grandIva = this.products.reduce((s, r) => s + (Number(r.taxAmount) || 0), 0);
+        }
+
+        if (response.grandTotal !== undefined && response.grandTotal !== null) {
+          this.grandTotal = Number(response.grandTotal);
+        } else if (page.grandTotal !== undefined && page.grandTotal !== null) {
+          this.grandTotal = Number(page.grandTotal);
+        } else {
+          this.grandTotal = this.products.reduce((s, r) => s + (Number(r.total) || 0), 0);
+        }
         this.isLoading = false;
       },
       error: (err) => {
