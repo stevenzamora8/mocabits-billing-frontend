@@ -9,4 +9,7 @@ export const environment = {
   // Optional client credentials that can be used by the login form as defaults.
   clientId: '',
   clientSecret: ''
+  ,
+  // Default tax type name to query from catalogs (e.g. 'IVA')
+  catalogTaxTypeName: 'IVA'
 };

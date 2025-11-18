@@ -305,17 +305,7 @@
   border-left: 3px solid #0369a1;
 }
 
-/* Action buttons / icons sizing to match products */
-.clients-container ui-table .action-buttons app-button{
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
-
-.clients-container ui-table .action-buttons app-button .app-button__icon-html i,
-.clients-container ui-table .action-buttons app-button .app-button__icon-html svg{
-  font-size: 16px;
-}
+/* Action buttons - rely on base ui-table styles for sizing and positioning */
 
 /* Destacar columna Tipo ID */
 .clients-container ui-table .ui-table__cell[data-field="typeIdentification"] {
@@ -350,14 +340,7 @@
   max-width: 180px;
 }
 
-.action-buttons app-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
+/* Base button styling is handled by ui-table component */
 
 /* View button styling */
 .action-buttons app-button.view-btn {

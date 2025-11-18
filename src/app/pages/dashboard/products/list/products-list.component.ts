@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProductsService } from '../../../../services/products.service';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
@@ -12,11 +13,12 @@ import { UiFiltersPanelComponent } from '../../../../shared/components/ui/filter
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { UiStatCardComponent } from '../../../../shared/components/ui/stat-card/stat-card.component';
 import { UiEmptyStateComponent } from '../../../../shared/components/ui/empty-state/empty-state.component';
+import { UiAlertComponent, UiAlertType } from '../../../../shared/components/ui/alert/alert.component';
 
 @Component({
   selector: 'app-products-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiEmptyStateComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, RouterModule, InputComponent, ButtonComponent, UiTableComponent, UiPageIntroComponent, UiStatCardComponent, UiFiltersPanelComponent, UiEmptyStateComponent, MoneyPipe, UiAlertComponent],
   templateUrl: './products-list.component.html',
   styleUrls: ['./products-list.component.css']
 })
@@ -36,21 +38,45 @@ export class ProductsListComponent implements OnInit, OnDestroy {
 
   readonly Math = Math;
 
+  // Alert model
+  alertVisible = false;
+  alertMessage = '';
+  alertType: UiAlertType = 'info';
+  alertAutoDismiss = true;
+
   get totalValue(): number {
-    return this.products.reduce((total, p) => total + ((Number(p.unitPrice) || 0) * (Number(p.quantity) || 0)), 0);
+    // Sum the final total (including tax) when available, otherwise fallback to unitPrice*quantity
+    return this.products.reduce((total, p) => {
+      const rowTotal = Number(p.total) || ((Number(p.unitPrice) || 0) * (Number(p.quantity) || 0));
+      return total + rowTotal;
+    }, 0);
   }
 
   private currentFilters: any = {};
   private subscriptions = new Subscription();
 
-  constructor(private productsService: ProductsService) {}
+  constructor(private productsService: ProductsService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
+    // If navigated here with alert in the navigation state, show it
+    const navigation = this.router.getCurrentNavigation?.();
+    if (navigation?.extras?.state?.['alert']) {
+      const alertData = navigation.extras.state['alert'];
+      this.showAlert(alertData.message, alertData.type, alertData.autoDismiss);
+    }
     this.loadData();
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  private showAlert(message: string, type: UiAlertType = 'info', autoDismiss: boolean = true) {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.alertAutoDismiss = autoDismiss;
+    this.alertVisible = true;
+    this.cdr.detectChanges();
   }
 
   private loadData() {
@@ -69,17 +95,33 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     this.productsService.getProductsApi(params, token).subscribe({
       next: (response: any) => {
         const productsData = Array.isArray(response.content) ? response.content : [];
-        this.products = productsData.map((p: any) => ({
-          id: p.id,
-          name: p.name || '',
-          mainCode: p.mainCode,
-          auxiliaryCode: p.auxiliaryCode,
-          description: p.description,
-          unitPrice: Number(p.unitPrice) || 0,
-          quantity: Number(p.quantity) || 0,
-          discount: Number(p.discount) || 0,
-          vat: Number(p.vat) || 0
-        }));
+        this.products = productsData.map((p: any) => {
+          const unitPrice = Number(p.unitPrice) || 0;
+          const quantity = Number(p.quantity) || 0;
+          const subtotal = unitPrice * quantity;
+          // taxRate may come as object with 'rate' field (percentage)
+          const taxRateValue = p?.taxRate?.rate ? Number(p.taxRate.rate) : 0;
+          const taxAmount = +(subtotal * (taxRateValue / 100));
+          // If backend returns a precise total field, prefer it; otherwise compute
+          const computedTotal = +(subtotal + taxAmount);
+
+          return {
+            id: p.id,
+            name: p.name || '',
+            mainCode: p.mainCode,
+            auxiliaryCode: p.auxiliaryCode,
+            description: p.description,
+            unitPrice,
+            quantity,
+            taxRateRate: taxRateValue,
+            subtotal,
+            taxRate: p.taxRate || null,
+            taxAmount,
+            // prefer server-provided total if present
+            total: p.total !== undefined && p.total !== null ? Number(p.total) : computedTotal,
+            status: quantity > 0 ? 'Activo' : 'Inactivo'
+          };
+        });
         this.filteredProducts = [...this.products];
   this.totalPages = response.totalPages || 1;
   // Use nullish coalescing to accept 0 from the server instead of falling back to previous data

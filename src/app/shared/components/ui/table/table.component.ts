@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MoneyPipe } from '../../../pipes/money.pipe';
 
 export interface UiTableColumn {
   field: string;
@@ -8,6 +9,8 @@ export interface UiTableColumn {
   align?: 'left' | 'center' | 'right';
   /** Keep content on a single line and show ellipsis if too long */
   nowrap?: boolean;
+  /** Pipe to apply to the cell value */
+  pipe?: string;
 }
 
 @Component({
@@ -59,8 +62,19 @@ export class UiTableComponent {
     // Fallback formatting: convert objects/arrays to JSON, otherwise toString
     if (val == null) return '';
     if (col.field === 'status') return this.formatStatus(val);
-    // Format totals as USD currency when the column is named 'total' or field is 'total'
-    // table should not impose domain-specific formatting here; pages (components) should provide pre-formatted values when needed
+    
+    // Apply pipe if specified
+    if (col.pipe) {
+      switch (col.pipe) {
+        case 'money':
+          const moneyPipe = new MoneyPipe();
+          return moneyPipe.transform(val, 'USD', 'en-US');
+        default:
+          // Add other pipes here as needed
+          break;
+      }
+    }
+    
     if (typeof val === 'object') {
       try { return JSON.stringify(val); } catch { return String(val); }
     }

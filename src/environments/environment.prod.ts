@@ -5,4 +5,7 @@ export const environment = {
   ,
   clientId: '',
   clientSecret: ''
+  ,
+  // Default tax type name to query from catalogs (production)
+  catalogTaxTypeName: 'IVA'
 };

@@ -12,7 +12,10 @@ export interface Product {
   unitPrice: number;
   quantity: number;
   discount: number;
-  vat: number;
+  /** VAT percentage (optional, legacy). Use taxRateId for catalog reference. */
+  vat?: number;
+  /** Reference to catalog tax rate id (preferred) */
+  taxRateId?: number;
   totalWithoutTax: number;
 }
 
@@ -35,6 +38,62 @@ export class ProductsService {
     if (params.page !== undefined) queryParams.page = params.page;
     if (params.size !== undefined) queryParams.size = params.size;
     return this.http.get(url, { headers, params: queryParams });
+  }
+
+  /**
+   * Fetch available tax rates from catalogs service.
+   * The endpoint provided by the user is: /catalogs/tax-rates
+   * Token is optional (catalogs may be public). If provided, it will be added as Bearer header.
+   */
+  /**
+   * Fetch available tax rates from catalogs service.
+   * Supports optional filtering by taxTypeName (e.g. 'IVA').
+   */
+  getTaxRates(token?: string, taxTypeName?: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/catalogs/tax-rates`;
+    const headers: any = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const params: any = {};
+    if (taxTypeName) params.taxTypeName = taxTypeName;
+    return this.http.get(url, { headers, params });
+  }
+
+  /**
+   * Fetch company establishments for the current user/company.
+   * Endpoint: /billing/v1/companies/establishments
+   */
+  getEstablishments(token: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/billing/v1/companies/establishments`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
+  }
+
+  /**
+   * Check if a main code already exists. Returns { exists: boolean }
+   * Endpoint: GET /billing/v1/products/exists/main-code?mainCode=...
+   */
+  checkMainCodeExists(mainCode: string, token?: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/billing/v1/products/exists/main-code`;
+    const headers: any = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const params: any = {};
+    if (mainCode) params.mainCode = mainCode;
+    return this.http.get(url, { headers, params });
+  }
+
+  /**
+   * Check if an auxiliary code already exists. Returns { exists: boolean }
+   * Endpoint: GET /billing/v1/products/exists/auxiliary-code?auxiliaryCode=...
+   */
+  checkAuxiliaryCodeExists(auxiliaryCode: string, token?: string): Observable<any> {
+    const url = `${environment.apiBaseUrl}/billing/v1/products/exists/auxiliary-code`;
+    const headers: any = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const params: any = {};
+    if (auxiliaryCode) params.auxiliaryCode = auxiliaryCode;
+    return this.http.get(url, { headers, params });
   }
 
   createProductApi(productData: Product, token: string): Observable<any> {

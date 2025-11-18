@@ -117,11 +117,12 @@
       { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '110px' },
       { field: 'name', label: 'Nombre' },
       { field: 'description', label: 'Descripción' },
-      { field: 'unitPrice', label: 'Precio Unitario', width: '110px', align: 'right' },
+      { field: 'unitPrice', label: 'Precio Unitario', width: '130px', align: 'right', pipe: 'money' },
       { field: 'quantity', label: 'Cantidad', width: '90px', align: 'center' },
-      { field: 'discount', label: 'Descuento', width: '100px', align: 'right' },
+      { field: 'discount', label: 'Descuento', width: '120px', align: 'right', pipe: 'money' },
       { field: 'vat', label: 'IVA (%)', width: '80px', align: 'center' },
-      { field: 'status', label: 'Estado', width: '110px', align: 'center' }
+      { field: 'totalWithoutTax', label: 'Total', width: '130px', align: 'right', pipe: 'money' },
+      { field: 'status', label: 'Estado', width: '120px', align: 'center', nowrap: true }
     ]"
         [data]="paginatedProducts"
         [loading]="isLoading"

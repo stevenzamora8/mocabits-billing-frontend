@@ -347,30 +347,13 @@
   color: #374151;
 }
 
-/* Action buttons / icons sizing to match clients */
-.products-container ui-table .action-buttons app-button{
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
-
-.products-container ui-table .action-buttons app-button .app-button__icon-html i,
-.products-container ui-table .action-buttons app-button .app-button__icon-html svg{
-  font-size: 16px;
-}
+/* Action buttons - rely on base ui-table styles for sizing and positioning */
 
 /* Header band for table is provided by the shared UiTable component */
 /* Table visuals are provided by the shared UiTable component. Page-level
    overrides removed to centralize design in the component. */
 
-.action-buttons app-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
+/* Base button styling is handled by ui-table component */
 
 /* Edit button styling */
 .action-buttons app-button.edit-btn {

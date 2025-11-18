@@ -4,7 +4,7 @@
          [for]="id" 
          class="app-input-label"
          [class.app-input-label--required]="required">
-    {{ label }}
+    {{ label }}<span *ngIf="requiredBool" class="app-input-required">*</span>
   </label>
 
   <!-- Input container -->

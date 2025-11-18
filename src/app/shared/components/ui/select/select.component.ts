@@ -7,6 +7,8 @@ export interface SelectOption {
   label: string;
   disabled?: boolean;
   group?: string;
+  // optional numeric payload (e.g. tax rate percent)
+  rate?: number;
 }
 
 export type SelectSize = 'sm' | 'md' | 'lg';

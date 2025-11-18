@@ -20,7 +20,8 @@
             <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
                 <div class="form-row">
                     <div class="form-group full-width">
-                        <app-input formControlName="name" label="Nombre Producto" placeholder="Ej: Computadora Lenovo"
+                        <app-input formControlName="name" label="Nombre Producto" placeholder="Ej: Computadora Lenovo" required
+                            [errorMessage]="productForm.get('name')?.touched && productForm.get('name')?.hasError('required') ? 'Requerido' : null"
                             rightIcon="true">
                             <i slot="right-icon" class="fas fa-box"></i>
                         </app-input>
@@ -29,22 +30,34 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <app-input formControlName="mainCode" label="Código Principal" placeholder="Ej: PROD-001"
-                            rightIcon="true">
+                                                <app-input formControlName="mainCode" label="Código Principal" placeholder="Ej: PROD-001" required
+                                                        [errorMessage]="productForm.get('mainCode')?.touched && productForm.get('mainCode')?.hasError('required') ? 'Requerido' : (productForm.get('mainCode')?.hasError('mainCodeExists') ? 'El código principal ya existe' : null)"
+                                                        rightIcon="true">
                             <i slot="right-icon" class="fas fa-barcode"></i>
                         </app-input>
+                        
                     </div>
 
                     <div class="form-group">
-                        <app-input formControlName="auxiliaryCode" label="Código Auxiliar" placeholder="Ej: 12345"
-                            rightIcon="true">
+                                                <app-input formControlName="auxiliaryCode" label="Código Auxiliar" placeholder="Ej: 12345" required
+                                                        [errorMessage]="productForm.get('auxiliaryCode')?.touched && productForm.get('auxiliaryCode')?.hasError('required') ? 'Requerido' : (productForm.get('auxiliaryCode')?.hasError('auxiliaryCodeExists') ? 'El código auxiliar ya existe' : null)"
+                                                        rightIcon="true">
                             <i slot="right-icon" class="fas fa-barcode"></i>
                         </app-input>
+                        
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                                                <app-select formControlName="establishmentId" [options]="establishmentOptions" [loading]="loadingEstablishments" label="Establecimiento" placeholder="Seleccionar establecimiento" [required]="true"
+                                                    [errorMessage]="productForm.get('establishmentId')?.touched && productForm.get('establishmentId')?.hasError('required') ? 'Requerido' : null"></app-select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <app-input type="textarea" formControlName="description" label="Descripción"
+                        <app-input type="textarea" formControlName="description" label="Descripción" required
+                        [errorMessage]="productForm.get('description')?.touched && productForm.get('description')?.hasError('required') ? 'Requerido' : null"
                         placeholder="Describe el producto o servicio..." rightIcon="true">
                         <i slot="right-icon" class="fas fa-align-left"></i>
                     </app-input>
@@ -52,14 +65,16 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <app-input formControlName="unitPrice" type="number" label="Precio Unitario" placeholder="0.00"
+                        <app-input formControlName="unitPrice" type="number" label="Precio Unitario" placeholder="0.00" required
+                            [errorMessage]="productForm.get('unitPrice')?.touched && productForm.get('unitPrice')?.hasError('required') ? 'Requerido' : (productForm.get('unitPrice')?.hasError('min') ? 'Debe ser >= 0' : null)"
                             leftIcon="true">
                             <span slot="left-icon">$</span>
                         </app-input>
                     </div>
 
                     <div class="form-group">
-                        <app-input formControlName="quantity" type="number" label="Cantidad" placeholder="1"
+                        <app-input formControlName="quantity" type="number" label="Cantidad" placeholder="1" required
+                            [errorMessage]="productForm.get('quantity')?.touched && productForm.get('quantity')?.hasError('required') ? 'Requerido' : (productForm.get('quantity')?.hasError('min') ? 'Debe ser >= 1' : null)"
                             rightIcon="true">
                             <i slot="right-icon" class="fas fa-hashtag"></i>
                         </app-input>
@@ -68,22 +83,27 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <app-input formControlName="discount" type="number" label="Descuento" placeholder="0.00"
-                            leftIcon="true">
-                            <span slot="left-icon">$</span>
-                        </app-input>
-                    </div>
-
-                    <div class="form-group">
-                        <app-input formControlName="vat" type="number" label="IVA (%)" placeholder="12"></app-input>
+                                                <app-select formControlName="taxRateId" [options]="taxOptions" [loading]="loadingTaxOptions" label="IVA" placeholder="Seleccionar tasa de IVA" [required]="true"
+                                                    [errorMessage]="productForm.get('taxRateId')?.touched && productForm.get('taxRateId')?.hasError('required') ? 'Requerido' : null"></app-select>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <app-input formControlName="totalWithoutTax" type="number" label="Total sin Impuesto"
-                        placeholder="0.00" [readonly]="true" leftIcon="true">
-                        <span slot="left-icon">$</span>
-                    </app-input>
+                <div class="form-row">
+                    <div class="form-group">
+                        <app-input formControlName="subtotal" type="number" label="Subtotal" placeholder="0.00" [readonly]="true" leftIcon="true">
+                            <span slot="left-icon">$</span>
+                        </app-input>
+                    </div>
+                    <div class="form-group">
+                        <app-input formControlName="taxAmount" type="number" label="IVA (monto)" placeholder="0.00" [readonly]="true" leftIcon="true">
+                            <span slot="left-icon">$</span>
+                        </app-input>
+                    </div>
+                    <div class="form-group">
+                        <app-input formControlName="total" type="number" label="Total" placeholder="0.00" [readonly]="true" leftIcon="true">
+                            <span slot="left-icon">$</span>
+                        </app-input>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -95,7 +115,7 @@
                         Limpiar
                     </app-button>
 
-                    <app-button variant="primary" type="submit" [loading]="isSaving" iconPosition="left">
+                    <app-button variant="primary" type="submit" [loading]="isSaving" [disabled]="productForm.invalid || isSaving" iconPosition="left">
                         <span class="app-button__icon-html"><i class="fas fa-save"></i></span>
                         {{ isSaving ? 'Guardando...' : 'Crear Producto' }}
                     </app-button>

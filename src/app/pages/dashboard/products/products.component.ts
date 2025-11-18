@@ -134,7 +134,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           // Map taxRateId to a vat percentage when provided, fallback to p.vat
           vat: p.taxRateId ? this.mapTaxRate(p.taxRateId) : (Number(p.vat) || 0),
           // Derive status from quantity (simple rule: quantity > 0 => active)
-          status: (Number(p.quantity) || 0) > 0 ? 'A' : 'I',
+          status: (Number(p.quantity) || 0) > 0 ? 'Activo' : 'Inactivo',
           // Compute total without tax if not provided by API
           totalWithoutTax: (Number(p.unitPrice) || 0) * (Number(p.quantity) || 0) - (Number(p.discount) || 0)
         }));

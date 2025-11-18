@@ -13,6 +13,9 @@
     [actionTemplate]="introAction">
   </ui-page-intro>
 
+  <!-- Alert que puede venir por navegación (p.ej. después de crear producto) -->
+  <ui-alert *ngIf="alertVisible" [message]="alertMessage" [type]="alertType" [autoDismiss]="alertAutoDismiss" (closed)="alertVisible = false"></ui-alert>
+
   <div class="stats-grid">
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="products.length" variant="primary"></ui-stat-card>
   <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Valor Total" [value]="totalValue | money:'USD':'en-US'" variant="success"></ui-stat-card>
@@ -73,13 +76,15 @@
         [columns]="[
           { field: 'mainCode', label: 'Código Principal', width: '130px' },
           { field: 'auxiliaryCode', label: 'Código Auxiliar', width: '110px' },
-          { field: 'name', label: 'Nombre' },
-          { field: 'description', label: 'Descripción' },
-          { field: 'unitPrice', label: 'Precio Unitario', width: '110px', align: 'right' },
+          { field: 'name', label: 'Nombre', width: '220px' },
+          { field: 'description', label: 'Descripción', width: '360px' },
+          { field: 'unitPrice', label: 'Precio Unitario', width: '130px', align: 'right', pipe: 'money' },
           { field: 'quantity', label: 'Cantidad', width: '90px', align: 'center' },
-          { field: 'discount', label: 'Descuento', width: '100px', align: 'right' },
-          { field: 'vat', label: 'IVA (%)', width: '80px', align: 'center' },
-          { field: 'status', label: 'Estado', width: '110px', align: 'center' }
+          { field: 'subtotal', label: 'Subtotal', width: '130px', align: 'right', pipe: 'money' },
+          { field: 'taxRateRate', label: 'IVA (%)', width: '80px', align: 'center' },
+          { field: 'taxAmount', label: 'IVA', width: '120px', align: 'right', pipe: 'money' },
+          { field: 'total', label: 'Total', width: '130px', align: 'right', pipe: 'money' },
+          { field: 'status', label: 'Estado', width: '120px', align: 'center', nowrap: true }
         ]"
         [data]="filteredProducts"
         [loading]="isLoading"
