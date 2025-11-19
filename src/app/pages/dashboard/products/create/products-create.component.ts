@@ -144,8 +144,8 @@ export class ProductsCreateComponent implements OnInit {
   }
 
   calculateTotals() {
-    const unitPrice = Number(this.productForm.get('unitPrice')?.value) || 0;
-    const quantity = Number(this.productForm.get('quantity')?.value) || 0;
+    const unitPrice = this.parseNumber(this.productForm.get('unitPrice')?.value) || 0;
+    const quantity = this.parseNumber(this.productForm.get('quantity')?.value) || 0;
     const subtotal = unitPrice * quantity;
     // Determine tax rate percentage from selected taxRateId / taxOptions list or from loaded taxOptions
     let taxRatePercent = 0;
@@ -173,6 +173,21 @@ export class ProductsCreateComponent implements OnInit {
     this.productForm.get('subtotal')?.setValue(subtotal, { emitEvent: false });
     this.productForm.get('taxAmount')?.setValue(taxAmount, { emitEvent: false });
     this.productForm.get('total')?.setValue(total, { emitEvent: false });
+  }
+
+  // Parse numbers that may contain commas, thousand separators or other non-numeric chars
+  private parseNumber(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    // If already a number, return directly
+    if (typeof val === 'number') return val;
+    // Convert to string and remove common thousand separators and currency symbols
+    const str = String(val).trim();
+    // Replace comma as decimal separator with dot, remove any chars except digits, dot and minus
+    const cleaned = str.replace(/\s+/g, '')
+                       .replace(/,/g, '.')
+                       .replace(/[^0-9.\-]/g, '');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
   }
 
   onSubmit() {
@@ -263,7 +278,10 @@ export class ProductsCreateComponent implements OnInit {
   // Validator: taxRateId should exist in loaded taxOptions
   existsInTaxOptionsValidator(control: any) {
     const val = control.value;
+    // If empty, mark required (Angular will also flag required if configured)
     if (val === null || val === undefined) return { required: true };
+    // If tax options haven't loaded yet, defer validation to avoid false negatives
+    if (!this.taxOptions || this.taxOptions.length === 0) return null;
     const found = (this.taxOptions || []).some((o: any) => o.value === val);
     return found ? null : { notFound: true };
   }
@@ -330,6 +348,10 @@ export class ProductsCreateComponent implements OnInit {
             this.productForm.get('taxRateId')?.setValue(initialId);
           }
         }
+
+        // After tax options are loaded, make sure taxRateId control re-validates (useful when editing)
+        const taxCtrl = this.productForm.get('taxRateId');
+        if (taxCtrl) taxCtrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
         this.loadingTaxOptions = false;
       },
       error: (err) => {
@@ -412,11 +434,22 @@ export class ProductsCreateComponent implements OnInit {
           description: product.description || '',
           unitPrice: Number(product.unitPrice) || 0,
           quantity: Number(product.quantity) || 0,
-          taxRateId: product.taxRateId || null
+          taxRateId: product.taxRateId || product.taxRate?.id || null
         });
         
         // Recalculate totals after loading data
         this.calculateTotals();
+        // If the server returned a taxRate object, ensure it's present in taxOptions so calculateTotals can find the rate
+        if (product.taxRate && typeof product.taxRate.id !== 'undefined') {
+          const exists = this.taxOptions.some((o: any) => o.value === product.taxRate.id);
+          if (!exists) {
+            // insert at the top so it's immediately available
+            this.taxOptions.unshift({ value: product.taxRate.id, label: product.taxRate.name || `${product.taxRate.rate}%`, rate: Number(product.taxRate.rate) });
+          }
+        }
+        // Re-validate tax control in case tax options were loaded after product was patched
+        const taxCtrl = this.productForm.get('taxRateId');
+        if (taxCtrl) taxCtrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
         this.isLoading = false;
       },
       error: (err) => {

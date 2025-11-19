@@ -115,11 +115,22 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     const params = { page, size: this.itemsPerPage, ...this.currentFilters, ...filters };
     this.productsService.getProductsApi(params, token).subscribe({
       next: (response: any) => {
-        // Support responses where the payload is either at the root or under a `page` key
-        const page = response.page ?? response;
-        const productsData = Array.isArray(response.content)
-          ? response.content
-          : (Array.isArray(page.content) ? page.content : []);
+        // Normalize different server response shapes. Support:
+        // { data: [...], pagination: {...}, summary: {...} }
+        // { page: { content: [...], ... } }
+        // { content: [...] } (legacy)
+        const payload = response || {};
+
+        // items come from payload.data or payload.content or payload.page.content
+        const productsData = Array.isArray(payload.data)
+          ? payload.data
+          : Array.isArray(payload.content)
+            ? payload.content
+            : Array.isArray(payload.page?.content)
+              ? payload.page.content
+              : Array.isArray(payload)
+                ? payload
+                : [];
 
         this.products = productsData.map((p: any) => {
           const unitPrice = Number(p.unitPrice) || 0;
@@ -150,33 +161,51 @@ export class ProductsListComponent implements OnInit, OnDestroy {
           
           return product;
         });
-        this.filteredProducts = [...this.products];
-        // totalPages/totalElements may live on either the root response or inside page
-        this.totalPages = (page.totalPages ?? response.totalPages) || 1;
-        // Use nullish coalescing to accept 0 from the server instead of falling back to previous data
-        this.totalElements = (page.totalElements ?? response.totalElements) ?? 0;
+  this.filteredProducts = [...this.products];
 
-        // Grand totals: prefer root-level server-provided values, then page-level, otherwise compute
-        if (response.grandSubtotal !== undefined && response.grandSubtotal !== null) {
-          this.grandSubtotal = Number(response.grandSubtotal);
-        } else if (page.grandSubtotal !== undefined && page.grandSubtotal !== null) {
-          this.grandSubtotal = Number(page.grandSubtotal);
+  // Pagination may live under payload.pagination or payload.page
+  const pagination = payload.pagination ?? payload.page ?? {};
+  // server may use 0-based pages; UI uses 1-based currentPage
+  const serverPageNumber = pagination.currentPage ?? pagination.number ?? 0;
+  this.currentPage = (serverPageNumber ?? 0) + 1;
+  this.itemsPerPage = pagination.pageSize ?? pagination.size ?? this.itemsPerPage;
+
+  // totalElements should reflect the total number of products in the system (not just the current page)
+  // Prefer summary.total when available, then payload-total fields, then pagination totals, otherwise fall back to items length
+  const summary = payload.summary ?? payload.totals ?? {};
+  const totalElementsRaw = summary.total ?? payload.totalElements ?? payload.total ?? pagination.totalElements ?? pagination.total ?? productsData.length;
+  this.totalElements = Number(totalElementsRaw) || 0;
+
+  // Compute total pages from totalElements and itemsPerPage
+  this.totalPages = Math.max(1, Math.ceil(this.totalElements / this.itemsPerPage));
+
+  // Grand totals: prefer payload.summary, then root/page fields, otherwise compute
+        if (summary.grandSubtotal !== undefined && summary.grandSubtotal !== null) {
+          this.grandSubtotal = Number(summary.grandSubtotal);
+        } else if (payload.grandSubtotal !== undefined && payload.grandSubtotal !== null) {
+          this.grandSubtotal = Number(payload.grandSubtotal);
+        } else if (pagination.grandSubtotal !== undefined && pagination.grandSubtotal !== null) {
+          this.grandSubtotal = Number(pagination.grandSubtotal);
         } else {
           this.grandSubtotal = this.products.reduce((s, r) => s + (Number(r.subtotal) || 0), 0);
         }
 
-        if (response.grandIva !== undefined && response.grandIva !== null) {
-          this.grandIva = Number(response.grandIva);
-        } else if (page.grandIva !== undefined && page.grandIva !== null) {
-          this.grandIva = Number(page.grandIva);
+        if (summary.grandIva !== undefined && summary.grandIva !== null) {
+          this.grandIva = Number(summary.grandIva);
+        } else if (payload.grandIva !== undefined && payload.grandIva !== null) {
+          this.grandIva = Number(payload.grandIva);
+        } else if (pagination.grandIva !== undefined && pagination.grandIva !== null) {
+          this.grandIva = Number(pagination.grandIva);
         } else {
           this.grandIva = this.products.reduce((s, r) => s + (Number(r.taxAmount) || 0), 0);
         }
 
-        if (response.grandTotal !== undefined && response.grandTotal !== null) {
-          this.grandTotal = Number(response.grandTotal);
-        } else if (page.grandTotal !== undefined && page.grandTotal !== null) {
-          this.grandTotal = Number(page.grandTotal);
+        if (summary.grandTotal !== undefined && summary.grandTotal !== null) {
+          this.grandTotal = Number(summary.grandTotal);
+        } else if (payload.grandTotal !== undefined && payload.grandTotal !== null) {
+          this.grandTotal = Number(payload.grandTotal);
+        } else if (pagination.grandTotal !== undefined && pagination.grandTotal !== null) {
+          this.grandTotal = Number(pagination.grandTotal);
         } else {
           this.grandTotal = this.products.reduce((s, r) => s + (Number(r.total) || 0), 0);
         }

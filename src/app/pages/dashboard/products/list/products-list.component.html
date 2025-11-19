@@ -17,7 +17,7 @@
   <ui-alert *ngIf="alertVisible" [message]="alertMessage" [type]="alertType" [autoDismiss]="alertAutoDismiss" (closed)="alertVisible = false"></ui-alert>
 
   <div class="stats-grid">
-    <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="products.length" variant="primary"></ui-stat-card>
+  <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-boxes&quot;&gt;&lt;/i&gt;'" title="Total Productos" [value]="totalElements" variant="primary"></ui-stat-card>
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-calculator&quot;&gt;&lt;/i&gt;'" title="Subtotal" [value]="grandSubtotal | money:'USD':'en-US'" variant="primary"></ui-stat-card>
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-percentage&quot;&gt;&lt;/i&gt;'" title="IVA" [value]="grandIva | money:'USD':'en-US'" variant="warning"></ui-stat-card>
     <ui-stat-card [iconHtml]="'&lt;i class=&quot;fas fa-dollar-sign&quot;&gt;&lt;/i&gt;'" title="Total" [value]="grandTotal | money:'USD':'en-US'" variant="success"></ui-stat-card>
