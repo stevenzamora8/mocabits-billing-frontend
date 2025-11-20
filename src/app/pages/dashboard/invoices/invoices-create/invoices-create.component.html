@@ -34,6 +34,20 @@
         <div class="client-avatar">
           <div class="avatar-circle">{{ getSelectedClient()?.name?.charAt(0) || 'C' }}</div>
         </div>
+
+        <!-- DEBUG: show selected product and items state -->
+        <div class="debug-info" style="background:#fffbe6;border:1px dashed #ffd34d;padding:8px;margin-top:8px;">
+          <strong>DEBUG</strong>
+          <div>selectedProductId: {{ selectedProductId | json }}</div>
+          <div>products.length: {{ products.length }}</div>
+          <div>productOptions.length: {{ productOptions.length }}</div>
+          <div>itemsFormArray.length: {{ itemsFormArray.length }}</div>
+          <div *ngIf="itemsFormArray.length > 0">
+            <div *ngFor="let item of itemsFormArray.controls; let ii = index">
+              {{ ii }}: {{ item.get('productName')?.value }} ({{ item.get('productId')?.value }})
+            </div>
+          </div>
+        </div>
         <div class="client-info">
           <div class="client-name">{{ getSelectedClient()?.name }}</div>
           <div class="client-details">
@@ -377,24 +391,22 @@
                   <div class="product-code">{{ itemControl.get('productCode')?.value }}</div>
                 </td>
                 <td>
-                  <app-input
+                  <input
                     type="number"
                     formControlName="quantity"
                     min="1"
                     step="1"
-                    class="quantity-input">
-                  </app-input>
+                    class="quantity-input native-input" />
                 </td>
                 <td>{{ formatCurrency(itemControl.get('unitPrice')?.value || 0) }}</td>
                 <td>
-                  <app-input
+                  <input
                     type="number"
                     formControlName="discount"
                     min="0"
                     max="100"
                     step="0.1"
-                    class="discount-input">
-                  </app-input>
+                    class="discount-input native-input" />
                 </td>
                 <td>{{ itemControl.get('taxRate')?.value || 0 }}%</td>
                 <td class="total-cell">{{ formatCurrency(itemControl.get('total')?.value || 0) }}</td>

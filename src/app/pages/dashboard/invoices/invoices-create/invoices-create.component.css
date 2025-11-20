@@ -274,6 +274,28 @@
   width: 80px;
 }
 
+/* When using native inputs inside the products table force a compact look
+   and avoid inherited styles from app-input component */
+.native-input {
+  width: 80px;
+  padding: 0.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+  height: auto;
+  box-sizing: border-box;
+}
+
+/* Ensure any labels or feedback from the app-input component do not display
+   inside table cells where we use native inputs */
+.products-table .app-input-label,
+.products-table .app-input-error,
+.products-table .app-input-hint,
+.products-table .app-input-feedback {
+  display: none !important;
+}
+
 .total-cell {
   font-weight: 600;
   color: var(--logo-primary-color, #3b82f6);

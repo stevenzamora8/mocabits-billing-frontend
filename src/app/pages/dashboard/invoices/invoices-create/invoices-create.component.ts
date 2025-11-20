@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/ui/button/button.component';
 import { InputComponent } from '../../../../shared/components/ui/input/input.component';
-import { SelectComponent, SelectOption } from '../../../../shared/components/ui/select/select.component';
+import { SelectComponent } from '../../../../shared/components/ui/select/select.component';
 import { UiAlertComponent, UiAlertType } from '../../../../shared/components/ui/alert/alert.component';
 import { UiPageIntroComponent } from '../../../../shared/components/ui/page-intro/page-intro.component';
 import { UiFormSectionComponent } from '../../../../shared/components/ui/form-section/form-section.component';
@@ -19,7 +19,6 @@ import { ProductsService } from '../../../../services/products.service';
 interface CreateInvoiceRequest {
   clientId: number;
   issueDate: string;
-  // Invoices are always drafts without due date in simplified version
   dueDate?: null;
   status: 'draft';
   items: {
@@ -69,56 +68,39 @@ interface Product {
 })
 export class InvoicesCreateComponent implements OnInit, OnDestroy {
   invoiceForm!: FormGroup;
-  // bound id for explicitly adding selected product
   selectedProductId: any = null;
-  
-  // UI state
+
   clients: Client[] = [];
   products: Product[] = [];
   establishments: any[] = [];
   isLoading = false;
   isSaving = false;
-  
-  // Alert state
+
   alertVisible = false;
   alertMessage = '';
   alertType: UiAlertType = 'info';
   alertAutoDismiss = true;
 
-  // Inline quick-create client UI state
   quickCreateVisible = false;
   quickCreateLoading = false;
   quickCreateForm!: FormGroup;
-  
-  // Current totals
+
   subtotal = 0;
   totalDiscount = 0;
   totalTax = 0;
   grandTotal = 0;
-  
-  // Client options for select
+
   clientOptions: { value: any; label: string }[] = [];
   productOptions: { value: any; label: string }[] = [];
   establishmentOptions: { value: any; label: string }[] = [];
   clientTypeOptions: { value: any; label: string }[] = [];
 
-  // Filters state (mirrors origin components)
-  clientFilters: any = {
-    searchTerm: '',
-    identification: '',
-    selectedType: ''
-  };
+  clientFilters: any = { searchTerm: '', identification: '', selectedType: '' };
+  productFilters: any = { filterName: '', filterMainCode: '', filterAuxiliaryCode: '', establishmentId: '' };
 
-  productFilters: any = {
-    filterName: '',
-    filterMainCode: '',
-    filterAuxiliaryCode: '',
-    establishmentId: ''
-  };
-
-  // Unsubscribe subject
   private destroy$ = new Subject<void>();
- 
+
+  @ViewChild('clientSelectComp') clientSelectComp?: SelectComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -132,7 +114,9 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
   ) {}
 
   get itemsFormArray(): FormArray {
-    return this.invoiceForm.get('items') as FormArray;
+    const array = this.invoiceForm.get('items') as FormArray;
+    console.log('itemsFormArray getter called, length:', array?.length);
+    return array;
   }
 
   ngOnInit(): void {
@@ -141,8 +125,7 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     this.loadProducts();
     this.loadEstablishments();
     this.loadClientTypes();
-    
-    // Check for navigation alerts
+
     const navigation = this.router.getCurrentNavigation?.();
     if (navigation?.extras?.state?.['alert']) {
       const alertData = navigation.extras.state['alert'];
@@ -157,23 +140,23 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     const today = new Date().toISOString().split('T')[0];
-    
     this.invoiceForm = this.fb.group({
       clientId: ['', [Validators.required]],
       issueDate: [today, [Validators.required]],
       items: this.fb.array([], { validators: [this.itemsArrayValidator.bind(this)] })
     });
+
     this.quickCreateForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       identification: ['', [Validators.required]],
       email: ['', []],
       phone: ['', []]
     });
+
+    this.invoiceForm.valueChanges.subscribe(() => this.calculateTotals());
     
-    // Subscribe to form changes to recalculate totals
-    this.invoiceForm.valueChanges.subscribe(() => {
-      this.calculateTotals();
-    });
+    console.log('Form initialized, itemsFormArray:', this.itemsFormArray);
+    console.log('itemsFormArray length:', this.itemsFormArray.length);
   }
 
   toggleQuickCreate(): void {
@@ -187,23 +170,19 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     }
 
     this.quickCreateLoading = true;
-
     const payload = {
       name: this.quickCreateForm.get('name')?.value,
       identification: this.quickCreateForm.get('identification')?.value,
-      typeIdentification: '04', // default RUC, UI could be extended
+      typeIdentification: '04',
       email: this.quickCreateForm.get('email')?.value || '',
       phone: this.quickCreateForm.get('phone')?.value || ''
     } as any;
 
     this.clientService.createClient(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: (created) => {
-        // Insert into local arrays so select shows it immediately
         const newClient = created as any;
         this.clients.unshift(newClient);
         this.clientOptions.unshift({ value: newClient.id, label: `${newClient.name} (${newClient.identification})` });
-
-        // Auto-select the newly created client
         this.invoiceForm.patchValue({ clientId: newClient.id });
         this.quickCreateForm.reset();
         this.quickCreateVisible = false;
@@ -218,28 +197,16 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Validator for the items FormArray: requires at least one valid item and each item to be valid.
-   */
   private itemsArrayValidator(control: AbstractControl): ValidationErrors | null {
     const arr = control as FormArray;
-    if (!arr || arr.length === 0) {
-      return { itemsRequired: true };
-    }
-
-    // Ensure each item group is valid (quantity > 0 and unitPrice > 0)
+    if (!arr || arr.length === 0) return { itemsRequired: true };
     for (let i = 0; i < arr.length; i++) {
       const item = arr.at(i);
-      if (!item.valid) {
-        return { invalidItem: true };
-      }
+      if (!item.valid) return { invalidItem: true };
       const qty = item.get('quantity')?.value || 0;
       const unit = item.get('unitPrice')?.value || 0;
-      if (qty <= 0 || unit <= 0) {
-        return { invalidItemValues: true };
-      }
+      if (qty <= 0 || unit <= 0) return { invalidItemValues: true };
     }
-
     return null;
   }
 
@@ -255,11 +222,10 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     const token = this.authService.getAccessToken();
     if (!token) {
-      console.error('No token available');
       this.isLoading = false;
       return;
     }
-    // Use filters if present
+
     const filters = {
       name: this.clientFilters.searchTerm,
       identification: this.clientFilters.identification,
@@ -284,17 +250,10 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  searchClients(): void {
-    // Debounce could be added later; for now call loadClients which applies current filters
-    this.loadClients();
-  }
-
   onClientSearch(term: string): void {
-    // term can be name or identification; detect numeric identification
     this.clientFilters.searchTerm = term || '';
     if (term && /^\d+$/.test(term.trim())) {
       this.clientFilters.identification = term.trim();
-      // clear name to avoid sending both
       this.clientFilters.searchTerm = '';
     } else {
       this.clientFilters.identification = '';
@@ -304,15 +263,9 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
 
   loadProducts(): void {
     const token = this.authService.getAccessToken();
-    if (!token) {
-      console.error('No token available');
-      return;
-    }
-    // Pass filters from productFilters and selected establishment
-    const params: any = {
-      page: 0,
-      size: 100
-    };
+    if (!token) return;
+
+    const params: any = { page: 0, size: 100 };
     if (this.productFilters.filterName) params.name = this.productFilters.filterName;
     if (this.productFilters.filterMainCode) params.mainCode = this.productFilters.filterMainCode;
     if (this.productFilters.filterAuxiliaryCode) params.auxiliaryCode = this.productFilters.filterAuxiliaryCode;
@@ -320,19 +273,17 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
 
     this.productsService.getProductsApi(params, token).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response: any) => {
-        const productsData = Array.isArray(response.data) 
-          ? response.data
-          : Array.isArray(response.content)
-          ? response.content
-          : Array.isArray(response.page?.content)
-          ? response.page.content
-          : [];
-
+        console.log('Products API response:', response);
+        const productsData = Array.isArray(response.data) ? response.data : 
+                           Array.isArray(response.content) ? response.content : 
+                           Array.isArray(response.page?.content) ? response.page.content : [];
         this.products = productsData;
+        console.log('Loaded products:', this.products);
         this.productOptions = this.products.map(product => ({
           value: product.id,
           label: `${product.name} - ${product.mainCode || ''} - $${product.unitPrice}`
         }));
+        console.log('Product options:', this.productOptions);
       },
       error: (error: any) => {
         console.error('Error loading products:', error);
@@ -341,12 +292,7 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  searchProducts(): void {
-    this.loadProducts();
-  }
-
   onProductSearch(term: string): void {
-    // Use the same term to search by name or codes
     const t = term || '';
     this.productFilters.filterName = t;
     this.productFilters.filterMainCode = t;
@@ -357,11 +303,15 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
   loadEstablishments(): void {
     const token = this.authService.getAccessToken();
     if (!token) return;
+
     this.productsService.getEstablishments(token).pipe(takeUntil(this.destroy$)).subscribe({
       next: (resp: any) => {
         const data = Array.isArray(resp.data) ? resp.data : (resp.content || resp);
         this.establishments = data || [];
-        this.establishmentOptions = this.establishments.map((e: any) => ({ value: e.id, label: e.name || e.address || `Establecimiento ${e.id}`}));
+        this.establishmentOptions = this.establishments.map((e: any) => ({
+          value: e.id,
+          label: e.name || e.address || `Establecimiento ${e.id}`
+        }));
       },
       error: (err: any) => {
         console.warn('Error loading establishments:', err);
@@ -370,7 +320,6 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
   }
 
   loadClientTypes(): void {
-    // Small helper to populate client type select; can be replaced with catalog service call
     this.clientTypeOptions = [
       { value: '', label: 'Todos' },
       { value: '04', label: 'RUC' },
@@ -378,7 +327,6 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
       { value: '06', label: 'Pasaporte' }
     ];
   }
-
 
   createItemFormGroup(item?: Partial<InvoiceItem>): FormGroup {
     return this.fb.group({
@@ -396,24 +344,35 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  addProduct(productId?: string, quantity: number = 1): void {
-    if (!productId) return;
+  addProduct(productId?: any, quantity: number = 1): void {
+    console.log('addProduct called with:', { productId, quantity });
+    
+    if (!productId) {
+      console.warn('addProduct: No productId provided');
+      return;
+    }
+    
+  // Use loose equality to tolerate number/string id differences from select
+  const product = this.products.find(p => p.id == productId);
+    console.log('addProduct: Found product:', product);
+    
+    if (!product) {
+      console.warn('addProduct: Product not found');
+      return;
+    }
 
-    const product = this.products.find(p => p.id === productId);
-    if (!product) return;
-
-    // Check if product already exists in items
-    const existingIndex = this.itemsFormArray.controls.findIndex(
-      control => control.get('productId')?.value === productId
-    );
+    const existingIndex = this.itemsFormArray.controls.findIndex(control => 
+      control.get('productId')?.value == productId);
+    
+    console.log('addProduct: Existing index:', existingIndex);
+    console.log('addProduct: Current items count:', this.itemsFormArray.length);
 
     if (existingIndex >= 0) {
-      // Update existing item quantity
       const existingControl = this.itemsFormArray.at(existingIndex);
       const currentQuantity = existingControl.get('quantity')?.value || 0;
+      console.log('addProduct: Updating existing item quantity from', currentQuantity, 'to', currentQuantity + quantity);
       existingControl.patchValue({ quantity: currentQuantity + quantity });
     } else {
-      // Add new item
       const taxRate = product.taxRate?.rate || 0;
       const itemGroup = this.createItemFormGroup({
         productId: product.id,
@@ -424,60 +383,54 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
         discount: 0,
         taxRate: taxRate
       });
-      
+      console.log('addProduct: Adding new item to form array');
       this.itemsFormArray.push(itemGroup);
-      // ensure validators on array re-evaluate
       this.itemsFormArray.updateValueAndValidity();
+      console.log('addProduct: New items count:', this.itemsFormArray.length);
     }
     
     this.calculateTotals();
+    console.log('addProduct: Totals calculated, grandTotal:', this.grandTotal);
   }
 
-  /**
-   * Add the product currently selected in the product select control.
-   * This is used by the explicit "Añadir" button next to the product select.
-   */
   addSelectedProduct(): void {
+    console.log('addSelectedProduct called, selectedProductId:', this.selectedProductId);
+    
     if (!this.selectedProductId) {
-      this.showAlert('Por favor selecciona un producto primero', 'warning', true);
+      console.warn('No product selected');
       return;
     }
-
+    
     const product = this.products.find(p => p.id === this.selectedProductId);
+    console.log('Found product:', product);
+    
     if (!product) {
-      this.showAlert('Producto no encontrado', 'danger', true);
+      console.warn('Product not found in products array');
       return;
     }
 
     try {
+      console.log('Calling addProduct with:', this.selectedProductId.toString());
       this.addProduct(this.selectedProductId.toString(), 1);
-      // clear selection after adding
       this.selectedProductId = null;
       
-      // Close dropdown if possible
+      // Force change detection
+      this.cdr.detectChanges();
+      
+      // Close dropdown and focus input
       try {
         const productSelect = document.querySelector('#productSelect') as any;
         if (productSelect && typeof productSelect.closeDropdown === 'function') {
           productSelect.closeDropdown();
         }
-      } catch (e) {
-        // Ignore dropdown close errors
-      }
-      
-      // Show success feedback with product name
-      this.showAlert(`${product.name} añadido a la factura`, 'success', true);
-      
-      // Focus back on product search for better UX
+      } catch (e) {}
+
       setTimeout(() => {
         const productInput = document.querySelector('#productSelect input') as HTMLElement;
-        if (productInput) {
-          productInput.focus();
-        }
+        if (productInput) productInput.focus();
       }, 100);
-      
     } catch (e) {
-      console.warn('Error adding selected product', e);
-      this.showAlert('Error al añadir el producto', 'danger', true);
+      console.error('Error adding selected product', e);
     }
   }
 
@@ -489,41 +442,38 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
 
   private calculateTotals(): void {
     const items = this.itemsFormArray.controls;
-    
     this.subtotal = 0;
     this.totalDiscount = 0;
     this.totalTax = 0;
-    
+
     items.forEach(itemControl => {
       const quantity = itemControl.get('quantity')?.value || 0;
       const unitPrice = itemControl.get('unitPrice')?.value || 0;
       const discount = itemControl.get('discount')?.value || 0;
       const taxRate = itemControl.get('taxRate')?.value || 0;
-      
+
       const itemSubtotal = quantity * unitPrice;
       const discountAmount = itemSubtotal * (discount / 100);
       const subtotalWithDiscount = itemSubtotal - discountAmount;
       const taxAmount = subtotalWithDiscount * (taxRate / 100);
       const itemTotal = subtotalWithDiscount + taxAmount;
-      
-      // Update the form control calculated values
+
       itemControl.patchValue({
         subtotal: itemSubtotal,
         discountAmount: discountAmount,
         taxAmount: taxAmount,
         total: itemTotal
       }, { emitEvent: false });
-      
+
       this.subtotal += itemSubtotal;
       this.totalDiscount += discountAmount;
       this.totalTax += taxAmount;
     });
-    
+
     this.grandTotal = this.subtotal - this.totalDiscount + this.totalTax;
   }
 
   isFormValid(): boolean {
-    // invoiceForm.valid will include the items array validator
     return this.invoiceForm.valid && this.grandTotal > 0;
   }
 
@@ -546,7 +496,6 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     const invoiceData: CreateInvoiceRequest = {
       clientId: formValue.clientId,
       issueDate: formValue.issueDate,
-      // Always draft without due date in simplified version
       dueDate: null,
       status: 'draft',
       items: formValue.items.map((item: any) => ({
@@ -562,18 +511,13 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
       next: (response) => {
         console.log('Invoice created successfully:', response);
         this.isSaving = false;
-        
-        // Store alert in session storage for navigation
         try {
           sessionStorage.setItem('invoiceAlert', JSON.stringify({
             message: 'Factura creada exitosamente',
             type: 'success',
             autoDismiss: true
           }));
-        } catch (e) {
-          // Ignore storage errors
-        }
-        
+        } catch (e) {}
         this.navigateToList();
       },
       error: (error) => {
@@ -592,12 +536,8 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     this.router.navigate(['../list'], { relativeTo: this.route });
   }
 
-  // Utility methods
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
   }
 
   getSelectedClient(): Client | null {
@@ -605,20 +545,18 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     return this.clients.find(c => c.id == clientId) || null;
   }
 
-  // Helper methods for template
   onProductSelect(selection: any): void {
-    // Don't auto-add product on selection - user should use the "Añadir" button
-    // This gives users more control over when products are added
+    console.log('onProductSelect called with:', selection);
     if (selection && selection.value) {
-      // Just update the selection, don't auto-add
       this.selectedProductId = selection.value;
+      console.log('selectedProductId set to:', this.selectedProductId);
+    } else {
+      console.log('No valid selection provided');
     }
   }
 
   onEstablishmentChange(): void {
-    // Clear current product selection when establishment changes
     this.selectedProductId = null;
-    // Reload products with new establishment filter
     this.loadProducts();
   }
 
@@ -628,40 +566,32 @@ export class InvoicesCreateComponent implements OnInit, OnDestroy {
     this.loadProducts();
   }
 
-  @ViewChild('clientSelectComp') clientSelectComp?: SelectComponent;
-
   onClientSelect(selection: any): void {
     if (!selection) return;
     const val = Array.isArray(selection) ? (selection.length ? selection[0].value : '') : selection.value;
     if (val !== undefined) {
       this.invoiceForm.patchValue({ clientId: val });
-      // mark as touched so validation updates
       this.invoiceForm.get('clientId')?.markAsTouched();
     }
   }
 
   openClientSearch(): void {
-    // Open the select dropdown programmatically if available
     setTimeout(() => {
       try {
         this.clientSelectComp?.openDropdown();
-      } catch (e) {
-        // fallback: do nothing
-      }
+      } catch (e) {}
     }, 0);
   }
 
-  /**
-   * Navigate to the client creation screen so user can add a new client if not found
-   */
   navigateToCreateClient(): void {
     this.router.navigate(['/dashboard', 'clients', 'create']);
   }
 
   clearSelectedClient(): void {
     this.invoiceForm.patchValue({ clientId: '' });
-    // close dropdown if open
-    try { this.clientSelectComp?.closeDropdown(); } catch (e) {}
+    try {
+      this.clientSelectComp?.closeDropdown();
+    } catch (e) {}
   }
 
   onQuantityChange(index: number, quantity: number): void {
