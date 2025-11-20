@@ -1031,6 +1031,7 @@ ui-form-section .filter-field app-select .select-display {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 24px;
+  margin-top: 12px; /* add spacing above the product search as requested */
   align-items: end;
   margin-bottom: 16px;
 }
@@ -1289,8 +1290,39 @@ ui-form-section .filter-field app-select .select-display {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
-  align-items: end;
+  /* center-align so the action button sits inline with the select input */
+  align-items: center;
   margin-bottom: 20px;
+}
+
+/* Ensure the client 'Crear nuevo cliente' button is vertically aligned with the select
+   and shares the same height so they line up precisely */
+.client-search-grid app-select,
+.client-search-grid .create-client-btn {
+  height: 48px;
+}
+
+.create-client-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  box-sizing: border-box;
+}
+
+/* Make sure the visual button element inside the app-button fills the wrapper height */
+.create-client-btn.app-button,
+.create-client-btn .app-button {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Slightly reduce mobile height to fit smaller screens */
+@media (max-width: 480px) {
+  .client-search-grid app-select,
+  .client-search-grid .create-client-btn {
+    height: 40px;
+  }
 }
 
 .search-input-column {

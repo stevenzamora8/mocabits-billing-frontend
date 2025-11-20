@@ -233,9 +233,12 @@
   <form [formGroup]="invoiceForm" class="invoice-form">
     <!-- Products Section - Card with blue stripe -->
       <ui-form-section>
-        <div class="section-header">
-          <h3>Productos y Servicios</h3>
-        </div>
+          <div class="section-header">
+            <h3>
+              <i class="fas fa-box-open" style="margin-right: 8px; color: var(--logo-primary-color);"></i>
+              Productos y Servicios
+            </h3>
+          </div>
 
         <!-- Product Search Grid -->
         <div class="product-search-grid">
@@ -368,7 +371,10 @@
       <!-- Detalle de la factura: tabla de items y totales (se muestra al final) -->
       <ui-form-section *ngIf="itemsFormArray.length > 0">
         <div class="section-header">
-          <h3>Detalle de la factura</h3>
+          <h3>
+            <i class="fas fa-receipt" style="margin-right: 8px; color: var(--logo-primary-color);"></i>
+            Detalle de la factura
+          </h3>
         </div>
 
         <div class="products-table-container">
