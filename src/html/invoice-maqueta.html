@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maqueta de Factura</title>
+  <style>
+    :root{
+      --brand-primary: #0ea5e9; /* azul claro */
+      --brand-dark: #0369a1;
+      --muted: #64748b;
+      --card-bg: #ffffff;
+      --paper-bg: #f8fafc;
+      --radius: 8px;
+      --shadow: 0 6px 18px rgba(2,6,23,0.06);
+      --mono: 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    html,body{height:100%;margin:0;background:var(--paper-bg);font-family:var(--mono);color:#0f172a}
+    .invoice-wrap{max-width:900px;margin:32px auto;padding:24px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow)}
+    header.invoice-header{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid var(--brand-primary);padding-bottom:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:72px;height:72px;border-radius:8px;background:linear-gradient(135deg,var(--brand-primary),var(--brand-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:22px}
+    .company-info{line-height:1}
+    .company-name{font-size:1.05rem;font-weight:700}
+    .company-meta{font-size:0.9rem;color:var(--muted)}
+
+    .invoice-meta{text-align:right}
+    .invoice-meta .title{font-weight:700}
+    .invoice-meta .small{color:var(--muted);font-size:0.9rem}
+
+    .section{display:flex;gap:18px;margin:18px 0}
+    .client-box{flex:1;background:#fbfdff;padding:14px;border-radius:6px;border:1px solid #eef2f6}
+    .client-box h4{margin:0 0 8px 0}
+    .client-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .client-field{font-size:0.95rem}
+    .client-field .label{display:block;color:var(--muted);font-size:0.82rem}
+
+    .items{margin-top:12px}
+    table.items-table{width:100%;border-collapse:collapse;font-size:0.95rem}
+    table.items-table thead th{background:#f1f5f9;padding:10px;text-align:left;border-bottom:1px solid #e2e8f0;color:#0f172a}
+    table.items-table tbody td{padding:10px;border-bottom:1px solid #eef2f6}
+    table.items-table tfoot td{padding:10px;font-weight:700}
+
+    .text-right{text-align:right}
+    .mono{font-family:monospace}
+
+    .totals{max-width:320px;margin-left:auto;margin-top:12px}
+    .totals .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eef2f6}
+    .totals .row.total{font-size:1.08rem;font-weight:800}
+
+    footer{margin-top:18px;padding-top:12px;border-top:1px solid #eef2f6;color:var(--muted);font-size:0.9rem}
+
+    /* Print friendly */
+    @media print{
+      body{background:#fff}
+      .invoice-wrap{box-shadow:none;margin:0;border-radius:0}
+    }
+
+    /* Small screens */
+    @media (max-width:640px){
+      header.invoice-header{flex-direction:column;align-items:flex-start;gap:12px}
+      .section{flex-direction:column}
+      .client-grid{grid-template-columns:1fr}
+      .invoice-wrap{padding:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-wrap" role="document">
+    <header class="invoice-header">
+      <div class="brand">
+        <div class="logo">MC</div>
+        <div class="company-info">
+          <div class="company-name">Mocabits S.A.S.</div>
+          <div class="company-meta">NIT: 900.123.456-7 · Calle 100 #10-20 · Bogotá · mocabits@example.com · +57 300 000 0000</div>
+        </div>
+      </div>
+
+      <div class="invoice-meta">
+        <div class="title">FACTURA DE VENTA</div>
+        <div class="small">No. <span class="mono">{{FACTURA_NUM}}</span></div>
+        <div class="small">Fecha: <strong>{{FECHA_EMISION}}</strong></div>
+        <div class="small">Vencimiento: <strong>{{FECHA_VENCIMIENTO}}</strong></div>
+      </div>
+    </header>
+
+    <!-- Cliente y datos de factura -->
+    <section class="section" aria-label="Datos de la factura y cliente">
+      <div class="client-box" aria-labelledby="client-title">
+        <h4 id="client-title">Datos del Cliente</h4>
+        <div class="client-grid">
+          <div class="client-field">
+            <span class="label">Nombre</span>
+            <div>{{CLIENT_NOMBRE}}</div>
+          </div>
+          <div class="client-field">
+            <span class="label">Identificación</span>
+            <div class="mono">{{CLIENT_IDENT}}</div>
+          </div>
+
+          <div class="client-field">
+            <span class="label">Dirección</span>
+            <div>{{CLIENT_DIRECCION}}</div>
+          </div>
+          <div class="client-field">
+            <span class="label">Contacto</span>
+            <div>{{CLIENT_TELEFONO}} · {{CLIENT_EMAIL}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-width:220px;">
+        <div class="client-box">
+          <h4>Datos de entrega / establecimiento</h4>
+          <div class="client-field">
+            <span class="label">Establecimiento</span>
+            <div>{{ESTABLECIMIENTO_NOMBRE}}</div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="client-field">
+            <span class="label">Vendedor</span>
+            <div>{{VENDEDOR_NOMBRE}}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Items -->
+    <section class="items" aria-label="Items de la factura">
+      <table class="items-table" role="table">
+        <thead>
+          <tr>
+            <th>Producto / Servicio</th>
+            <th class="text-right">Cantidad</th>
+            <th class="text-right">Precio Unit.</th>
+            <th class="text-right">Desc (%)</th>
+            <th class="text-right">IVA (%)</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Repetir filas por cada item -->
+          <tr>
+            <td>
+              <div><strong>Nombre producto ejemplo</strong></div>
+              <div style="color:var(--muted);font-size:0.9rem">Código: P-001 · Unidad: und</div>
+            </td>
+            <td class="text-right">2</td>
+            <td class="text-right">$ 120.000</td>
+            <td class="text-right">0</td>
+            <td class="text-right">19</td>
+            <td class="text-right">$ 285.600</td>
+          </tr>
+
+          <!-- placeholder rows (reemplazar dinámicamente) -->
+          <tr>
+            <td>
+              <div><strong>Servicio de consultoría</strong></div>
+              <div style="color:var(--muted);font-size:0.9rem">Código: S-010 · Horas</div>
+            </td>
+            <td class="text-right">5</td>
+            <td class="text-right">$ 80.000</td>
+            <td class="text-right">10</td>
+            <td class="text-right">0</td>
+            <td class="text-right">$ 360.000</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="text-right">Subtotal</td>
+            <td class="text-right">$ 645.600</td>
+          </tr>
+          <tr>
+            <td colspan="5" class="text-right">Descuentos</td>
+            <td class="text-right">- $ 36.000</td>
+          </tr>
+          <tr>
+            <td colspan="5" class="text-right">IVA</td>
+            <td class="text-right">$ 117.??</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="totals" aria-hidden="false">
+        <div class="row"><span>Subtotal</span><span>$ 645.600</span></div>
+        <div class="row"><span>Descuentos</span><span>- $ 36.000</span></div>
+        <div class="row"><span>IVA</span><span>$ 117.000</span></div>
+        <div class="row total"><span>Total</span><span>$ 726.600</span></div>
+      </div>
+    </section>
+
+    <footer>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <strong>Notas</strong>
+          <p style="margin:6px 0 0 0;color:var(--muted)">Gracias por su preferencia. Pago dentro de 30 días. Para aclaraciones comunicar al correo de facturación.</p>
+        </div>
+
+        <div style="min-width:220px;text-align:right">
+          <div style="margin-bottom:24px;color:var(--muted)">Firma autorizada</div>
+          <div style="border-top:1px dashed #e2e8f0;padding-top:8px;color:var(--muted)">Nombre y cargo</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

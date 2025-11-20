@@ -1,142 +1,363 @@
 <!-- Invoices Create Component -->
 <div class="invoices-create-container">
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <div class="header-text">
-        <h1>Crear Nueva Factura</h1>
-        <p>Complete los detalles de la factura</p>
-      </div>
-      <div class="header-actions">
-        <app-button variant="outline" size="md" (click)="cancel()" [icon]="backIcon" iconPosition="left">Volver</app-button>
+  <!-- Page Header using shared ui-page-intro for consistent look with clients/products -->
+  <ng-template #introAction>
+    <app-button variant="outline" size="md" (click)="cancel()">
+      <span class="app-button__icon-html" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      Volver
+    </app-button>
+  </ng-template>
+
+  <ui-page-intro
+    [title]="'Crear Nueva Factura'"
+    [description]="'Complete los detalles de la factura'"
+    [iconClass]="'fas fa-file-invoice'"
+    [actionTemplate]="introAction">
+  </ui-page-intro>
+
+  <!-- Client Selection Section -->
+  <ui-form-section [extraClass]="'client-section'">
+    <div class="section-header">
+      <h3>
+        <i class="fas fa-user-circle" style="margin-right: 8px; color: var(--logo-primary-color);"></i>
+        Información del cliente
+      </h3>
+    </div>
+
+    <!-- Selected Client Display -->
+    <div *ngIf="getSelectedClient()" class="selected-client-display">
+      <div class="client-card">
+        <div class="client-avatar">
+          <div class="avatar-circle">{{ getSelectedClient()?.name?.charAt(0) || 'C' }}</div>
+        </div>
+        <div class="client-info">
+          <div class="client-name">{{ getSelectedClient()?.name }}</div>
+          <div class="client-details">
+            <span class="client-id">{{ getSelectedClient()?.identification }}</span>
+            <span class="client-contact" *ngIf="getSelectedClient()?.email || getSelectedClient()?.phone">
+              • 
+              <span *ngIf="getSelectedClient()?.email">{{ getSelectedClient()?.email }}</span>
+              <span *ngIf="getSelectedClient()?.email && getSelectedClient()?.phone"> • </span>
+              <span *ngIf="getSelectedClient()?.phone">{{ getSelectedClient()?.phone }}</span>
+            </span>
+          </div>
+        </div>
+        <div class="client-actions">
+          <app-button variant="ghost" size="sm" (click)="clearSelectedClient()" title="Cambiar cliente">
+            <span class="app-button__icon-html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 12H20M12 4L20 12L12 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            Cambiar
+          </app-button>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Client Search State -->
+    <div *ngIf="!getSelectedClient()" class="client-search-state">
+      <!-- Search Input Grid -->
+      <div class="client-search-grid">
+        <div class="search-input-column">
+          <label class="filter-label">Buscar cliente</label>
+          <app-select
+            #clientSelectComp
+            [options]="clientOptions"
+            [searchable]="true"
+            [loading]="isLoading"
+            placeholder="Buscar cliente por nombre o identificación..."
+            (search)="onClientSearch($event)"
+            (selectionChange)="onClientSelect($event)"
+            rightIcon="true">
+            <span slot="right-icon" aria-hidden="true" class="select-right-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </span>
+          </app-select>
+        </div>
+        
+        <!-- Quick Actions Column -->
+        <div class="search-actions-column">
+          <label class="filter-label visually-hidden">Acciones</label>
+          <app-button 
+            type="button" 
+            variant="outline"
+            size="md" 
+            (click)="toggleQuickCreate()"
+            class="create-client-btn">
+            <span class="app-button__icon-html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            {{ quickCreateVisible ? 'Cancelar creación' : 'Crear nuevo cliente' }}
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Quick Create Form -->
+      <div class="quick-create-container" *ngIf="quickCreateVisible">
+        <div class="quick-create-header">
+          <h4>
+            <span class="quick-create-icon" aria-hidden="true" style="display:inline-flex;align-items:center;margin-right:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            Crear nuevo cliente
+          </h4>
+          <p>Complete la información básica del cliente</p>
+        </div>
+        
+        <form [formGroup]="quickCreateForm" class="quick-create-form" (ngSubmit)="submitQuickCreate()">
+          <div class="quick-create-grid">
+            <!-- Primary Info Row -->
+            <div class="primary-info-row">
+              <div class="form-field">
+                <label>Nombre completo *</label>
+                <app-input 
+                  formControlName="name" 
+                  placeholder="Ej: Juan Pérez" 
+                  required>
+                </app-input>
+              </div>
+              
+              <div class="form-field">
+                <label>Identificación *</label>
+                <app-input 
+                  formControlName="identification" 
+                  placeholder="Ej: 1234567890" 
+                  required>
+                </app-input>
+              </div>
+            </div>
+            
+            <!-- Contact Info Row -->
+            <div class="contact-info-row">
+              <div class="form-field">
+                <label>Correo electrónico</label>
+                <app-input 
+                  formControlName="email" 
+                  type="email"
+                  placeholder="Ej: cliente@email.com">
+                </app-input>
+              </div>
+              
+              <div class="form-field">
+                <label>Teléfono</label>
+                <app-input 
+                  formControlName="phone" 
+                  placeholder="Ej: 0987654321">
+                </app-input>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions-inline">
+            <app-button 
+              type="button" 
+              variant="ghost" 
+              size="md" 
+              (click)="toggleQuickCreate()">
+              Cancelar
+            </app-button>
+            <app-button 
+              type="submit" 
+              variant="primary" 
+              size="md" 
+              [loading]="quickCreateLoading"
+              [disabled]="!quickCreateForm.valid">
+              <span class="app-button__icon-html">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              Crear y seleccionar
+            </app-button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Empty State Message -->
+      <div class="empty-client-state" *ngIf="!quickCreateVisible && clientOptions.length === 0 && !isLoading">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <h4>No se encontraron clientes</h4>
+        <p>Intente con otros términos de búsqueda o cree un nuevo cliente</p>
+      </div>
+    </div>
+
+    <!-- Validation Error (use shared ui-alert component for consistent look) -->
+    <ui-alert
+      *ngIf="!getSelectedClient() && invoiceForm?.get('clientId')?.invalid && invoiceForm?.get('clientId')?.touched"
+      [message]="'Debe seleccionar un cliente para continuar'"
+      [type]="'danger'"
+      [autoDismiss]="false"
+      [fixed]="false"
+      (closed)="invoiceForm.get('clientId')?.markAsUntouched()">
+    </ui-alert>
+
+    <!-- Hidden input for form binding -->
+    <input *ngIf="invoiceForm?.get('clientId')" type="hidden" [formControl]="$any(invoiceForm.get('clientId'))">
+  </ui-form-section>
+
+  <!-- Alert -->
+  <ui-alert *ngIf="alertVisible" [message]="alertMessage" [type]="alertType" [autoDismiss]="alertAutoDismiss" (closed)="alertVisible = false"></ui-alert>
 
   <!-- Invoice Form -->
-  <div class="invoice-form-container">
-    <form class="invoice-form">
-      <!-- Client Information -->
-      <div class="form-section">
-        <h3>Información del Cliente</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="clientSelect">Cliente *</label>
-            <select
-              id="clientSelect"
-              class="form-select"
-              [(ngModel)]="invoiceForm.clientId"
-              (change)="onClientChange()"
-              name="clientId"
-              required>
-              <option value="">Seleccionar cliente...</option>
-              <option *ngFor="let client of clients" [value]="client.id">
-                {{ client.name }} ({{ client.identification }})
-              </option>
-            </select>
-          </div>
+  <form [formGroup]="invoiceForm" class="invoice-form">
+    <!-- Products Section - Card with blue stripe -->
+      <ui-form-section>
+        <div class="section-header">
+          <h3>Productos y Servicios</h3>
         </div>
 
-        <div *ngIf="invoiceForm.client" class="client-info-card">
-          <div class="client-details">
-            <h4>{{ invoiceForm.client.name }}</h4>
-            <p><strong>ID:</strong> {{ invoiceForm.client.identification }}</p>
-            <p><strong>Email:</strong> {{ invoiceForm.client.email }}</p>
-            <p><strong>Teléfono:</strong> {{ invoiceForm.client.phone }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Invoice Details -->
-      <div class="form-section">
-        <h3>Detalles de la Factura</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="issueDate">Fecha de Emisión *</label>
-            <app-input
-              id="issueDate"
-              [type]="'date'"
-              class="form-input"
-              [(ngModel)]="invoiceForm.issueDate"
-              name="issueDate"
-              [required]="true"
-              leftIcon="calendar">
-              <svg slot="left-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 10h5v5H7z"/>
-                <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/>
-              </svg>
-            </app-input>
-          </div>
-          <div class="form-group">
-            <label for="dueDate">Fecha de Vencimiento *</label>
-            <app-input
-              id="dueDate"
-              [type]="'date'"
-              class="form-input"
-              [(ngModel)]="invoiceForm.dueDate"
-              name="dueDate"
-              [required]="true"
-              leftIcon="calendar">
-              <svg slot="left-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 10h5v5H7z"/>
-                <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/>
-              </svg>
-            </app-input>
-          </div>
-          <div class="form-group">
-            <label for="status">Estado</label>
-            <select
-              id="status"
-              class="form-select"
-              [(ngModel)]="invoiceForm.status"
-              name="status">
-              <option value="draft">Borrador</option>
-              <option value="sent">Enviada</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Products Section -->
-      <div class="form-section">
-        <h3>Productos y Servicios</h3>
-
-        <!-- Add Product Form -->
-        <div class="add-product-section">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="productSelect">Producto</label>
-              <select
+        <!-- Product Search Grid -->
+        <div class="product-search-grid">
+          <!-- Product Search Column -->
+          <div class="product-search-column">
+            <label class="filter-label">Buscar Producto</label>
+            <div class="product-search-row">
+              <app-select
+                #productSelect
                 id="productSelect"
-                class="form-select"
                 [(ngModel)]="selectedProductId"
-                name="selectedProductId">
-                <option value="">Seleccionar producto...</option>
-                <option *ngFor="let product of products" [value]="product.id">
-                  {{ product.name }} - {{ formatCurrency(product.unitPrice) }}
-                </option>
-              </select>
+                [ngModelOptions]="{standalone: true}"
+                [options]="productOptions"
+                [searchable]="true"
+                [loading]="isLoading"
+                placeholder="Buscar producto por nombre o código..."
+                (search)="onProductSearch($event)"
+                (selectionChange)="onProductSelect($event)"
+                rightIcon="true"
+                class="product-select">
+                <span slot="right-icon" aria-hidden="true" class="select-right-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 9.5l5 3 5-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </app-select>
+              
+              <app-button
+                type="button"
+                variant="primary"
+                size="md"
+                (click)="addSelectedProduct()"
+                [disabled]="!selectedProductId"
+                [title]="!selectedProductId ? 'Selecciona un producto para añadir' : 'Añadir producto seleccionado'"
+                class="add-product-btn">
+                <span class="app-button__icon-html" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                Añadir
+              </app-button>
             </div>
-            <div class="form-group">
-              <label for="quantity">Cantidad</label>
-              <input
-                id="quantity"
-                type="number"
-                class="form-input"
-                [(ngModel)]="itemQuantity"
-                name="itemQuantity"
-                min="1"
-                step="1">
-            </div>
-            <div class="form-group">
-              <label>&nbsp;</label>
-              <app-button type="button" variant="primary" size="md" (click)="addProduct()" [disabled]="!selectedProductId" [icon]="addIcon" iconPosition="left">Agregar</app-button>
+          </div>
+          
+          <!-- Establishment Filter Column -->
+          <div class="establishment-filter-column">
+            <label class="filter-label">Establecimiento</label>
+            <div class="establishment-filter-row">
+              <app-select
+                [options]="establishmentOptions"
+                placeholder="Seleccionar establecimiento"
+                [(ngModel)]="productFilters.establishmentId"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="onEstablishmentChange()"
+                rightIcon="true"
+                class="establishment-select">
+                <span slot="right-icon" aria-hidden="true" class="select-right-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9l1-4h16l1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 13h.01M17 13h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </app-select>
+              
+              <!-- Quick filter clear action -->
+              <app-button
+                *ngIf="productFilters.establishmentId"
+                type="button"
+                variant="ghost"
+                size="sm"
+                (click)="clearEstablishmentFilter()"
+                title="Limpiar filtro de establecimiento"
+                class="clear-filter-btn">
+                <span class="app-button__icon-html" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </app-button>
             </div>
           </div>
         </div>
 
-        <!-- Products Table -->
-        <div class="products-table-container" *ngIf="invoiceForm.items.length > 0">
+        <!-- Product search results info -->
+        <div class="search-results-info" *ngIf="productOptions.length > 0">
+          <span class="results-count">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            {{ productOptions.length }} producto{{ productOptions.length !== 1 ? 's' : '' }} disponible{{ productOptions.length !== 1 ? 's' : '' }}
+          </span>
+          <span class="filter-status" *ngIf="productFilters.establishmentId">
+            • Filtrado por establecimiento
+          </span>
+        </div>
+
+        <!-- (La tabla de items se muestra al final en la sección 'Detalle de la factura') -->
+
+        <!-- Empty Products State -->
+        <div *ngIf="itemsFormArray.length === 0" class="empty-products">
+          <div class="empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3h18l-1.68 9.39a2 2 0 0 1-1.98 1.61H8.75a2 2 0 0 1-1.98-1.61L5.21 3H3zM16 13v1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="20" r="1" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="15" cy="20" r="1" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h4>No hay productos agregados</h4>
+          <p>Seleccione un producto de la lista y haga clic en "Añadir" para comenzar a crear su factura.</p>
+          <div class="empty-actions" *ngIf="productOptions.length === 0 && !isLoading">
+            <app-button
+              variant="outline"
+              size="sm"
+              (click)="loadProducts()">
+              <span class="app-button__icon-html" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 4h22M1 4v16h22V4M1 4l2-3h18l2 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              Cargar productos
+            </app-button>
+          </div>
+        </div>
+  </ui-form-section>
+
+      <!-- Detalle de la factura: tabla de items y totales (se muestra al final) -->
+      <ui-form-section *ngIf="itemsFormArray.length > 0">
+        <div class="section-header">
+          <h3>Detalle de la factura</h3>
+        </div>
+
+        <div class="products-table-container">
           <table class="products-table">
             <thead>
               <tr>
@@ -150,88 +371,87 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of invoiceForm.items; let i = index" class="product-row">
+              <tr *ngFor="let itemControl of itemsFormArray.controls; let i = index" class="product-row" [formGroup]="$any(itemControl)">
                 <td class="product-info">
-                  <div class="product-name">{{ item.product.name }}</div>
-                  <div class="product-code">{{ item.product.mainCode }}</div>
+                  <div class="product-name">{{ itemControl.get('productName')?.value }}</div>
+                  <div class="product-code">{{ itemControl.get('productCode')?.value }}</div>
                 </td>
                 <td>
-                  <input
+                  <app-input
                     type="number"
-                    class="quantity-input"
-                    [value]="item.quantity"
-                    (input)="updateItemQuantity(item, $any($event.target).value)"
+                    formControlName="quantity"
                     min="1"
-                    step="1">
+                    step="1"
+                    class="quantity-input">
+                  </app-input>
                 </td>
-                <td>{{ formatCurrency(item.unitPrice) }}</td>
+                <td>{{ formatCurrency(itemControl.get('unitPrice')?.value || 0) }}</td>
                 <td>
-                  <input
+                  <app-input
                     type="number"
-                    class="discount-input"
-                    [value]="item.discount"
-                    (input)="updateItemDiscount(item, $any($event.target).value)"
+                    formControlName="discount"
                     min="0"
                     max="100"
-                    step="0.1">
+                    step="0.1"
+                    class="discount-input">
+                  </app-input>
                 </td>
-                <td>{{ item.vat }}%</td>
-                <td class="total-cell">{{ formatCurrency(item.total) }}</td>
+                <td>{{ itemControl.get('taxRate')?.value || 0 }}%</td>
+                <td class="total-cell">{{ formatCurrency(itemControl.get('total')?.value || 0) }}</td>
                 <td>
-                  <app-button type="button" variant="ghost" size="sm" (click)="removeItem(i)" ariaLabel="Eliminar item" class="delete-btn" [icon]="deleteIcon" iconPosition="left"></app-button>
+                  <app-button type="button" variant="ghost" size="sm" (click)="removeItem(i)" title="Eliminar item" class="delete-btn">
+                    <span class="app-button__icon-html">
+                      <i class="fas fa-trash"></i>
+                    </span>
+                  </app-button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Empty Products State -->
-        <div *ngIf="invoiceForm.items.length === 0" class="empty-products">
-          <svg width="48" height="48" fill="currentColor" viewBox="0 0 20 20" class="empty-icon">
-            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-          </svg>
-          <h4>No hay productos agregados</h4>
-          <p>Seleccione un producto de la lista para comenzar a agregar items a la factura.</p>
-        </div>
-      </div>
-
-      <!-- Totals Section -->
-      <div class="form-section" *ngIf="invoiceForm.items.length > 0">
-        <h3>Resumen de Totales</h3>
+        <!-- Resumen de totales dentro del detalle -->
         <div class="totals-section">
           <div class="total-row">
             <span>Subtotal:</span>
-            <span>{{ formatCurrency(invoiceForm.subtotal) }}</span>
+            <span>{{ formatCurrency(subtotal) }}</span>
           </div>
           <div class="total-row">
             <span>Descuentos:</span>
-            <span>-{{ formatCurrency(invoiceForm.totalDiscount) }}</span>
+            <span>-{{ formatCurrency(totalDiscount) }}</span>
           </div>
           <div class="total-row">
             <span>IVA:</span>
-            <span>{{ formatCurrency(invoiceForm.totalVat) }}</span>
+            <span>{{ formatCurrency(totalTax) }}</span>
           </div>
           <div class="total-row total">
             <span>Total:</span>
-            <span>{{ formatCurrency(invoiceForm.total) }}</span>
+            <span>{{ formatCurrency(grandTotal) }}</span>
           </div>
         </div>
-      </div>
+      </ui-form-section>
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="cancel()">Cancelar</button>
-        <button
+        <app-button type="button" variant="outline" size="md" (click)="cancel()">
+          Cancelar
+        </app-button>
+        <app-button
           type="button"
-          class="btn-primary"
+          variant="primary"
+          size="md"
           (click)="saveInvoice()"
-          [disabled]="!isFormValid()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Crear Factura
-        </button>
+          [disabled]="!isFormValid() || isSaving"
+          [showIconWhenLoading]="true"
+          [loading]="isSaving">
+            <span class="app-button__icon-html" aria-hidden="true">
+              <!-- Inline check icon inside brand-colored circle to match clients/products intro icon -->
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          {{ isSaving ? 'Creando...' : 'Crear Factura' }}
+        </app-button>
       </div>
     </form>
-  </div>
 </div>

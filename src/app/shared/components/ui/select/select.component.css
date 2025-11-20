@@ -136,6 +136,29 @@
   overflow: hidden;
 }
 
+/* Search box inside dropdown - match app-input look for consistency */
+.app-select-search {
+  padding: 0.75rem;
+  background: #ffffff;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.app-select-search-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #374151;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.app-select-search-input:focus {
+  border-color: var(--primary-500, #3b82f6);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.06);
+}
+
 .app-select-options {
   max-height: 200px;
   overflow-y: auto;

@@ -208,7 +208,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * Avoids using arrow functions inside template bindings (not supported by the Angular template parser).
    */
   isActive(path: string): boolean {
-    return this.navigationItems.some(i => i.path === path && i.active);
+    // First try to find an exact match
+    const exact = this.navigationItems.find(i => i.path === path);
+    if (exact) return exact.active;
+
+    // Fallback: treat the path as active if it is a child route of any active navigation item
+    // e.g. '/dashboard/invoices/create' should mark '/dashboard/invoices' as active
+    return this.navigationItems.some(i => i.active && path.startsWith(i.path));
   }
 
   toggleSidebar() {

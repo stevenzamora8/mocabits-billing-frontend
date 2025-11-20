@@ -1,0 +1,56 @@
+:host { 
+	display: block; 
+	margin-bottom: 1.5rem;
+}
+
+:host:first-child {
+	margin-top: 0;
+}
+
+:host:last-child {
+	margin-bottom: 0;
+}
+
+/* Card container with brand stripe on top — encapsulated so any usage of ui-form-section
+	 renders consistently without depending on page-level CSS. */
+.form-section-card {
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+	border: 1px solid #e2e8f0;
+	padding: 1.5rem;
+	position: relative;
+	overflow: hidden;
+}
+
+/* Allow overflow for dropdowns in client section */
+:host(.client-section) .form-section-card {
+	overflow: visible;
+}
+
+.form-section-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--logo-primary-color, #3b82f6), var(--logo-secondary-color, #1d4ed8));
+	border-radius: 16px 16px 0 0;
+}
+
+.form-section-card h3 {
+	margin: 0 0 1.5rem 0;
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #1f2937;
+}
+
+/* Ensure proper spacing for section headers */
+.form-section-card .section-header {
+	margin-bottom: 1.5rem;
+}
+
+.form-section-card .section-header h3 {
+	margin: 0;
+}

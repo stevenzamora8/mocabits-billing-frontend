@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Propuesta - Crear Factura (sin Vencimiento ni Estado visible)</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#fff;--border:#e5e7eb;--muted:#64748b;--accent1:#667eea;--accent2:#764ba2}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#0f172a}
+    .page{max-width:1100px;margin:28px auto;padding:20px}
+    .header{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);position:relative}
+    .header::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--accent1),var(--accent2));border-radius:12px 12px 0 0}
+    .title{font-size:1.4rem;font-weight:800}
+    .subtitle{color:var(--muted);font-size:0.95rem;margin-top:6px}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:18px;box-shadow:0 6px 20px rgba(16,24,40,0.04)}
+    .section{margin-bottom:18px}
+    .section h3{margin:0 0 12px 0;font-size:1rem;font-weight:700}
+
+    .filters{display:flex;gap:12px;align-items:flex-end}
+    .filter{display:flex;flex-direction:column;gap:8px}
+    .filter input,.filter select{padding:10px;border-radius:10px;border:1px solid var(--border)}
+    .filter-label{font-weight:700;color:#475569}
+
+    .client-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid var(--border);background:#fff}
+    .avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(90deg,var(--accent1),var(--accent2));font-weight:700}
+    .client-meta{display:flex;flex-direction:column}
+    .client-name{font-weight:700}
+    .client-id{color:var(--muted);font-size:0.9rem}
+    .client-actions{margin-left:auto;display:flex;gap:8px}
+    .btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;font-weight:700;cursor:pointer}
+    .btn.primary{background:var(--accent1);color:#fff;border:none}
+
+    .table{width:100%;border-collapse:collapse;margin-top:12px}
+    .table th,.table td{padding:10px;border-bottom:1px solid #f1f5f9;text-align:left}
+    .totals{max-width:360px;margin-left:auto;padding:12px;border-radius:10px;border:1px solid var(--border);background:#fff}
+    .actions{display:flex;gap:12px;justify-content:flex-end;margin-top:18px}
+
+    @media(max-width:900px){.filters{flex-direction:column;align-items:stretch}.client-actions{margin-left:0}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="title">Crear Nueva Factura</div>
+      <div class="subtitle">Flujo simplificado: sin vencimiento ni campo "Estado" visible (estado por defecto: Borrador)</div>
+    </div>
+
+    <div class="card">
+      <div class="section">
+        <h3>Buscar Cliente</h3>
+        <div class="filters">
+          <div class="filter" style="flex:1">
+            <label class="filter-label">Buscar Cliente</label>
+            <input type="text" placeholder="Buscar por nombre o identificación..." />
+            <div style="font-size:0.85rem;color:var(--muted)">Introduce nombre o identificación para buscar cliente.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="client-card">
+            <div class="avatar">B</div>
+            <div class="client-meta">
+              <div class="client-name">Bryan Zamora S.A.</div>
+              <div class="client-id">0993116815001</div>
+            </div>
+            <div class="client-actions">
+              <button class="btn">Cambiar</button>
+              <button class="btn">Quitar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Detalles (simplificados)</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <label class="filter-label">Fecha de emisión</label>
+            <input type="date" />
+          </div>
+
+          <!-- Se remueven: Fecha de vencimiento y Estado -->
+
+          <div style="flex:1;min-width:220px;display:flex;align-items:flex-end">
+            <div style="font-size:0.9rem;color:var(--muted)">Nota: el documento se guarda en estado <strong>Borrador</strong> por defecto. No se muestra campo "Estado" ni fecha de vencimiento.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Productos y Servicios</h3>
+        <div class="filters" style="margin-bottom:8px">
+          <div class="filter" style="width:240px">
+            <label class="filter-label">Establecimiento</label>
+            <select>
+              <option>Principal</option>
+              <option>Sucursal A</option>
+            </select>
+          </div>
+          <div class="filter" style="flex:1">
+            <label class="filter-label">Buscar producto (nombre o código)</label>
+            <input placeholder="Ej: PROD-001 o Nombre" />
+          </div>
+          <div style="width:120px;align-self:flex-end">
+            <button class="btn primary">Agregar</button>
+          </div>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Unit.</th>
+              <th>Descuento (%)</th>
+              <th>IVA (%)</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Licencia Software Pro</strong><div style="color:var(--muted);font-size:0.9rem">PROD-001</div></td>
+              <td><input style="width:80px;padding:6px;border-radius:6px;border:1px solid var(--border)" type="number" value="1" min="1" /></td>
+              <td>$120.00</td>
+              <td><input style="width:80px;padding:6px;border-radius:6px;border:1px solid var(--border)" type="number" value="0" min="0" max="100" /></td>
+              <td>12%</td>
+              <td>$134.40</td>
+              <td><button class="btn">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="flex:1"></div>
+        <div class="totals">
+          <div style="font-weight:700;margin-bottom:8px">Resumen de Totales</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Subtotal</span><span>$120.00</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Descuentos</span><span>-$0.00</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>IVA</span><span>$14.40</span></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;border-top:1px solid #eef2f7;padding-top:8px"><span>Total</span><span>$134.40</span></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn">Cancelar</button>
+        <button class="btn primary">Crear Factura (Borrador)</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

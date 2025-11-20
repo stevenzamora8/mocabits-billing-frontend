@@ -1,0 +1,143 @@
+<!-- Propuesta: Tarjeta compacta para 'Cliente seleccionado' en la página de crear factura
+     Copiar/pegar el bloque relevante dentro de `invoices-create.component.html`.
+     Este archivo contiene HTML de ejemplo + estilos mínimos para preview.
+-->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Propuesta - Cliente seleccionado (Factura)</title>
+  <style>
+    /* Estilos de ejemplo - trasladar a invoices-create.component.css si se aprueba */
+    .client-selected-card {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 12px;
+      padding: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      max-width: 880px;
+    }
+
+    .client-selected-row {
+      display:flex;
+      align-items:center;
+      gap: 1rem;
+    }
+
+    .avatar-circle {
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background: linear-gradient(135deg,var(--logo-primary-color,#667eea),var(--logo-secondary-color,#764ba2));
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size: 1rem;
+    }
+
+    .client-meta .client-name {
+      font-weight:700;
+      color:#1e293b;
+      font-size: 1rem;
+    }
+
+    .client-meta .client-id {
+      font-size:0.875rem;
+      color:#64748b;
+      margin-top: 0.125rem;
+    }
+
+    .client-meta .client-contact {
+      margin-top: 0.25rem;
+      font-size:0.85rem;
+      color:#6b7280;
+    }
+
+    .client-actions {
+      margin-left: auto;
+      display:flex;
+      gap:0.5rem;
+      align-items:center;
+    }
+
+    /* Botones de ejemplo (simular app-button) */
+    .btn {
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #374151;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.outline {
+      background: transparent;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+    }
+
+    .no-client-placeholder .placeholder-note {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+    }
+
+    .wrapper { padding: 32px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+    h2 { color: #1e293b; }
+
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h2>Información del Cliente — Propuesta de UI</h2>
+    <p>Ejemplo de cómo mostrar el cliente seleccionado con acciones claras (Cambiar / Quitar).</p>
+
+    <!-- Si hay cliente seleccionado -->
+    <section style="margin-top:18px;">
+      <label style="display:block; font-weight:700; color:#475569; margin-bottom:8px;">Cliente</label>
+
+      <div class="client-selected-card">
+        <div class="client-selected-row">
+          <div class="client-avatar" aria-hidden="true">
+            <div class="avatar-circle">B</div>
+          </div>
+
+          <div class="client-meta">
+            <div class="client-name">Bryan Zamora S.A.</div>
+            <div class="client-id">0993116815001</div>
+            <div class="client-contact">bryan@example.com · +593 9 1234 567</div>
+          </div>
+
+          <div class="client-actions">
+            <button class="btn outline" onclick="alert('Abrir búsqueda')">Cambiar</button>
+            <button class="btn ghost" title="Quitar cliente" onclick="alert('Quitar')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle"><path d="M3 6h18" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><path d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><path d="M14 11v6" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Si NO hay cliente seleccionado (placeholder) -->
+    <section style="margin-top:28px;">
+      <label style="display:block; font-weight:700; color:#475569; margin-bottom:8px;">Cliente</label>
+      <div class="no-client-placeholder">
+        <!-- Aquí se vería el app-select (searchable) en la implementación real -->
+        <div style="border:1px solid #e5e7eb; padding:12px; border-radius:12px; background:#fff; max-width:880px;">
+          <em>Seleccionar cliente o buscar por nombre/identificación...</em>
+          <div class="placeholder-note">Puedes escribir el nombre o la identificación y seleccionar la opción que aparezca.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
